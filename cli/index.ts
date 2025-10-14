@@ -4,6 +4,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { findAnchorProject } from "./project-finder";
 import { startDevServer } from "../server";
+import { getMessageFromError } from "./parse-error";
 
 const program = new Command();
 
@@ -29,7 +30,7 @@ const handleStartCommand = async (options: any) => {
 
     await startDevServer(anchorProject, options.port);
   } catch (error) {
-    console.error(chalk.red(`[PULSE] Error: `), error);
+    console.error(chalk.red(`[PULSE] Error: `), getMessageFromError(error));
     process.exit(1);
   }
 };

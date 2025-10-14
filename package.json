@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "tsx cli/index.ts",
     "build": "tsc",
+    "relink": "npm run build && sudo npm link",
     "test": "npm run dev start"
   },
   "keywords": [],
