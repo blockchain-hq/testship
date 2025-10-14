@@ -1,0 +1,55 @@
+import path from "path";
+import fs from "fs";
+import chalk from "chalk";
+import { AnchorProject } from "../shared/types";
+
+export const findAnchorProject = async (
+  cwd: string
+): Promise<AnchorProject> => {
+  // check if Anchor.toml exists
+  const anchorToml = path.join(cwd, "Anchor.toml");
+  if (!fs.existsSync(anchorToml)) {
+    throw new Error(
+      "No Anchor project found. Please run from Anchor project directory."
+    );
+  }
+
+  // check idl file for program name
+  const idlDirPath = path.join(cwd, "target/idl");
+  if (!fs.existsSync(idlDirPath)) {
+    throw new Error(
+      "No IDL directory found. \n\n" + chalk.yellow("Please run: anchor build")
+    );
+  }
+
+  // find all idl files
+  const idlFiles = fs
+    .readdirSync(idlDirPath)
+    .filter((f) => f.endsWith(".json"))
+    .sort();
+
+  if (idlFiles.length === 0) {
+    throw new Error(
+      "No IDL files found.\n\n" + chalk.yellow("Please run: anchor build")
+    );
+  }
+
+  // TODO: implement selector for multiple programs
+  const programName = idlFiles[0].replace(".json", "");
+  const idlPath = path.join(idlDirPath, idlFiles[0]);
+  const programPath = path.join(cwd, `target/deploy/${programName}.so`);
+
+  if (idlFiles.length > 1) {
+    console.log(chalk.yellow("Multiple IDL files found:"));
+    idlFiles.forEach((f) => console.log(chalk.yellow(`- ${f}\n`)));
+    console.log(chalk.blue(`Using ${programName}.json`));
+  }
+
+  return {
+    root: cwd,
+    programName,
+    idlPath,
+    programPath,
+    anchorToml,
+  };
+};
