@@ -1,23 +1,9 @@
-import { useEffect, useState } from "react";
-import { type Idl } from "@coral-xyz/anchor";
 import "./App.css";
+import InstructionForm from "./components/instruction-form";
+import UseIdl from "./hooks/use-idl";
 
 function App() {
-  const [idl, setIdl] = useState<Idl | null>(null);
-
-  const fetchIdl = async () => {
-    const response = await fetch("http://localhost:3000/api/idl");
-    const data = await response.json();
-    setIdl(data);
-  };
-
-  useEffect(() => {
-    console.log(idl);
-  }, [idl]);
-
-  useEffect(() => {
-    fetchIdl();
-  }, []);
+  const { idl } = UseIdl();
 
   return (
     <>
@@ -27,13 +13,13 @@ function App() {
             <h1>{idl.metadata.name}</h1>
             <p>{idl.metadata.description}</p>
 
-            <ul>
-              {idl.instructions.map((i) => (
-                <li>
-                  {i.name} - {i.args.map((a) => a.name)}
-                </li>
+            <div className="flex flex-col justify-center items-center gap-4">
+              {idl.instructions.map((instruction) => (
+                <div key={instruction.name}>
+                  <InstructionForm instruction={instruction} />
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ) : (
           <p>Loading...</p>

@@ -1,0 +1,36 @@
+import { useEffect, useState } from "react";
+import { type Idl } from "@coral-xyz/anchor";
+
+const UseIdl = () => {
+  const [idl, setIdl] = useState<Idl | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const fetchIdl = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://localhost:3000/api/idl");
+      const data = await response.json();
+
+      setIdl(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchIdl();
+  }, []);
+
+  return {
+    idl,
+    error,
+    loading,
+    fetchIdl,
+  };
+};
+
+export default UseIdl;
