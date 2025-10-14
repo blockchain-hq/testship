@@ -32,5 +32,8 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
   app.listen(port || 3000, () => {
     // TODO: implement automatic increment of port if current one is already in use
     console.log(chalk.green(`Dev server listening on port ${port || 3000}`));
+    console.log(
+      chalk.green(`Dev server live at: http://localhost:${port || 3000}`)
+    );
   });
 };

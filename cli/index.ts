@@ -21,16 +21,16 @@ program
 
 const handleStartCommand = async (options: any) => {
   try {
-    console.log(chalk.blue("[PULSE] Scanning for Anchor project..."));
+    console.log(chalk.blue("Scanning for Anchor project..."));
     const anchorProject = await findAnchorProject(process.cwd());
 
-    console.log(chalk.green("[PULSE] Found Anchor project"));
-    console.log(chalk.gray(`[PULSE] Program: ${anchorProject.programName}`));
-    console.log(chalk.gray(`[PULSE] IDL: ${anchorProject.idlPath}`));
+    console.log(chalk.green("Found Anchor project"));
+    console.log(chalk.gray(`Program: ${anchorProject.programName}`));
+    console.log(chalk.gray(`IDL: ${anchorProject.idlPath}`));
 
     await startDevServer(anchorProject, options.port);
   } catch (error) {
-    console.error(chalk.red(`[PULSE] Error: `), getMessageFromError(error));
+    console.error(chalk.red(`Error: `), getMessageFromError(error));
     process.exit(1);
   }
 };
