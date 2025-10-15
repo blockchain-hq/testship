@@ -150,7 +150,7 @@ const InstructionForm = (props: InstructionFormProps) => {
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="min-w-32 bg-accent-primary hover:bg-accent-primary/90 text-white disabled:opacity-50"
+              className="min-w-32 dark:text-white text-black bg-accent-primary hover:bg-accent-primary/90   disabled:opacity-50"
             >
               {isSubmitting ? 'Running...' : 'Run Instruction'}
             </Button>
