@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '../ui/button';
-import { WalletConnect } from '../WalletConnect';
+import React from "react";
+import { Button } from "../ui/button";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export const Header: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     // Toggle dark mode class on document
-    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle("dark");
   };
 
   return (
@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
               </span>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
@@ -45,8 +45,8 @@ export const Header: React.FC = () => {
                 </>
               )}
             </Button>
-            
-            <WalletConnect />
+
+            <WalletMultiButton />
           </div>
         </div>
       </div>
