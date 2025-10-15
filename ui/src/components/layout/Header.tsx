@@ -6,8 +6,7 @@ export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // Toggle dark mode class on document
+    setIsDarkMode(!isDarkMode); 
     document.documentElement.classList.toggle("dark");
   };
 
@@ -31,17 +30,15 @@ export const Header = () => {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="flex items-center space-x-2 border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary"
+              className="flex cursor-pointer items-center space-x-2 border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary"
             >
               {isDarkMode ? (
                 <>
-                  <span>☀️</span>
-                  <span className="hidden sm:inline">Light</span>
+                  <span>☀️</span> 
                 </>
               ) : (
                 <>
-                  <span>🌙</span>
-                  <span className="hidden sm:inline">Dark</span>
+                  <span>🌙</span> 
                 </>
               )}
             </Button>
