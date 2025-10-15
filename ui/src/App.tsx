@@ -11,24 +11,43 @@ import UseIdl from "./hooks/useIDL";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
 
+const getHasVisitedFromLocalStorage = () =>
+  localStorage.getItem("hasVisited") === "true";
+const setHasVisitedToLocalStorage = () =>
+  localStorage.setItem("hasVisited", "true");
+
 function App() {
   const { idl, isLoading } = UseIdl();
-  const [currentPage] = useState<'home' | 'instructions'>('home');
+  const [currentPage] = useState<"home" | "instructions">("home");
+  const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
+
+  const handleGetStarted = () => {
+    setHasVisited(true);
+    setHasVisitedToLocalStorage();
+  };
+
+  if (!hasVisited) {
+    return (
+      <div className="min-h-screen bg-background dark:bg-background-dark w-full">
+        <Header />
+        <div className="flex w-full">
+          <main className="flex-1 min-h-screen w-full lg:ml-0">
+            <Home onGetStarted={handleGetStarted} />
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark w-full">
       <Header />
-      
       <div className="flex w-full">
         <Sidebar />
-        
+
         <main className="flex-1 min-h-screen w-full lg:ml-0">
-          {currentPage === 'home' ? (
-            <Home />
-          ) : (
-            <InstructionView />
-          )}
-          
+          {/* {currentPage === "home" ? <Home /> : <InstructionView />} */}
+
           {isLoading ? (
             <div className="p-4 sm:p-6">
               <div className="space-y-4">
@@ -58,11 +77,14 @@ function App() {
                   </h2>
                   <div className="space-y-4">
                     {idl.instructions.map((instruction) => (
-                      <InstructionForm key={instruction.name} instruction={instruction} />
+                      <InstructionForm
+                        key={instruction.name}
+                        instruction={instruction}
+                      />
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
                     Output & Logs
@@ -88,7 +110,7 @@ function App() {
           )}
         </main>
       </div>
-      
+
       <Footer />
       <Toaster />
     </div>
