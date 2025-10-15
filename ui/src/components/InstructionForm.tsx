@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { type Idl } from "@coral-xyz/anchor";
 import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -14,8 +14,8 @@ interface InstructionFormProps {
 
 const InstructionForm = (props: InstructionFormProps) => {
   const { instruction } = props;
-  const [formData, setFormData] = React.useState<Record<string, any>>({});
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const deriveType = (type: IdlType): string => {
     if (typeof type === 'string') {
@@ -42,7 +42,7 @@ const InstructionForm = (props: InstructionFormProps) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     

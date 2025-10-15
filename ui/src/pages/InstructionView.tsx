@@ -1,6 +1,4 @@
-import React from 'react';
-
-export const InstructionView: React.FC = () => {
+export const InstructionView = () => {
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">

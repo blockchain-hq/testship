@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
 import { Button } from './ui/button';
@@ -20,8 +20,8 @@ interface TransactionResult {
   timestamp: Date;
 }
 
-export const LogsPanel: React.FC = () => {
-  const [logs, setLogs] = React.useState<LogEntry[]>([
+export const LogsPanel = () => {
+  const [logs, setLogs] = useState<LogEntry[]>([
     {
       id: '1',
       timestamp: new Date(),
@@ -42,7 +42,7 @@ export const LogsPanel: React.FC = () => {
     },
   ]);
 
-  const [transactions, setTransactions] = React.useState<TransactionResult[]>([]);
+  const [transactions, setTransactions] = useState<TransactionResult[]>([]);
 
   const getLogIcon = (type: LogEntry['type']) => {
     switch (type) {

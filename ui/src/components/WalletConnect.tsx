@@ -1,8 +1,8 @@
-import React from 'react';
+import { useState } from 'react';
 import { Button } from './ui/button';
 
-export const WalletConnect: React.FC = () => {
-  const [isConnected, setIsConnected] = React.useState(false);
+export const WalletConnect = () => {
+  const [isConnected, setIsConnected] = useState(false);
 
   const handleConnect = () => {
     setIsConnected(true);

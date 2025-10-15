@@ -1,9 +1,9 @@
-import React from "react";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
-export const Header: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+export const Header = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
