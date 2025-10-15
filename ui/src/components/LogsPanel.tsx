@@ -55,21 +55,21 @@ export const LogsPanel: React.FC = () => {
 
   const getLogColor = (type: LogEntry['type']) => {
     switch (type) {
-      case 'success': return 'text-green-400';
-      case 'error': return 'text-red-400';
-      case 'warning': return 'text-yellow-400';
-      default: return 'text-blue-400';
+      case 'success': return 'text-log-success';
+      case 'error': return 'text-log-error';
+      case 'warning': return 'text-log-warning';
+      default: return 'text-log-info';
     }
   };
 
   const getStatusBadge = (status: TransactionResult['status']) => {
     switch (status) {
       case 'success':
-        return <Badge variant="default" className="bg-green-500">Success</Badge>;
+        return <Badge variant="default" className="bg-log-success text-white">Success</Badge>;
       case 'error':
-        return <Badge variant="destructive">Error</Badge>;
+        return <Badge variant="destructive" className="bg-log-error text-white">Error</Badge>;
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="secondary" className="bg-log-warning text-white">Pending</Badge>;
     }
   };
 
@@ -106,18 +106,18 @@ export const LogsPanel: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Transaction Results */}
-      <Card>
+      <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium flex items-center space-x-2">
+            <CardTitle className="text-sm font-medium flex items-center space-x-2 text-foreground dark:text-foreground-dark">
               <span>📊</span>
               <span>Transaction Results</span>
             </CardTitle>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm" onClick={addMockTransaction}>
+              <Button variant="outline" size="sm" onClick={addMockTransaction} className="border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary text-foreground dark:text-foreground-dark">
                 Test Transaction
               </Button>
-              <Button variant="outline" size="sm" onClick={clearLogs}>
+              <Button variant="outline" size="sm" onClick={clearLogs} className="border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary text-foreground dark:text-foreground-dark">
                 Clear All
               </Button>
             </div>
@@ -128,10 +128,10 @@ export const LogsPanel: React.FC = () => {
             <ScrollArea className="h-32">
               <div className="space-y-2">
                 {transactions.map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                  <div key={tx.id} className="flex items-center justify-between p-2 bg-surface-secondary dark:bg-surface-dark-secondary rounded">
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(tx.status)}
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-foreground/60 dark:text-foreground-dark/60">
                         {tx.timestamp.toLocaleTimeString()}
                       </span>
                     </div>
@@ -139,7 +139,7 @@ export const LogsPanel: React.FC = () => {
                       <Button
                         variant="link"
                         size="sm"
-                        className="text-xs p-0 h-auto"
+                        className="text-xs p-0 h-auto text-accent-primary hover:text-accent-primary/80"
                         onClick={() => {
                           // Mock explorer link
                           console.log('Opening explorer for:', tx.signature);
@@ -153,7 +153,7 @@ export const LogsPanel: React.FC = () => {
               </div>
             </ScrollArea>
           ) : (
-            <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+            <div className="text-sm text-foreground/50 dark:text-foreground-dark/50 text-center py-4">
               No transactions yet
             </div>
           )}
@@ -161,9 +161,9 @@ export const LogsPanel: React.FC = () => {
       </Card>
 
       {/* Console Logs */}
-      <Card>
+      <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center space-x-2">
+          <CardTitle className="text-sm font-medium flex items-center space-x-2 text-foreground dark:text-foreground-dark">
             <span>🖥️</span>
             <span>Console Logs</span>
           </CardTitle>
@@ -173,7 +173,7 @@ export const LogsPanel: React.FC = () => {
             <div className="space-y-1 font-mono text-sm">
               {logs.map((log) => (
                 <div key={log.id} className="flex items-start space-x-2">
-                  <span className="text-gray-500 dark:text-gray-400 text-xs">
+                  <span className="text-foreground/40 dark:text-foreground-dark/40 text-xs">
                     {log.timestamp.toLocaleTimeString()}
                   </span>
                   <span className="flex-shrink-0">

@@ -16,7 +16,7 @@ function App() {
   const [currentPage] = useState<'home' | 'instructions'>('home');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
+    <div className="min-h-screen bg-background dark:bg-background-dark w-full">
       <Header />
       
       <div className="flex w-full">
@@ -43,17 +43,17 @@ function App() {
           ) : idl ? (
             <div className="p-4 sm:p-6">
               <div className="mb-4 sm:mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-foreground-dark mb-2">
                   {idl.metadata.name}
                 </h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                <p className="text-sm sm:text-base text-foreground/70 dark:text-foreground-dark/70">
                   {idl.metadata.description}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-4">
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
                     Instructions ({idl.instructions.length})
                   </h2>
                   <div className="space-y-4">
@@ -64,7 +64,7 @@ function App() {
                 </div>
                 
                 <div className="space-y-4">
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
                     Output & Logs
                   </h2>
                   <LogsPanel />
@@ -74,13 +74,13 @@ function App() {
           ) : (
             <div className="p-4 sm:p-6">
               <div className="text-center py-8 sm:py-12">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground dark:text-foreground-dark mb-2">
                   No IDL Loaded
                 </h2>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm sm:text-base text-foreground/70 dark:text-foreground-dark/70 mb-4">
                   Load an Anchor program IDL to start testing instructions
                 </p>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base">
+                <button className="px-4 py-2 bg-accent-primary text-white rounded hover:bg-accent-primary/90 text-sm sm:text-base transition-colors">
                   Load IDL File
                 </button>
               </div>

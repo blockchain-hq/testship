@@ -12,15 +12,15 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full">
+    <header className="bg-surface dark:bg-surface-dark shadow-sm border-b border-border dark:border-border-dark w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                PULSE <span className="text-yellow-500">⚡</span>
+              <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">
+                PULSE <span className="text-accent-primary">⚡</span>
               </h1>
-              <span className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">
+              <span className="hidden sm:block text-sm text-foreground/60 dark:text-foreground-dark/60">
                 Interactive Testing for Anchor Programs
               </span>
             </div>
@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary"
             >
               {isDarkMode ? (
                 <>
