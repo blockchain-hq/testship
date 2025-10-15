@@ -32,7 +32,7 @@ const UseIdl = () => {
   return {
     idl,
     error,
-    loading,
+    isLoading: loading,
     fetchIdl,
   };
 };
