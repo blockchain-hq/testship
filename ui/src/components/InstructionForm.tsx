@@ -1,7 +1,6 @@
 import React, { useState, type FormEvent } from "react";
 import { AnchorProvider, Program, type Idl } from "@coral-xyz/anchor";
 import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -14,7 +13,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import AccountsForm from "./accounts/AccountsForm";
-import { useAnchorWallet, useConnection, type AnchorWallet } from "@solana/wallet-adapter-react";
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
@@ -30,7 +29,7 @@ const InstructionForm = (props: InstructionFormProps) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
-  const provider = new AnchorProvider(connection, wallet as AnchorWallet, {
+  const provider = new AnchorProvider(connection, wallet, {
     commitment: "confirmed",
   });
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
@@ -63,11 +62,9 @@ const InstructionForm = (props: InstructionFormProps) => {
       console.log("Program:", program);
 
       const accountPubKeyMap = Object.fromEntries(
-        Array.from(accounts.entries())
-          .filter(([_, address]) => address !== null)
-          .map(([name, address]) => [
+        Array.from(accounts.entries()).map(([name, address]) => [
           name,
-          new PublicKey(address!),
+          address ? new PublicKey(address) : null,
         ])
       );
 

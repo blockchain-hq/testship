@@ -1,5 +1,5 @@
 import type { ModIdlAccount, SavedAccount } from "@/lib/types";
-import { Button, Input, Label } from "../ui";
+import { Badge, Button, Input, Label } from "../ui";
 import { memo } from "react";
 
 interface AccountInputProps {
@@ -25,7 +25,12 @@ const AccountInput = (props: AccountInputProps) => {
 
   return (
     <div className="flex flex-col space-y-2 w-full justify-center items-start gap-4 border border-muted p-4 rounded-md">
-      <Label htmlFor={account.name}>{account.name}</Label>
+      <div className="flex flex-row gap-2 w-full">
+        <Label htmlFor={account.name}>{account.name}</Label>
+        {account.signer && <Badge variant="secondary">Signer</Badge>}
+        {account.writable && <Badge variant="default">Writable</Badge>}
+      </div>
+
       <div className="flex flex-row gap-2 w-full">
         <Input
           id={account.name}

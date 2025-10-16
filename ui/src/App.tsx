@@ -5,7 +5,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { Footer } from "./components/layout/Footer";
 import { LogsPanel } from "./components/LogsPanel";
 import InstructionForm from "./components/InstructionForm";
-import { Home } from "./pages/Home"; 
+import { Home } from "./pages/Home";
 import UseIdl from "./hooks/useIDL";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
@@ -104,7 +104,7 @@ function App() {
                           <AccordionTrigger>
                             {instruction.name}
                           </AccordionTrigger>
-                          <AccordionContent>
+                          <AccordionContent className="animate-in slide-in-from-top-2">
                             <InstructionForm
                               key={instruction.name}
                               instruction={instruction}
