@@ -32,11 +32,15 @@ const AccountInput = (props: AccountInputProps) => {
         />
 
         {account.signer && (
-          <Button onClick={onUseConnectedWallet}>Use Connected Wallet</Button>
+          <Button type="button" onClick={onUseConnectedWallet}>
+            Use Connected Wallet
+          </Button>
         )}
 
         {account.signer && (
-          <Button onClick={generateAndUseKeypair}>Generate Keypair</Button>
+          <Button type="button" onClick={generateAndUseKeypair}>
+            Generate Keypair
+          </Button>
         )}
       </div>
     </div>

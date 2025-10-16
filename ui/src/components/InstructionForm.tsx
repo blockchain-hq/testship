@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, type FormEvent } from "react";
 import { AnchorProvider, Program, type Idl } from "@coral-xyz/anchor";
 import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -73,6 +73,9 @@ const InstructionForm = (props: InstructionFormProps) => {
         .rpc();
 
       console.log("Transaction signature:", tx);
+      alert(
+        `https://explorer.solana.com/tx/${tx}?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899`
+      );
     } catch (error) {
       console.error("Error executing instruction:", error);
       throw error;
@@ -106,6 +109,7 @@ const InstructionForm = (props: InstructionFormProps) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
@@ -185,6 +189,8 @@ const InstructionForm = (props: InstructionFormProps) => {
                 instruction={instruction}
                 accountsMap={accountsAddressMap}
                 setAccountsMap={setAccountsAddressMap}
+                signersKeypairs={signersKeypairs}
+                setSignersKeypairs={setSignersKeypairs}
               />
             </div>
           )}

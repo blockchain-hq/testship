@@ -51,7 +51,7 @@ const AccountsForm = (props: AccountsFormProps) => {
             if (!walletPublicKey) return;
             console.log("using connected wallet");
             console.log(walletPublicKey?.toBase58());
-            accountsMap.set(account.name, walletPublicKey?.toBase58() || "");
+            onChange(account.name, walletPublicKey?.toBase58() || "");
 
             const newSignersKeypairs = new Map(signersKeypairs);
             newSignersKeypairs.delete(account.name); // wallet signs automatically
