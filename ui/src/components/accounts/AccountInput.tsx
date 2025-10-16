@@ -24,9 +24,9 @@ const AccountInput = (props: AccountInputProps) => {
   const dataListId = `${account.name}-suggestions`;
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col space-y-2 w-full justify-center items-start gap-4 border border-muted p-4 rounded-md">
       <Label htmlFor={account.name}>{account.name}</Label>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 w-full">
         <Input
           id={account.name}
           type="text"

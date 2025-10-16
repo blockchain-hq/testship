@@ -185,18 +185,15 @@ const InstructionForm = (props: InstructionFormProps) => {
   };
 
   return (
-    <Card className="w-full bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-foreground dark:text-foreground-dark">
-          <span>⚡</span>
-          <span>{instruction.name}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="w-full max-w-[800px] bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
+      <div className="w-full">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 w-full justify-start"
+        >
           {/* Accounts Section */}
           {instruction.accounts && instruction.accounts.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 flex flex-col w-full justify-start">
               <h4 className="text-sm font-medium text-foreground dark:text-foreground-dark">
                 Accounts
               </h4>
@@ -245,8 +242,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

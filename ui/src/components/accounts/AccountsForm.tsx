@@ -70,7 +70,7 @@ const AccountsForm = (props: AccountsFormProps) => {
   );
 
   return (
-    <div className="space-y-2 flex flex-col justify-center items-center gap-4">
+    <div className="space-y-2 flex flex-col w-full justify-center items-center">
       {instruction.accounts.map((account) => (
         <AccountInput
           key={account.name}

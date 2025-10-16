@@ -10,6 +10,12 @@ import { InstructionView } from "./pages/InstructionView";
 import UseIdl from "./hooks/useIDL";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionContent,
+  AccordionTrigger,
+} from "./components/ui/accordion";
 
 const getHasVisitedFromLocalStorage = () =>
   localStorage.getItem("hasVisited") === "true";
@@ -72,7 +78,7 @@ function App() {
 
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-4">
-                  <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
+                  {/* <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
                     Instructions ({idl.instructions.length})
                   </h2>
                   <div className="space-y-4">
@@ -83,7 +89,33 @@ function App() {
                         idl={idl}
                       />
                     ))}
-                  </div>
+                  </div> */}
+
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="border-b border-border dark:border-border-dark"
+                  >
+                    <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
+                      Instructions ({idl.instructions.length})
+                    </h2>
+                    <div className="space-y-4">
+                      {idl.instructions.map((instruction, index) => (
+                        <AccordionItem value={`item-${index}`}>
+                          <AccordionTrigger>
+                            {instruction.name}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <InstructionForm
+                              key={instruction.name}
+                              instruction={instruction}
+                              idl={idl}
+                            />
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </div>
+                  </Accordion>
                 </div>
 
                 <div className="space-y-4">
