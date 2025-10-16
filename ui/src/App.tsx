@@ -80,6 +80,7 @@ function App() {
                       <InstructionForm
                         key={instruction.name}
                         instruction={instruction}
+                        idl={idl}
                       />
                     ))}
                   </div>
