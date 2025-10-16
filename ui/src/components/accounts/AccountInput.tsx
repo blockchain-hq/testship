@@ -9,6 +9,7 @@ interface AccountInputProps {
   onUseConnectedWallet: () => void;
   generateAndUseKeypair: () => void;
   savedAccounts: SavedAccount[];
+  validationError?: string;
 }
 
 const AccountInput = (props: AccountInputProps) => {
@@ -19,6 +20,7 @@ const AccountInput = (props: AccountInputProps) => {
     value,
     onChange,
     savedAccounts,
+    validationError,
   } = props;
 
   const dataListId = `${account.name}-suggestions`;
@@ -30,6 +32,10 @@ const AccountInput = (props: AccountInputProps) => {
         {account.signer && <Badge variant="secondary">Signer</Badge>}
         {account.writable && <Badge variant="default">Writable</Badge>}
       </div>
+      
+      {validationError && (
+        <p className="text-red-500 text-sm">{validationError}</p>
+      )}
 
       <div className="flex flex-row gap-2 w-full">
         <Input
