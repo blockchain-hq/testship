@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import chalk from "chalk";
 import { AnchorProject } from "../shared/types";
+import { select } from "@inquirer/prompts";
 
 export const findAnchorProject = async (
   cwd: string
@@ -34,16 +35,21 @@ export const findAnchorProject = async (
     );
   }
 
-  // TODO: implement selector for multiple programs
-  const programName = idlFiles[0].replace(".json", "");
-  const idlPath = path.join(idlDirPath, idlFiles[0]);
-  const programPath = path.join(cwd, `target/deploy/${programName}.so`);
-
+  let programIndex = 0;
   if (idlFiles.length > 1) {
-    console.log(chalk.yellow("Multiple IDL files found:"));
-    idlFiles.forEach((f) => console.log(chalk.yellow(`- ${f}\n`)));
-    console.log(chalk.blue(`Using ${programName}.json`));
+    programIndex = await select({
+      message: "Found multiple Anchor programs. Select one:",
+      choices: idlFiles.map((file, i) => ({
+        name: file.replace(".json", ""),
+        value: i,
+      })),
+    });
   }
+
+  // TODO: implement selector for multiple programs
+  const programName = idlFiles[programIndex].replace(".json", "");
+  const idlPath = path.join(idlDirPath, idlFiles[programIndex]);
+  const programPath = path.join(cwd, `target/deploy/${programName}.so`);
 
   return {
     root: cwd,
