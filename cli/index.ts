@@ -5,6 +5,7 @@ import { Command } from "commander";
 import { findAnchorProject } from "./project-finder";
 import { startDevServer } from "../server";
 import { getMessageFromError } from "./parse-error";
+import { select } from "@inquirer/prompts";
 
 const program = new Command();
 

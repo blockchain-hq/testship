@@ -13,7 +13,11 @@ import {
   SelectValue,
 } from "./ui/select";
 import AccountsForm from "./accounts/AccountsForm";
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import {
+  useAnchorWallet,
+  useConnection,
+  type AnchorWallet,
+} from "@solana/wallet-adapter-react";
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
@@ -29,7 +33,7 @@ const InstructionForm = (props: InstructionFormProps) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
-  const provider = new AnchorProvider(connection, wallet, {
+  const provider = new AnchorProvider(connection, wallet as AnchorWallet, {
     commitment: "confirmed",
   });
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
@@ -69,7 +73,7 @@ const InstructionForm = (props: InstructionFormProps) => {
       );
 
       const tx = await program.methods[instructionName]()
-        .accounts(accountPubKeyMap)
+        .accounts(accountPubKeyMap as unknown as any)
         .signers(Array.from(signersKeypairs.values()))
         .rpc();
 
