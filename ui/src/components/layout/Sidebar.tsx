@@ -4,7 +4,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 import UseIdl from '../../hooks/useIDL';
 
-export const Sidebar: React.FC = () => {
+export const Sidebar = () => {
   const { idl } = UseIdl();
 
   return (
