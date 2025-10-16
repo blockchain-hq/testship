@@ -102,15 +102,14 @@ const InstructionForm = (props: InstructionFormProps) => {
       });
     } catch (error) {
       console.error("Error executing instruction:", error);
-      
-      // Provide user-friendly error messages
+       
       if (error instanceof Error) {
         if (error.message.includes('Invalid public key input')) {
           throw new Error('One or more account addresses are invalid. Please check that all addresses are valid Solana public keys.');
         } else if (error.message.includes('must be a valid Solana public key')) {
-          throw error; // Re-throw our custom error messages
+          throw error;
         } else if (error.message.includes('address is required')) {
-          throw error; // Re-throw our custom error messages
+          throw error;
         } else {
           throw new Error(`Failed to execute instruction: ${error.message}`);
         }
