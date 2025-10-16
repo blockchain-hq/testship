@@ -2,6 +2,7 @@ import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import type { IdlInstruction, ModIdlAccount, PDASeed } from "./types";
 import BN from "bn.js";
 import { PublicKey } from "@solana/web3.js";
+import { Buffer } from "buffer";
 
 export const isAccountPda = (account: ModIdlAccount) => {
   return account.pda !== undefined;
