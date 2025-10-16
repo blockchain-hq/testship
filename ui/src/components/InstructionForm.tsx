@@ -18,11 +18,6 @@ import {
   useConnection,
   type AnchorWallet,
 } from "@solana/wallet-adapter-react";
-import {
-  useAnchorWallet,
-  useConnection,
-  type AnchorWallet,
-} from "@solana/wallet-adapter-react";
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
