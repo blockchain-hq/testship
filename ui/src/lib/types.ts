@@ -6,3 +6,11 @@ export type ModIdlAccount = IdlInstruction["accounts"][number] & {
   signer?: boolean;
   address?: string;
 };
+
+export interface SavedAccount {
+  accountName: string;
+  address: string;
+  timestamp: number;
+  programId: string;
+  instructionName: string;
+}

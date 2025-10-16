@@ -17,6 +17,7 @@ import AccountsForm from "./accounts/AccountsForm";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
+import UseSavedAccounts from "@/hooks/useSavedAccounts";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -32,6 +33,7 @@ const InstructionForm = (props: InstructionFormProps) => {
   const provider = new AnchorProvider(connection, wallet, {
     commitment: "confirmed",
   });
+  const { addSavedAccount, savedAccounts } = UseSavedAccounts();
 
   const [accountsAddressMap, setAccountsAddressMap] = useState(
     () =>
@@ -76,6 +78,19 @@ const InstructionForm = (props: InstructionFormProps) => {
       alert(
         `https://explorer.solana.com/tx/${tx}?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899`
       );
+
+      // save accounts
+      Object.entries(accountPubKeyMap).forEach(([name, pubKey]) => {
+        if (!pubKey) return;
+
+        addSavedAccount({
+          accountName: name,
+          address: pubKey.toBase58(),
+          instructionName: instructionName,
+          programId: idl.address,
+          timestamp: new Date().getTime(),
+        });
+      });
     } catch (error) {
       console.error("Error executing instruction:", error);
       throw error;
