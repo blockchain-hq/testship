@@ -31,6 +31,9 @@ const InstructionForm = (props: InstructionFormProps) => {
   const { instruction, idl } = props;
   const [formData, setFormData] = React.useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [validationErrors, setValidationErrors] = React.useState<
+    Record<string, string>
+  >({});
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
   const provider = new AnchorProvider(connection, wallet as AnchorWallet, {
@@ -73,7 +76,7 @@ const InstructionForm = (props: InstructionFormProps) => {
       );
 
       const tx = await program.methods[instructionName]()
-        .accounts(accountPubKeyMap as unknown as any)
+        .accounts(accountPubKeyMap as any)
         .signers(Array.from(signersKeypairs.values()))
         .rpc();
 
@@ -121,13 +124,66 @@ const InstructionForm = (props: InstructionFormProps) => {
     return "string";
   };
 
+  const validateField = (name: string, value: any): string | null => {
+    if (!value || (typeof value === "string" && value.trim() === "")) {
+      return `${name} is required`;
+    }
+    return null;
+  };
+
+  const validateAllFields = (): boolean => {
+    const errors: Record<string, string> = {};
+    let isValid = true;
+
+    // Validate accounts
+    instruction.accounts.forEach((account) => {
+      const value = accountsAddressMap.get(account.name);
+      const error = validateField(account.name, value);
+      if (error) {
+        errors[account.name] = error;
+        isValid = false;
+      }
+    });
+
+    // Validate arguments
+    instruction.args?.forEach((arg) => {
+      const value = formData[arg.name];
+      const error = validateField(arg.name, value);
+      if (error) {
+        errors[arg.name] = error;
+        isValid = false;
+      }
+    });
+
+    setValidationErrors(errors);
+    return isValid;
+  };
+
   const handleInputChange = (name: string, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear validation error for this field
+    const error = validateField(name, value);
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      if (error) {
+        newErrors[name] = error;
+      } else {
+        delete newErrors[name];
+      }
+      return newErrors;
+    });
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
+
+    // Validate all fields before submission
+    if (!validateAllFields()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -207,6 +263,8 @@ const InstructionForm = (props: InstructionFormProps) => {
                 signersKeypairs={signersKeypairs}
                 setSignersKeypairs={setSignersKeypairs}
                 savedAccounts={savedAccounts}
+                validationErrors={validationErrors}
+                setValidationErrors={setValidationErrors}
               />
             </div>
           )}
@@ -228,6 +286,11 @@ const InstructionForm = (props: InstructionFormProps) => {
                       ({typeof arg.type === "string" ? arg.type : "object"})
                     </span>
                   </Label>
+                  {validationErrors[arg.name] && (
+                    <p className="text-red-500 text-sm">
+                      {validationErrors[arg.name]}
+                    </p>
+                  )}
                   {renderInput(arg)}
                 </div>
               ))}

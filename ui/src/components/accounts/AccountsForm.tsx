@@ -2,7 +2,7 @@ import type { IdlInstruction, SavedAccount } from "@/lib/types";
 import AccountInput from "./AccountInput";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 
 interface AccountsFormProps {
   instruction: IdlInstruction;
@@ -11,6 +11,8 @@ interface AccountsFormProps {
   signersKeypairs: Map<string, Keypair>;
   setSignersKeypairs: (map: Map<string, Keypair>) => void;
   savedAccounts: SavedAccount[];
+  validationErrors: Record<string, string>;
+  setValidationErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const AccountsForm = (props: AccountsFormProps) => {
@@ -21,6 +23,8 @@ const AccountsForm = (props: AccountsFormProps) => {
     signersKeypairs,
     setSignersKeypairs,
     savedAccounts,
+    validationErrors,
+    setValidationErrors,
   } = props;
 
   const { publicKey: walletPublicKey } = useWallet();
@@ -30,8 +34,20 @@ const AccountsForm = (props: AccountsFormProps) => {
       const newMap = new Map(accountsMap);
       newMap.set(accountName, value);
       setAccountsMap(newMap);
+
+      // Clear validation error for this field
+      const error = value && value.trim() !== '' ? null : `${accountName} is required`;
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        if (error) {
+          newErrors[accountName] = error;
+        } else {
+          delete newErrors[accountName];
+        }
+        return newErrors;
+      });
     },
-    [accountsMap, setAccountsMap]
+    [accountsMap, setAccountsMap, setValidationErrors]
   );
 
   const generateNewKeypair = useCallback(
@@ -80,6 +96,7 @@ const AccountsForm = (props: AccountsFormProps) => {
           onUseConnectedWallet={() => handleUseWallet(account.name)}
           generateAndUseKeypair={() => generateNewKeypair(account.name)}
           savedAccounts={savedAccounts}
+          validationError={validationErrors[account.name]}
         />
       ))}
     </div>
