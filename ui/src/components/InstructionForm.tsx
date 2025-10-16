@@ -206,6 +206,7 @@ const InstructionForm = (props: InstructionFormProps) => {
                 setAccountsMap={setAccountsAddressMap}
                 signersKeypairs={signersKeypairs}
                 setSignersKeypairs={setSignersKeypairs}
+                savedAccounts={savedAccounts}
               />
             </div>
           )}

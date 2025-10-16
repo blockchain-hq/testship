@@ -31,6 +31,12 @@ const UseSavedAccounts = () => {
   }, [savedAccounts]);
 
   const addSavedAccount = (savedAccount: SavedAccount) => {
+    const existingAddresses = savedAccounts.map(
+      (savedAccount) => savedAccount.address
+    );
+    if (existingAddresses.includes(savedAccount.address)) {
+      return;
+    }
     addSavedAccountFromStorage(savedAccount);
     setSavedAccounts((prevSavedAccounts) => [
       ...prevSavedAccounts,

@@ -1,5 +1,6 @@
-import type { ModIdlAccount } from "@/lib/types";
+import type { ModIdlAccount, SavedAccount } from "@/lib/types";
 import { Button, Input, Label } from "../ui";
+import { memo } from "react";
 
 interface AccountInputProps {
   account: ModIdlAccount;
@@ -7,6 +8,7 @@ interface AccountInputProps {
   onChange: (value: string) => void;
   onUseConnectedWallet: () => void;
   generateAndUseKeypair: () => void;
+  savedAccounts: SavedAccount[];
 }
 
 const AccountInput = (props: AccountInputProps) => {
@@ -16,7 +18,10 @@ const AccountInput = (props: AccountInputProps) => {
     generateAndUseKeypair,
     value,
     onChange,
+    savedAccounts,
   } = props;
+
+  const dataListId = `${account.name}-suggestions`;
 
   return (
     <div className="flex flex-col space-y-2">
@@ -26,10 +31,20 @@ const AccountInput = (props: AccountInputProps) => {
           id={account.name}
           type="text"
           placeholder={`Enter ${account.name}`}
-          defaultValue={value}
+          value={value}
           onChange={(e) => onChange(e.target.value)}
           className="flex-1"
+          list={dataListId}
         />
+
+        <datalist id={dataListId}>
+          {savedAccounts.map((savedAcc) => (
+            <option key={savedAcc.address} value={savedAcc.address}>
+              {savedAcc.instructionName} - {savedAcc.accountName} -{" "}
+              {new Date(savedAcc.timestamp).toLocaleString()}
+            </option>
+          ))}
+        </datalist>
 
         {account.signer && (
           <Button type="button" onClick={onUseConnectedWallet}>
@@ -47,4 +62,4 @@ const AccountInput = (props: AccountInputProps) => {
   );
 };
 
-export default AccountInput;
+export default memo(AccountInput);
