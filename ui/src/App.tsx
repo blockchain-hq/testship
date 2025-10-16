@@ -5,8 +5,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { Footer } from "./components/layout/Footer";
 import { LogsPanel } from "./components/LogsPanel";
 import InstructionForm from "./components/InstructionForm";
-import { Home } from "./pages/Home";
-import { InstructionView } from "./pages/InstructionView";
+import { Home } from "./pages/Home"; 
 import UseIdl from "./hooks/useIDL";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
@@ -24,7 +23,7 @@ const setHasVisitedToLocalStorage = () =>
 
 function App() {
   const { idl, isLoading } = UseIdl();
-  const [currentPage] = useState<"home" | "instructions">("home");
+  // const [currentPage] = useState<"home" | "instructions">("home");
   const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
 
   const handleGetStarted = () => {
