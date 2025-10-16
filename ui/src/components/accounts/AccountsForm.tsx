@@ -1,8 +1,14 @@
-import type { IdlInstruction, SavedAccount } from "@/lib/types";
+import type {
+  IdlInstruction,
+  ModIdlAccount,
+  PDASeed,
+  SavedAccount,
+} from "@/lib/types";
 import AccountInput from "./AccountInput";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
 import React, { useCallback } from "react";
+import { derivePda } from "@/lib/pdaUtils";
 
 interface AccountsFormProps {
   instruction: IdlInstruction;
@@ -12,7 +18,11 @@ interface AccountsFormProps {
   setSignersKeypairs: (map: Map<string, Keypair>) => void;
   savedAccounts: SavedAccount[];
   validationErrors: Record<string, string>;
-  setValidationErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setValidationErrors: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
+  formData: any;
+  programId: string;
 }
 
 const AccountsForm = (props: AccountsFormProps) => {
@@ -25,6 +35,8 @@ const AccountsForm = (props: AccountsFormProps) => {
     savedAccounts,
     validationErrors,
     setValidationErrors,
+    formData,
+    programId,
   } = props;
 
   const { publicKey: walletPublicKey } = useWallet();
@@ -36,7 +48,8 @@ const AccountsForm = (props: AccountsFormProps) => {
       setAccountsMap(newMap);
 
       // Clear validation error for this field
-      const error = value && value.trim() !== '' ? null : `${accountName} is required`;
+      const error =
+        value && value.trim() !== "" ? null : `${accountName} is required`;
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
         if (error) {
@@ -85,9 +98,27 @@ const AccountsForm = (props: AccountsFormProps) => {
     ]
   );
 
+  const onDerivePda = (seeds: PDASeed[], accountName: string) => {
+    const { data: pda, error } = derivePda(
+      seeds,
+      programId,
+      instruction,
+      formData
+    );
+
+    if (error || !pda) {
+      console.error(error || "Failed to derive PDA");
+      return;
+    }
+
+    const newMap = new Map(accountsMap);
+    newMap.set(accountName, pda?.toBase58());
+    setAccountsMap(newMap);
+  };
+
   return (
     <div className="space-y-2 flex flex-col w-full justify-center items-center">
-      {instruction.accounts.map((account) => (
+      {instruction.accounts.map((account: ModIdlAccount) => (
         <AccountInput
           key={account.name}
           account={account}
@@ -97,6 +128,9 @@ const AccountsForm = (props: AccountsFormProps) => {
           generateAndUseKeypair={() => generateNewKeypair(account.name)}
           savedAccounts={savedAccounts}
           validationError={validationErrors[account.name]}
+          onDerivePda={() =>
+            onDerivePda(account.pda?.seeds || [], account.name)
+          }
         />
       ))}
     </div>

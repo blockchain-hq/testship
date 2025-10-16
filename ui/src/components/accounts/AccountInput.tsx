@@ -1,6 +1,7 @@
 import type { ModIdlAccount, SavedAccount } from "@/lib/types";
 import { Badge, Button, Input, Label } from "../ui";
 import { memo } from "react";
+import { derivePda, isAccountPda, isPdaAutoDerivable } from "@/lib/pdaUtils";
 
 interface AccountInputProps {
   account: ModIdlAccount;
@@ -9,6 +10,7 @@ interface AccountInputProps {
   onUseConnectedWallet: () => void;
   generateAndUseKeypair: () => void;
   savedAccounts: SavedAccount[];
+  onDerivePda: () => void;
   validationError?: string;
 }
 
@@ -21,6 +23,7 @@ const AccountInput = (props: AccountInputProps) => {
     onChange,
     savedAccounts,
     validationError,
+    onDerivePda,
   } = props;
 
   const dataListId = `${account.name}-suggestions`;
@@ -31,8 +34,12 @@ const AccountInput = (props: AccountInputProps) => {
         <Label htmlFor={account.name}>{account.name}</Label>
         {account.signer && <Badge variant="secondary">Signer</Badge>}
         {account.writable && <Badge variant="default">Writable</Badge>}
+        {isAccountPda(account) && <Badge variant="default">PDA</Badge>}
+        {isPdaAutoDerivable(account) && (
+          <Badge variant="outline">PDA Auto Derivable</Badge>
+        )}
       </div>
-      
+
       {validationError && (
         <p className="text-red-500 text-sm">{validationError}</p>
       )}
@@ -47,6 +54,12 @@ const AccountInput = (props: AccountInputProps) => {
           className="flex-1"
           list={dataListId}
         />
+
+        {isPdaAutoDerivable(account) && (
+          <Button type="button" className="right-0" onClick={onDerivePda}>
+            Derive
+          </Button>
+        )}
 
         <datalist id={dataListId}>
           {savedAccounts.map((savedAcc) => (
