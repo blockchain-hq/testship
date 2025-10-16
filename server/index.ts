@@ -43,6 +43,9 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
         chalk.green(`Dev server live at: http://localhost:${port || 3000}`)
       );
 
+      // TODO: remove conditional opening of browser
+      // this tool will be used by devs during development so
+      // their environment would be set to development then
       const isProd = process.env.NODE_ENV === "production";
       if (!isProd) {
         console.log(chalk.yellow("Development Mode"));
