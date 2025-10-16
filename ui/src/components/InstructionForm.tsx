@@ -265,6 +265,8 @@ const InstructionForm = (props: InstructionFormProps) => {
                 savedAccounts={savedAccounts}
                 validationErrors={validationErrors}
                 setValidationErrors={setValidationErrors}
+                formData={formData}
+                programId={idl.address}
               />
             </div>
           )}

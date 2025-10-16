@@ -1,7 +1,7 @@
 import type { ModIdlAccount, SavedAccount } from "@/lib/types";
 import { Badge, Button, Input, Label } from "../ui";
 import { memo } from "react";
-import { derivePda, isAccountPda, isPdaAutoDerivable } from "@/lib/pdaUtils";
+import { isAccountPda, isPdaAutoDerivable } from "@/lib/pdaUtils";
 
 interface AccountInputProps {
   account: ModIdlAccount;
