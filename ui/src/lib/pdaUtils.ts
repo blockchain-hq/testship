@@ -227,8 +227,9 @@ export const extractSeedForAccountKindPda = async (
       console.log("value is BN");
       const accountType = idl.types?.find((t) => t.name === pdaSeed.account);
       console.log(accountType, "accountType");
-      const field = accountType?.type.fields.find(
-        (f) => f.name === fieldName || toCamelCase(f.name) === camelFieldName
+      const field = (accountType as any)?.type.fields.find(
+        (f: { name: string }) =>
+          f.name === fieldName || toCamelCase(f.name) === camelFieldName
       );
       console.log(field, "field");
 
@@ -242,4 +243,35 @@ export const extractSeedForAccountKindPda = async (
   }
 
   return { data: null, error: "Invalid seed path" };
+};
+
+export const convertArgValue = (value: any, type: IdlType): any => {
+  if (typeof type === "string") {
+    switch (type) {
+      case "u8":
+      case "u16":
+      case "u32":
+      case "u64":
+      case "i8":
+      case "i16":
+      case "i32":
+      case "i64":
+        // Convert to BN for all integer types
+        return new BN(value);
+
+      case "bool":
+        return typeof value === "boolean" ? value : value === "true";
+
+      case "string":
+        return String(value);
+
+      case "pubkey":
+        return new PublicKey(value);
+
+      default:
+        return value;
+    }
+  }
+
+  return value;
 };

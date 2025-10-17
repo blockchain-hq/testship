@@ -22,6 +22,7 @@ import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
 import { toCamelCase } from "@/lib/utils";
+import { convertArgValue } from "@/lib/pdaUtils";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -61,6 +62,11 @@ const InstructionForm = (props: InstructionFormProps) => {
     instructionName: string,
     accounts: Map<string, string | null>
   ) => {
+    console.log("=== DEBUG START ===");
+    console.log("Accounts Map:", accounts);
+    console.log("Accounts Map entries:", Array.from(accounts.entries()));
+    console.log("poll_authority value:", accounts.get("poll_authority"));
+    console.log("=== DEBUG END ===");
     try {
       if (!idl)
         throw new Error("IDL not load, please load IDL for the program.");
@@ -74,7 +80,21 @@ const InstructionForm = (props: InstructionFormProps) => {
         ])
       );
 
-      const tx = await program.methods[toCamelCase(instructionName)]()
+      console.log("=== AFTER CONVERSION ===");
+      console.log("accountPubKeyMap:", accountPubKeyMap);
+      console.log("pollAuthority value:", accountPubKeyMap.pollAuthority);
+      console.log("=== CONVERSION END ===");
+
+      const args = instruction.args.map((arg) => {
+        const value = formData[arg.name];
+        if (!value) throw Error(`Argument ${arg.name} is required.`);
+
+        return convertArgValue(value, arg.type);
+      });
+
+      console.log(args, "arguments");
+
+      const tx = await program.methods[toCamelCase(instructionName)](...args)
         .accounts(accountPubKeyMap as any)
         .signers(Array.from(signersKeypairs.values()))
         .rpc();
