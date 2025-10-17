@@ -16,7 +16,8 @@ export const isPdaAutoDerivable = (account: ModIdlAccount) => {
   if (!seeds) return false;
 
   // if any of the seeds have kind account, then its not derivable
-  return seeds.every((seed) => seed.kind !== "account");
+  // return seeds.every((seed) => seed.kind !== "account");
+  return true;
 };
 
 export const isPdaComplexToDerive = (account: ModIdlAccount) => {
@@ -117,22 +118,40 @@ export const derivePda = async (
           };
         }
       }
-    } else if (seed.kind === "account" && seed.account) {
+    } else if (seed.kind === "account") {
       if (!connection || !idl) {
         return { data: null, error: "Missing connection or idl" };
       }
-      const { data: seedValue, error } = await extractSeedForAccountKindPda(
-        seed,
-        formData,
-        accountAddressMap,
-        connection,
-        idl
-      );
-      if (error || !seedValue) {
-        return { data: null, error: "Missing seed value" };
-      }
 
-      seedBuffers.push(seedValue);
+      if (seed.account) {
+        const { data: seedValue, error } = await extractSeedForAccountKindPda(
+          seed,
+          formData,
+          accountAddressMap,
+          connection,
+          idl
+        );
+        if (error || !seedValue) {
+          return { data: null, error: "Missing seed value" };
+        }
+
+        seedBuffers.push(seedValue);
+      } else {
+        const accountName = seed.path;
+        if (!accountName) {
+          return { data: null, error: "Missing account name" };
+        }
+        const accountAddress = accountAddressMap.get(accountName);
+        if (!accountAddress) {
+          return {
+            data: null,
+            error: `Missing account address for ${accountName}`,
+          };
+        }
+
+        const pubKey = new PublicKey(accountAddress);
+        seedBuffers.push(pubKey.toBytes());
+      }
     }
   }
 
@@ -223,20 +242,43 @@ export const extractSeedForAccountKindPda = async (
     console.log(value, "final value from extractSeedForAccountKindPda");
     console.log(typeof value);
 
-    if (BN.isBN(value)) {
-      console.log("value is BN");
-      const accountType = idl.types?.find((t) => t.name === pdaSeed.account);
-      console.log(accountType, "accountType");
-      const field = (accountType as any)?.type.fields.find(
-        (f: { name: string }) =>
-          f.name === fieldName || toCamelCase(f.name) === camelFieldName
-      );
-      console.log(field, "field");
+    const accountType = idl.types?.find((t) => t.name === pdaSeed.account);
+    const field = (accountType as any)?.type.fields.find(
+      (f: { name: string }) =>
+        f.name === fieldName || toCamelCase(f.name) === camelFieldName
+    );
 
-      const fieldType = field?.type;
-      console.log(fieldType, "fieldType");
+    const fieldType = field?.type;
 
-      return { data: convertToBuffer(value, fieldType), error: null };
+    if (!fieldType) {
+      return { data: null, error: `Field type not found for ${fieldName}` };
+    }
+
+    if (typeof fieldType === "string") {
+      if (
+        fieldType === "u8" ||
+        fieldType === "u16" ||
+        fieldType === "u32" ||
+        fieldType === "u64" ||
+        fieldType === "i8" ||
+        fieldType === "i16" ||
+        fieldType === "i32" ||
+        fieldType === "i64"
+      ) {
+        return { data: convertToBuffer(value, fieldType), error: null };
+      }
+
+      if (fieldType === "pubkey" || fieldType === "publicKey") {
+        if (value instanceof PublicKey) {
+          return { data: value.toBytes(), error: null };
+        }
+        return { data: new PublicKey(value).toBytes(), error: null };
+      }
+
+      // String type
+      if (fieldType === "string") {
+        return { data: new TextEncoder().encode(value), error: null };
+      }
     }
 
     return { data: value, error: null };

@@ -89,7 +89,13 @@ const InstructionForm = (props: InstructionFormProps) => {
 
       const args = instruction.args.map((arg) => {
         const value = formData[arg.name];
-        if (!value) throw Error(`Argument ${arg.name} is required.`);
+        if (value === undefined || value === null) {
+          throw Error(`Argument ${arg.name} is required.`);
+        }
+
+        if (typeof value === "string" && value.trim() === "") {
+          throw Error(`Argument ${arg.name} is required.`);
+        }
 
         return convertArgValue(value, arg.type);
       });
@@ -177,28 +183,30 @@ const InstructionForm = (props: InstructionFormProps) => {
     value: any,
     type?: IdlType
   ): string | null => {
-    // Check if value is required - allow 0 for numeric types
-    if (
-      value === null ||
-      value === undefined ||
-      (typeof value === "string" && value.trim() === "")
-    ) {
+    // Allow 0, false, and other falsy values except null/undefined
+    if (value === null || value === undefined) {
       return `${name} is required`;
     }
 
-    if (typeof value === "string" && value.trim() !== "") {
-      if (!type && !isValidSolanaPublicKey(value.trim())) {
-        return `${name} must be a valid Solana public key`;
-      }
+    // For strings, check for empty or whitespace-only
+    if (typeof value === "string" && value.trim() === "") {
+      return `${name} is required`;
     }
 
+    // If no type specified (accounts), validate as PublicKey
     if (!type) {
+      if (typeof value === "string" && value.trim() !== "") {
+        if (!isValidSolanaPublicKey(value.trim())) {
+          return `${name} must be a valid Solana public key`;
+        }
+      }
       return null;
     }
 
+    // Type-specific validation for arguments
     if (typeof type === "string") {
       switch (type) {
-        case "u8":
+        case "u8": {
           const u8Value = Number(value);
           if (
             isNaN(u8Value) ||
@@ -209,7 +217,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid u8 (0-255)`;
           }
           break;
-        case "u16":
+        }
+        case "u16": {
           const u16Value = Number(value);
           if (
             isNaN(u16Value) ||
@@ -220,7 +229,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid u16 (0-65535)`;
           }
           break;
-        case "u32":
+        }
+        case "u32": {
           const u32Value = Number(value);
           if (
             isNaN(u32Value) ||
@@ -231,7 +241,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid u32 (0-4294967295)`;
           }
           break;
-        case "u64":
+        }
+        case "u64": {
           const u64Value = Number(value);
           if (
             isNaN(u64Value) ||
@@ -242,7 +253,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid u64 (0-${Number.MAX_SAFE_INTEGER})`;
           }
           break;
-        case "i8":
+        }
+        case "i8": {
           const i8Value = Number(value);
           if (
             isNaN(i8Value) ||
@@ -253,7 +265,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid i8 (-128 to 127)`;
           }
           break;
-        case "i16":
+        }
+        case "i16": {
           const i16Value = Number(value);
           if (
             isNaN(i16Value) ||
@@ -264,7 +277,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid i16 (-32768 to 32767)`;
           }
           break;
-        case "i32":
+        }
+        case "i32": {
           const i32Value = Number(value);
           if (
             isNaN(i32Value) ||
@@ -275,7 +289,8 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid i32 (-2147483648 to 2147483647)`;
           }
           break;
-        case "i64":
+        }
+        case "i64": {
           const i64Value = Number(value);
           if (
             isNaN(i64Value) ||
@@ -286,6 +301,7 @@ const InstructionForm = (props: InstructionFormProps) => {
             return `${name} must be a valid i64 (${Number.MIN_SAFE_INTEGER} to ${Number.MAX_SAFE_INTEGER})`;
           }
           break;
+        }
         case "bool":
           if (
             typeof value !== "boolean" &&
