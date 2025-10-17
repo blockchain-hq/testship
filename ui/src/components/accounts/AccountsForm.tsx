@@ -5,10 +5,11 @@ import type {
   SavedAccount,
 } from "@/lib/types";
 import AccountInput from "./AccountInput";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
 import React, { useCallback } from "react";
 import { derivePda } from "@/lib/pdaUtils";
+import type { Idl } from "@coral-xyz/anchor";
 
 interface AccountsFormProps {
   instruction: IdlInstruction;
@@ -23,6 +24,7 @@ interface AccountsFormProps {
   >;
   formData: any;
   programId: string;
+  idl: Idl;
 }
 
 const AccountsForm = (props: AccountsFormProps) => {
@@ -37,9 +39,11 @@ const AccountsForm = (props: AccountsFormProps) => {
     setValidationErrors,
     formData,
     programId,
+    idl,
   } = props;
 
   const { publicKey: walletPublicKey } = useWallet();
+  const { connection } = useConnection();
 
   const onChange = useCallback(
     (accountName: string, value: string) => {
@@ -98,12 +102,15 @@ const AccountsForm = (props: AccountsFormProps) => {
     ]
   );
 
-  const onDerivePda = (seeds: PDASeed[], accountName: string) => {
-    const { data: pda, error } = derivePda(
+  const onDerivePda = async (seeds: PDASeed[], accountName: string) => {
+    const { data: pda, error } = await derivePda(
       seeds,
       programId,
       instruction,
-      formData
+      accountsMap,
+      formData,
+      connection,
+      idl
     );
 
     if (error || !pda) {

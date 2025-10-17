@@ -1,7 +1,11 @@
 import type { ModIdlAccount, SavedAccount } from "@/lib/types";
 import { Badge, Button, Input, Label } from "../ui";
 import { memo } from "react";
-import { isAccountPda, isPdaAutoDerivable } from "@/lib/pdaUtils";
+import {
+  isAccountPda,
+  isPdaAutoDerivable,
+  isPdaComplexToDerive,
+} from "@/lib/pdaUtils";
 
 interface AccountInputProps {
   account: ModIdlAccount;
@@ -38,6 +42,9 @@ const AccountInput = (props: AccountInputProps) => {
         {isPdaAutoDerivable(account) && (
           <Badge variant="outline">PDA Auto Derivable</Badge>
         )}
+        {isPdaComplexToDerive(account) && (
+          <Badge variant="outline">PDA Complex</Badge>
+        )}
       </div>
 
       {validationError && (
@@ -58,6 +65,12 @@ const AccountInput = (props: AccountInputProps) => {
         {isPdaAutoDerivable(account) && (
           <Button type="button" className="right-0" onClick={onDerivePda}>
             Derive
+          </Button>
+        )}
+
+        {isPdaComplexToDerive(account) && (
+          <Button type="button" className="right-0" onClick={onDerivePda}>
+            Derive (Advanced)
           </Button>
         )}
 
