@@ -26,7 +26,10 @@ function App() {
   const { idl, isLoading } = UseIdl();
   // const [currentPage] = useState<"home" | "instructions">("home");
   const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
-  const [transactionResults, setTransactionResults] = useState<TransactionResult[]>([]);
+  // @ts-expect-error: to be fixed later
+  const [transactionResults, setTransactionResults] = useState<
+    TransactionResult[]
+  >([]);
 
   const handleGetStarted = () => {
     setHasVisited(true);
