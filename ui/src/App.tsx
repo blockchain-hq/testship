@@ -15,6 +15,7 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "./components/ui/accordion";
+import type { TransactionResult } from "./lib/types";
 
 const getHasVisitedFromLocalStorage = () =>
   localStorage.getItem("hasVisited") === "true";
@@ -25,6 +26,7 @@ function App() {
   const { idl, isLoading } = UseIdl();
   // const [currentPage] = useState<"home" | "instructions">("home");
   const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
+  const [transactionResults, setTransactionResults] = useState<TransactionResult[]>([]);
 
   const handleGetStarted = () => {
     setHasVisited(true);
@@ -121,7 +123,7 @@ function App() {
                   <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
                     Output & Logs
                   </h2>
-                  <LogsPanel />
+                  <LogsPanel transactionResults={transactionResults} />
                 </div>
               </div>
             </div>
