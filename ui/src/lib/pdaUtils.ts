@@ -2,7 +2,6 @@ import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import type { IdlInstruction, ModIdlAccount, PDASeed } from "./types";
 import BN from "bn.js";
 import { PublicKey } from "@solana/web3.js";
-import { Buffer } from "buffer";
 
 export const isAccountPda = (account: ModIdlAccount) => {
   return account.pda !== undefined;
@@ -22,25 +21,28 @@ export const convertToBuffer = (value: any, type: IdlType) => {
   // TODO: support more types
   if (type === "u64" || type === "i64") {
     const num = new BN(value);
-    return num.toArrayLike(Buffer, "le", 8);
+    const arr = num.toArray("le", 8);
+    return new Uint8Array(arr);
   }
 
   if (type === "u32" || type === "i32") {
     const num = new BN(value);
-    return num.toArrayLike(Buffer, "le", 4);
+    const arr = num.toArray("le", 4);
+    return new Uint8Array(arr);
   }
 
   if (type === "u8" || type === "i8") {
     const num = new BN(value);
-    return num.toArrayLike(Buffer, "le", 1);
+    const arr = num.toArray("le", 1);
+    return new Uint8Array(arr);
   }
 
   if (type === "string") {
-    return Buffer.from(value, "utf-8");
+    return new TextEncoder().encode(value);
   }
 
   if (type === "pubkey") {
-    return new PublicKey(value).toBuffer();
+    return new PublicKey(value).toBytes();
   }
 
   throw Error(`Unsupported type: ${type}`);
@@ -52,11 +54,11 @@ export const derivePda = (
   instruction: IdlInstruction,
   formData: any
 ) => {
-  const seedBuffers: Buffer[] = [];
+  const seedBuffers: Uint8Array[] = [];
 
   for (const seed of seeds) {
     if (seed.kind === "const" && seed.value) {
-      seedBuffers.push(Buffer.from(seed.value));
+      seedBuffers.push(new Uint8Array(seed.value));
     } else if (seed.kind === "arg") {
       const argType = instruction.args.find(
         (arg) => arg.name === seed.path
