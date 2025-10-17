@@ -21,6 +21,7 @@ import {
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
+import { toCamelCase } from "@/lib/utils";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -70,12 +71,12 @@ const InstructionForm = (props: InstructionFormProps) => {
 
       const accountPubKeyMap = Object.fromEntries(
         Array.from(accounts.entries()).map(([name, address]) => [
-          name,
+          toCamelCase(name),
           address ? new PublicKey(address) : null,
         ])
       );
 
-      const tx = await program.methods[instructionName]()
+      const tx = await program.methods[toCamelCase(instructionName)]()
         .accounts(accountPubKeyMap as any)
         .signers(Array.from(signersKeypairs.values()))
         .rpc();
