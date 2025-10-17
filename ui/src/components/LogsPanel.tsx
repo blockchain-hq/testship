@@ -65,11 +65,11 @@ export const LogsPanel = () => {
   const getStatusBadge = (status: TransactionResult['status']) => {
     switch (status) {
       case 'success':
-        return <Badge variant="default" className="bg-log-success text-white">Success</Badge>;
+        return <Badge variant="default" className="bg-green-500 text-white">Success</Badge>;
       case 'error':
-        return <Badge variant="destructive" className="bg-log-error text-white">Error</Badge>;
+        return <Badge variant="destructive" className="bg-red-500 text-white">Error</Badge>;
       case 'pending':
-        return <Badge variant="secondary" className="bg-log-warning text-white">Pending</Badge>;
+        return <Badge variant="secondary" className="bg-yellow-500 text-white">Pending</Badge>;
     }
   };
 
