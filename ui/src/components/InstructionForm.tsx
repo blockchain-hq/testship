@@ -21,6 +21,8 @@ import {
 import type { ModIdlAccount } from "@/lib/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import UseSavedAccounts from "@/hooks/useSavedAccounts";
+import { Toaster } from "./ui/sonner";
+import { toast } from "sonner";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -87,7 +89,7 @@ const InstructionForm = (props: InstructionFormProps) => {
       alert(
         `https://explorer.solana.com/tx/${tx}?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899`
       );
-
+      toast.success(`Instruction ${instructionName} executed successfully`);
       // save accounts
       Object.entries(accountPubKeyMap).forEach(([name, pubKey]) => {
         if (!pubKey) return;
@@ -99,10 +101,10 @@ const InstructionForm = (props: InstructionFormProps) => {
           programId: idl.address,
           timestamp: new Date().getTime(),
         });
+       
       });
     } catch (error) {
-      console.error("Error executing instruction:", error);
-       
+      console.error("Error executing instruction:", error); 
       if (error instanceof Error) {
         if (error.message.includes('Invalid public key input')) {
           throw new Error('One or more account addresses are invalid. Please check that all addresses are valid Solana public keys.');
@@ -150,7 +152,8 @@ const InstructionForm = (props: InstructionFormProps) => {
   };
 
   const validateField = (name: string, value: any, type?: IdlType): string | null => {  
-    if (!value || (typeof value === 'string' && value.trim() === '')) {
+    // Check if value is required - allow 0 for numeric types
+    if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
       return `${name} is required`;
     }
  
@@ -300,7 +303,7 @@ const InstructionForm = (props: InstructionFormProps) => {
 
   const renderInput = (arg: any) => {
     const type = deriveType(arg.type);
-    const value = formData[arg.name] || "";
+    const value = formData[arg.name] ?? "";
 
     switch (type) {
       case "number":
@@ -336,9 +339,12 @@ const InstructionForm = (props: InstructionFormProps) => {
             type="number"
             id={arg.name}
             value={value}
-            onChange={(e) =>
-              handleInputChange(arg.name, Number(e.target.value))
-            }
+            onChange={(e) => {
+              const inputValue = e.target.value;
+              // Convert empty string to undefined, otherwise convert to number
+              const numericValue = inputValue === '' ? undefined : Number(inputValue);
+              handleInputChange(arg.name, numericValue);
+            }}
             placeholder={`Enter ${arg.name} (${typeof arg.type === 'string' ? arg.type : 'number'})`}
             className="bg-input dark:bg-input-dark border-input-border dark:border-input-border-dark text-foreground dark:text-foreground-dark"
             min={constraints.min}
@@ -378,6 +384,7 @@ const InstructionForm = (props: InstructionFormProps) => {
   return (
     <div className="w-full max-w-[800px] bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
       <div className="w-full">
+        <Toaster />
         <form
           onSubmit={handleSubmit}
           className="space-y-4 w-full justify-start"

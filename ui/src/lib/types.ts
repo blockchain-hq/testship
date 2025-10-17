@@ -14,3 +14,20 @@ export interface SavedAccount {
   programId: string;
   instructionName: string;
 }
+
+export type TransactionResult = {
+  id: string;
+  signature?: string;
+  status: 'success' | 'error' | 'pending';
+  logs: TransactionResultLog[];
+  timestamp: Date;
+  explorerUrl?: string;
+}
+
+export type TransactionResultLog = {
+  id: string;
+  timestamp: Date;
+  type: 'info' | 'success' | 'error' | 'warning';
+  message: string;
+  data?: any;
+}
