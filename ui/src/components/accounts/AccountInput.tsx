@@ -6,6 +6,7 @@ import {
   isPdaAutoDerivable,
   isPdaComplexToDerive,
 } from "@/lib/pdaUtils";
+import { Loader2 } from "lucide-react";
 
 interface AccountInputProps {
   account: ModIdlAccount;
@@ -16,6 +17,7 @@ interface AccountInputProps {
   savedAccounts: SavedAccount[];
   onDerivePda: () => void;
   validationError?: string;
+  isDerivingPda?: boolean;
 }
 
 const AccountInput = (props: AccountInputProps) => {
@@ -28,6 +30,7 @@ const AccountInput = (props: AccountInputProps) => {
     savedAccounts,
     validationError,
     onDerivePda,
+    isDerivingPda,
   } = props;
 
   const dataListId = `${account.name}-suggestions`;
@@ -40,10 +43,10 @@ const AccountInput = (props: AccountInputProps) => {
         {account.writable && <Badge variant="default">Writable</Badge>}
         {isAccountPda(account) && <Badge variant="default">PDA</Badge>}
         {isPdaAutoDerivable(account) && (
-          <Badge variant="outline">PDA Auto Derivable</Badge>
+          <Badge variant="outline">Auto-derivable</Badge>
         )}
         {isPdaComplexToDerive(account) && (
-          <Badge variant="outline">PDA Complex</Badge>
+          <Badge variant="outline">Complex PDA</Badge>
         )}
       </div>
 
@@ -60,17 +63,21 @@ const AccountInput = (props: AccountInputProps) => {
           onChange={(e) => onChange(e.target.value)}
           className="flex-1"
           list={dataListId}
+          disabled={isDerivingPda}
         />
 
         {isPdaAutoDerivable(account) && (
-          <Button type="button" className="right-0" onClick={onDerivePda}>
-            Derive
-          </Button>
-        )}
-
-        {isPdaComplexToDerive(account) && (
-          <Button type="button" className="right-0" onClick={onDerivePda}>
-            Derive (Advanced)
+          <Button type="button" onClick={onDerivePda} disabled={isDerivingPda}>
+            {isDerivingPda ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Deriving...
+              </>
+            ) : isPdaComplexToDerive(account) ? (
+              "Derive (Advanced)"
+            ) : (
+              "Derive"
+            )}
           </Button>
         )}
 
@@ -84,15 +91,14 @@ const AccountInput = (props: AccountInputProps) => {
         </datalist>
 
         {account.signer && (
-          <Button type="button" onClick={onUseConnectedWallet}>
-            Use Connected Wallet
-          </Button>
-        )}
-
-        {account.signer && (
-          <Button type="button" onClick={generateAndUseKeypair}>
-            Generate Keypair
-          </Button>
+          <>
+            <Button type="button" onClick={onUseConnectedWallet}>
+              Use Wallet
+            </Button>
+            <Button type="button" onClick={generateAndUseKeypair}>
+              Generate
+            </Button>
+          </>
         )}
       </div>
     </div>

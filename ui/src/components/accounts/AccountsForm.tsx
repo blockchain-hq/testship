@@ -1,15 +1,11 @@
-import type {
-  IdlInstruction,
-  ModIdlAccount,
-  PDASeed,
-  SavedAccount,
-} from "@/lib/types";
+import type { IdlInstruction, ModIdlAccount, SavedAccount } from "@/lib/types";
 import AccountInput from "./AccountInput";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
-import React, { useCallback } from "react";
-import { derivePda } from "@/lib/pdaUtils";
+import React, { useCallback, useState } from "react";
+import { derivePDA } from "@/lib/solana";
 import type { Idl } from "@coral-xyz/anchor";
+import { toast } from "sonner";
 
 interface AccountsFormProps {
   instruction: IdlInstruction;
@@ -22,7 +18,7 @@ interface AccountsFormProps {
   setValidationErrors: React.Dispatch<
     React.SetStateAction<Record<string, string>>
   >;
-  formData: any;
+  formData: Record<string, unknown>;
   programId: string;
   idl: Idl;
 }
@@ -44,6 +40,7 @@ const AccountsForm = (props: AccountsFormProps) => {
 
   const { publicKey: walletPublicKey } = useWallet();
   const { connection } = useConnection();
+  const [derivingPda, setDerivingPda] = useState<string | null>(null);
 
   const onChange = useCallback(
     (accountName: string, value: string) => {
@@ -102,25 +99,34 @@ const AccountsForm = (props: AccountsFormProps) => {
     ]
   );
 
-  const onDerivePda = async (seeds: PDASeed[], accountName: string) => {
-    const { data: pda, error } = await derivePda(
-      seeds,
-      programId,
-      instruction,
-      accountsMap,
-      formData,
-      connection,
-      idl
-    );
+  const onDerivePda = async (account: ModIdlAccount) => {
+    if (!account.pda?.seeds) return;
 
-    if (error || !pda) {
-      console.error(error || "Failed to derive PDA");
-      return;
+    setDerivingPda(account.name);
+
+    try {
+      const pda = await derivePDA(
+        account.pda.seeds,
+        programId,
+        accountsMap,
+        formData,
+        connection,
+        idl
+      );
+
+      const newMap = new Map(accountsMap);
+      newMap.set(account.name, pda.toBase58());
+      setAccountsMap(newMap);
+
+      toast.success(`Derived PDA for ${account.name}`);
+    } catch (error) {
+      console.error("PDA derivation error:", error);
+      const message =
+        error instanceof Error ? error.message : "Failed to derive PDA";
+      toast.error(message);
+    } finally {
+      setDerivingPda(null);
     }
-
-    const newMap = new Map(accountsMap);
-    newMap.set(accountName, pda?.toBase58());
-    setAccountsMap(newMap);
   };
 
   return (
@@ -135,9 +141,8 @@ const AccountsForm = (props: AccountsFormProps) => {
           generateAndUseKeypair={() => generateNewKeypair(account.name)}
           savedAccounts={savedAccounts}
           validationError={validationErrors[account.name]}
-          onDerivePda={() =>
-            onDerivePda(account.pda?.seeds || [], account.name)
-          }
+          onDerivePda={() => onDerivePda(account)}
+          isDerivingPda={derivingPda === account.name}
         />
       ))}
     </div>
