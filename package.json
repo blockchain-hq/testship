@@ -1,7 +1,8 @@
 {
-  "name": "testship",
+  "name": "@blockchain-hq/testship",
   "version": "0.1.0",
   "description": "Free, Open source, and Fast Testing for Solana Anchor Programs",
+  "repository": "https://github.com/blockchain-hq/testship",
   "main": "index.js",
   "bin": {
     "testship": "./dist/cli/index.js"
@@ -16,7 +17,7 @@
     "test": "npm run dev start"
   },
   "keywords": [],
-  "author": "",
+  "author": "BlockchainHQ",
   "license": "ISC",
   "devDependencies": {
     "@types/bn.js": "^5.2.0",
