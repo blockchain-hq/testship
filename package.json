@@ -4,7 +4,7 @@
   "description": "Free, Open source, and Fast Testing for Solana Anchor Programs",
   "main": "index.js",
   "bin": {
-    "testship": "./dist/cli/index.js"
+    "testship": "dist/cli/index.js"
   },
   "files": [
     "dist/"
