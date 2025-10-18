@@ -10,8 +10,12 @@ import { toCamelCase } from "@/lib/utils";
 import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import { useTransactionToast } from "./useTransactionToast";
 import { parseSolanaError } from "@/lib/errorParser";
+import { type TransactionRecord } from "./useTransactionHistory";
 
-export default function useTransaction(idl: Idl) {
+export default function useTransaction(
+  idl: Idl,
+  addTransaction: (tx: TransactionRecord) => void
+) {
   const [isExecuting, setIsExecuting] = useState(false);
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -32,13 +36,12 @@ export default function useTransaction(idl: Idl) {
     const toastId = txToast.loading(`Executing ${instruction.name}...`);
 
     try {
-      // Setup program
       const provider = new AnchorProvider(connection, wallet, {
         commitment: "confirmed",
       });
       const program = new Program(idl, provider);
 
-      // Auto-derive PDAs
+      // auto-derive
       const accountMap = new Map(accounts);
       for (const account of instruction.accounts) {
         const acc = account as ModIdlAccount;
@@ -59,14 +62,12 @@ export default function useTransaction(idl: Idl) {
         }
       }
 
-      // Convert accounts to PublicKeys
       const accountPubkeys: Record<string, PublicKey> = {};
       for (const [name, address] of accountMap) {
         if (!address) throw new Error(`Missing account: ${name}`);
         accountPubkeys[toCamelCase(name)] = new PublicKey(address);
       }
 
-      // Convert args to Anchor types
       const anchorArgs = instruction.args.map((arg) => {
         const value = args[arg.name];
         if (value === undefined || value === null) {
@@ -75,7 +76,17 @@ export default function useTransaction(idl: Idl) {
         return toAnchorType(value, arg.type);
       });
 
-      // Execute transaction
+      for (const [name, pubkey] of Object.entries(accountPubkeys)) {
+        const balance = await connection.getBalance(pubkey as PublicKey);
+        console.log(
+          `${name}:`,
+          pubkey.toBase58(),
+          "Balance:",
+          balance / 1e9,
+          "SOL"
+        );
+      }
+
       const signature = await program.methods[toCamelCase(instruction.name)](
         ...anchorArgs
       )
@@ -83,27 +94,44 @@ export default function useTransaction(idl: Idl) {
         .signers(Array.from(signers.values()))
         .rpc();
 
-      // Dismiss loading toast
       txToast.dismiss(toastId);
 
-      // Show success toast
       txToast.success(
         signature,
         `Instruction ${instruction.name} executed successfully`
       );
 
+      addTransaction({
+        signature,
+        instructionName: instruction.name,
+        programId: idl.address,
+        status: "success",
+        timestamp: Date.now(),
+        accounts: Object.fromEntries(accountMap),
+      });
+
       return { signature, accounts: accountMap };
     } catch (error) {
       console.error("Transaction error:", error);
 
-      // Dismiss loading toast
       txToast.dismiss(toastId);
 
-      // Parse the error for user-friendly display
       const parsedError = parseSolanaError(error);
 
-      // Show error toast with parsed information
       txToast.error(parsedError);
+
+      const errorSignature = (error as any)?.signature;
+      if (errorSignature) {
+        addTransaction({
+          signature: errorSignature,
+          instructionName: instruction.name,
+          programId: idl.address,
+          status: "error",
+          timestamp: Date.now(),
+          error: parsedError.message,
+          accounts: accounts ? Object.fromEntries(accounts) : undefined,
+        });
+      }
 
       return null;
     } finally {

@@ -20,20 +20,22 @@ import { Toaster } from "./ui/sonner";
 import { toast } from "sonner";
 import useTransaction from "@/hooks/useTransaction";
 import { validateField } from "@/lib/validation";
+import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
   idl: Idl;
+  addTransactionRecord: (tx: TransactionRecord) => void;
 }
 
 const InstructionForm = (props: InstructionFormProps) => {
-  const { instruction, idl } = props;
+  const { instruction, idl, addTransactionRecord } = props;
   const [formData, setFormData] = React.useState<Record<string, unknown>>({});
   const [validationErrors, setValidationErrors] = React.useState<
     Record<string, string>
   >({});
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
-  const { execute, isExecuting } = useTransaction(idl);
+  const { execute, isExecuting } = useTransaction(idl, addTransactionRecord);
 
   const [accountsAddressMap, setAccountsAddressMap] = useState(
     () =>

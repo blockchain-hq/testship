@@ -29,7 +29,7 @@ interface TransactionToastProps {
 
 export function TransactionToast({
   signature,
-  status,
+  // status,
   message,
   suggestion,
   logs,
