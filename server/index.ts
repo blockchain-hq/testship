@@ -16,7 +16,6 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
     app.use(express.json());
 
     const uiPath = path.join(__dirname, "../ui");
-    app.use(express.static(uiPath));
 
     app.get("/api/idl", (req: Request, res: Response) => {
       try {
@@ -35,8 +34,9 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
       });
     });
 
-    // spa fallback route
-    app.get("*", (req, res) => {
+    app.use(express.static(uiPath));
+
+    app.use((req, res) => {
       res.sendFile(path.join(uiPath, "index.html"));
     });
 
