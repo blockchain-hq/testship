@@ -34,6 +34,10 @@ const AccountInput = (props: AccountInputProps) => {
   } = props;
 
   const dataListId = `${account.name}-suggestions`;
+  const filteredSuggestions = savedAccounts
+    .filter((savedAcc) => savedAcc.accountName === account.name)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 10);
 
   return (
     <div className="flex flex-col space-y-2 w-full justify-center items-start gap-4 border border-muted p-4 rounded-md">
@@ -82,7 +86,7 @@ const AccountInput = (props: AccountInputProps) => {
         )}
 
         <datalist id={dataListId}>
-          {savedAccounts.map((savedAcc) => (
+          {filteredSuggestions.map((savedAcc) => (
             <option key={savedAcc.address} value={savedAcc.address}>
               {savedAcc.instructionName} - {savedAcc.accountName} -{" "}
               {new Date(savedAcc.timestamp).toLocaleString()}
