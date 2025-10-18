@@ -1,5 +1,5 @@
-// API utilities for communicating with the Pulse backend
-export const API_BASE_URL = 'http://localhost:3001';
+// API utilities for communicating with the Testship backend
+export const API_BASE_URL = "http://localhost:3001";
 
 export interface InstructionRequest {
   programId: string;
@@ -16,12 +16,14 @@ export interface InstructionResponse {
 }
 
 export const api = {
-  async executeInstruction(request: InstructionRequest): Promise<InstructionResponse> {
+  async executeInstruction(
+    request: InstructionRequest
+  ): Promise<InstructionResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/execute`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(request),
       });
@@ -34,7 +36,7 @@ export const api = {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   },
@@ -47,7 +49,7 @@ export const api = {
       }
       return await response.json();
     } catch (error) {
-      console.error('Failed to fetch programs:', error);
+      console.error("Failed to fetch programs:", error);
       return [];
     }
   },
@@ -55,9 +57,9 @@ export const api = {
   async validateIDL(idl: string): Promise<{ valid: boolean; error?: string }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/validate-idl`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ idl }),
       });
@@ -70,7 +72,7 @@ export const api = {
     } catch (error) {
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   },

@@ -6,7 +6,7 @@ export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode); 
+    setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle("dark");
   };
 
@@ -16,8 +16,9 @@ export const Header = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
+              <img src="/ts.png" alt="Testship Logo" width={50} height={50} />
               <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">
-                PULSE <span className="text-accent-primary">⚡</span>
+                Testship
               </h1>
               <span className="hidden sm:block text-sm text-foreground/60 dark:text-foreground-dark/60">
                 Interactive Testing for Anchor Programs
@@ -34,11 +35,11 @@ export const Header = () => {
             >
               {isDarkMode ? (
                 <>
-                  <span>☀️</span> 
+                  <span>☀️</span>
                 </>
               ) : (
                 <>
-                  <span>🌙</span> 
+                  <span>🌙</span>
                 </>
               )}
             </Button>

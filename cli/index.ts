@@ -5,18 +5,17 @@ import { Command } from "commander";
 import { findAnchorProject } from "./project-finder";
 import { startDevServer } from "../server";
 import { getMessageFromError } from "./parse-error";
-import { select } from "@inquirer/prompts";
 
 const program = new Command();
 
 program
-  .name("pulse")
+  .name("testship")
   .description("Interactive testing for Anchor Programs")
   .version("0.1.0");
 
 program
   .command("start")
-  .description("Start PULSE development server")
+  .description("Start Testship development server")
   .option("-p, --port <port>", "Port to run on", "3000")
   .action((options) => handleStartCommand(options));
 

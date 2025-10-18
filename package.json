@@ -1,10 +1,10 @@
 {
-  "name": "pulse",
+  "name": "testship",
   "version": "0.1.0",
-  "description": "Interactive Testing for Anchor Programs",
+  "description": "Free, Open source, and Fast Testing for Solana Anchor Programs",
   "main": "index.js",
   "bin": {
-    "pulse": "./dist/cli/index.js"
+    "testship": "./dist/cli/index.js"
   },
   "files": [
     "dist/"

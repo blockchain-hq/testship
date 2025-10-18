@@ -1,8 +1,5 @@
-
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { ScrollArea } from '../ui/scroll-area';
-import { Button } from '../ui/button';
-import UseIdl from '../../hooks/useIDL';
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import UseIdl from "../../hooks/useIDL";
 
 export const Sidebar = () => {
   const { idl } = UseIdl();
@@ -22,7 +19,9 @@ export const Sidebar = () => {
             <CardContent className="pt-0">
               {idl ? (
                 <div className="text-sm text-foreground/70 dark:text-foreground-dark/70">
-                  <div className="font-medium text-foreground dark:text-foreground-dark">{idl.metadata.name}</div>
+                  <div className="font-medium text-foreground dark:text-foreground-dark">
+                    {idl.metadata.name}
+                  </div>
                   <div className="text-xs mt-1">{idl.metadata.description}</div>
                 </div>
               ) : (
@@ -34,7 +33,7 @@ export const Sidebar = () => {
           </Card>
 
           {/* Instructions Section */}
-          <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
+          {/* <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center space-x-2 text-foreground dark:text-foreground-dark">
                 <span>⚡</span>
@@ -68,10 +67,10 @@ export const Sidebar = () => {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Quick Actions */}
-          <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
+          {/* <Card className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center space-x-2 text-foreground dark:text-foreground-dark">
                 <span>🔧</span>
@@ -91,7 +90,7 @@ export const Sidebar = () => {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </nav>
       </div>
     </aside>
