@@ -1,14 +1,15 @@
 {
   "name": "@blockchain-hq/testship",
-  "version": "0.1.0",
-  "description": "Free, Open source, and Fast Testing for Solana Anchor Programs",
-  "repository": "https://github.com/blockchain-hq/testship",
+  "version": "0.1.1",
+  "description": "Interactive testing for Solana Anchor programs in the browser. Zero config, auto-generated forms, smart PDA derivation. Will be MIT licensed Dec 1, 2025.",
   "main": "index.js",
   "bin": {
-    "testship": "./dist/cli/index.js"
+    "testship": "dist/cli/index.js"
   },
   "files": [
-    "dist/"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "tsx cli/index.ts",
@@ -16,9 +17,32 @@
     "relink": "npm run build && sudo npm link",
     "test": "npm run dev start"
   },
-  "keywords": [],
-  "author": "BlockchainHQ",
-  "license": "ISC",
+  "keywords": [
+    "solana",
+    "anchor",
+    "testing",
+    "blockchain",
+    "web3",
+    "anchor-testing",
+    "solana-testing",
+    "idl",
+    "pda",
+    "developer-tools",
+    "cypherpunk"
+  ],
+  "author": {
+    "name": "BlockchainHQ",
+    "url": "https://github.com/blockchain-hq"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockchain-hq/testship.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blockchain-hq/testship/issues"
+  },
+  "homepage": "https://testship.xyz",
   "devDependencies": {
     "@types/bn.js": "^5.2.0",
     "@types/cors": "^2.8.19",
@@ -38,5 +62,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "open": "^10.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
