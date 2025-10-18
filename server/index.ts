@@ -15,8 +15,7 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
     app.use(cors());
     app.use(express.json());
 
-    const uiPath = path.join(__dirname, "../ui/dist");
-    console.log("Looking for UI at:", uiPath);
+    const uiPath = path.join(__dirname, "../ui");
     app.use(express.static(uiPath));
 
     app.get("/api/idl", (req: Request, res: Response) => {
@@ -34,6 +33,11 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
         name: project.programName,
         root: project.root,
       });
+    });
+
+    // spa fallback route
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(uiPath, "index.html"));
     });
 
     app.listen(port || 3000, async () => {
