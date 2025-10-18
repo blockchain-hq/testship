@@ -69,7 +69,7 @@ export function TransactionToast({
       {message && <p className="text-sm">{message}</p>}
 
       {suggestion && (
-        <div className="bg-muted/50 p-2 rounded text-xs max-h-32 overflow-y-auto">
+        <div className="bg-muted/20 p-2 rounded text-xs max-h-32 overflow-y-auto">
           <p className="font-semibold mb-1">💡 Suggestion:</p>
           <p className="whitespace-pre-line">{suggestion}</p>
         </div>
