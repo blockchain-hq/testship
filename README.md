@@ -1,4 +1,4 @@
-# <img src="public/ts.png" alt="testship logo" width="200"/>
+# <img src="https://www.testship.xyz/_astro/ts.Hvygf-Mj.png" alt="testship logo" width="200"/>
 
 # Testship
 
@@ -8,6 +8,23 @@
 
 [![npm version](https://img.shields.io/npm/v/@blockchain-hq/testship.svg)](https://www.npmjs.com/package/@blockchain-hq/testship)
 [![License: Restrictive→MIT](https://img.shields.io/badge/License-Restrictive%20%E2%86%92%20MIT%20Dec%202025-orange)](LICENSE)
+
+---
+
+## 🎥 Demo
+
+[![Testship Demo](https://img.youtube.com/vi/zxEXkeOBNp8/maxresdefault.jpg)](https://youtu.be/zxEXkeOBNp8)
+
+**[► Watch on YouTube](https://youtu.be/zxEXkeOBNp8)** (2 min)
+
+See how Testship makes testing Anchor programs interactive and visual. This silent demo shows:
+
+- Loading IDL from local Anchor project
+- Testing instructions with live forms
+- Real-time transaction execution
+- Built-in transaction history
+
+_Voice-over version coming soon!_
 
 ---
 
