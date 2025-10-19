@@ -5,7 +5,6 @@ import { Footer } from "./components/layout/Footer";
 import { TransactionHistory } from "./components/TransactionHistory";
 import InstructionForm from "./components/InstructionForm";
 import { Home } from "./pages/Home";
-import UseIdl from "./hooks/useIDL";
 import { useTransactionHistory } from "./hooks/useTransactionHistory";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
@@ -16,9 +15,11 @@ import {
   AccordionTrigger,
 } from "./components/ui/accordion";
 import useHasVisited from "./hooks/useHasVisited";
+import { useAppContext } from "./hooks/useAppContext";
 
 function App() {
-  const { idl, isLoading } = UseIdl();
+  // const { idl, isLoading } = UseIdl();
+  const { idl, isLoading } = useAppContext();
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
