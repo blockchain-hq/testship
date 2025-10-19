@@ -1,5 +1,4 @@
 import "./App.css";
-import { useState } from "react";
 import { Header } from "./components/layout/Header";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Footer } from "./components/layout/Footer";
@@ -16,22 +15,13 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "./components/ui/accordion";
-
-const getHasVisitedFromLocalStorage = () =>
-  localStorage.getItem("hasVisited") === "true";
-const setHasVisitedToLocalStorage = () =>
-  localStorage.setItem("hasVisited", "true");
+import useHasVisited from "./hooks/useHasVisited";
 
 function App() {
   const { idl, isLoading } = UseIdl();
-  const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
-
-  const handleGetStarted = () => {
-    setHasVisited(true);
-    setHasVisitedToLocalStorage();
-  };
+  const { hasVisited, handleVisit } = useHasVisited();
 
   if (!hasVisited) {
     return (
@@ -39,7 +29,7 @@ function App() {
         <Header />
         <div className="flex w-full">
           <main className="flex-1 min-h-screen w-full lg:ml-0">
-            <Home onGetStarted={handleGetStarted} />
+            <Home onGetStarted={handleVisit} />
           </main>
         </div>
         <Toaster />
