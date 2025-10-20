@@ -22,6 +22,8 @@ import useTransaction from "@/hooks/useTransaction";
 import { validateField } from "@/lib/validation";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 import UseShareState from "@/hooks/useShareState";
+import { Share } from "lucide-react";
+import ShareModal from "./ShareModal";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -247,13 +249,7 @@ const InstructionForm = (props: InstructionFormProps) => {
     <div className="w-full max-w-[800px] bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
       <div className="w-full">
         <Toaster />
-        <Button
-          onClick={() => {
-            prepareUrl(idl, accountsAddressMap, [instruction], formData);
-          }}
-        >
-          Share
-        </Button>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-4 w-full justify-start"
@@ -309,7 +305,14 @@ const InstructionForm = (props: InstructionFormProps) => {
           )}
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-4 gap-2">
+            <ShareModal
+              idl={idl}
+              accountMap={accountsAddressMap}
+              formData={formData}
+              instructions={[instruction]}
+              key={instruction.name}
+            />
             <Button
               type="submit"
               disabled={isExecuting}
