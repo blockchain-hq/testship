@@ -15,11 +15,10 @@ import {
   AccordionTrigger,
 } from "./components/ui/accordion";
 import useHasVisited from "./hooks/useHasVisited";
-import { useAppContext } from "./hooks/useAppContext";
+import UseIdl from "./hooks/useIDL";
 
 function App() {
-  // const { idl, isLoading } = UseIdl();
-  const { idl, isLoading } = useAppContext();
+  const { idl, isLoading } = UseIdl();
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
