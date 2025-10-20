@@ -98,7 +98,7 @@ const ShareModal = (props: ShareModalProps) => {
             </div>
 
             {shareUrl && (
-              <div className="flex items-center gap-2 mt-8">
+              <div className="flex items-center gap-2 mt-8 w-[85%] px-2">
                 <p className="text-xs bg-muted-foreground/20 px-2 py-1 rounded flex-1 overflow-hidden text-ellipsis">
                   {truncatedUrl}
                 </p>

@@ -32,8 +32,9 @@ function App() {
     console.log(currentHash, "current hash");
     if (currentHash) {
       const decompressed = LZ.decompressFromEncodedURIComponent(
-        currentHash.replace("#status=", "")
+        currentHash.replace("#state=", "")
       );
+      console.log(decompressed, "decompressed");
       const state: SharedState = JSON.parse(decompressed);
       setIdl(state.idl);
       setState(state);
