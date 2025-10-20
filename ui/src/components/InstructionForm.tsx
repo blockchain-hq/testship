@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import useTransaction from "@/hooks/useTransaction";
 import { validateField } from "@/lib/validation";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
+import UseShareState from "@/hooks/useShareState";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
@@ -30,10 +31,13 @@ interface InstructionFormProps {
 
 const InstructionForm = (props: InstructionFormProps) => {
   const { instruction, idl, addTransactionRecord } = props;
-  const [formData, setFormData] = React.useState<Record<string, unknown>>({});
+  const [formData, setFormData] = React.useState<
+    Record<string, string | number>
+  >({});
   const [validationErrors, setValidationErrors] = React.useState<
     Record<string, string>
   >({});
+  const { shareUrl, prepareUrl } = UseShareState();
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
   const { execute, isExecuting } = useTransaction(idl, addTransactionRecord);
 
@@ -243,6 +247,13 @@ const InstructionForm = (props: InstructionFormProps) => {
     <div className="w-full max-w-[800px] bg-surface dark:bg-surface-dark border-border dark:border-border-dark">
       <div className="w-full">
         <Toaster />
+        <Button
+          onClick={() => {
+            prepareUrl(idl, accountsAddressMap, [instruction], formData);
+          }}
+        >
+          Share
+        </Button>
         <form
           onSubmit={handleSubmit}
           className="space-y-4 w-full justify-start"

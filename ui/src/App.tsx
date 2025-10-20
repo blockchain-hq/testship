@@ -16,12 +16,22 @@ import {
 } from "./components/ui/accordion";
 import useHasVisited from "./hooks/useHasVisited";
 import UseIdl from "./hooks/useIDL";
+import LZ from "lz-string";
 
 function App() {
   const { idl, isLoading } = UseIdl();
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
+
+  const currentHash = window.location.hash;
+  console.log(currentHash, "current hash");
+  if (currentHash) {
+    const decompressed = LZ.decompressFromEncodedURIComponent(
+      currentHash.replace("#status=", "")
+    );
+    console.log(JSON.parse(decompressed));
+  }
 
   if (!hasVisited) {
     return (

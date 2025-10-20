@@ -35,6 +35,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       open:
         specifier: ^10.2.0
         version: 10.2.0
@@ -776,6 +779,10 @@ packages:
 
   json-stringify-safe@5.0.1:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
+
+  lz-string@1.5.0:
+    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
+    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -1761,6 +1768,8 @@ snapshots:
       - utf-8-validate
 
   json-stringify-safe@5.0.1: {}
+
+  lz-string@1.5.0: {}
 
   math-intrinsics@1.1.0: {}
 
