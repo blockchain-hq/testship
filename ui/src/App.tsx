@@ -17,21 +17,41 @@ import {
 import useHasVisited from "./hooks/useHasVisited";
 import UseIdl from "./hooks/useIDL";
 import LZ from "lz-string";
+import type { SharedState } from "./lib/types";
+import { useEffect, useState } from "react";
 
 function App() {
-  const { idl, isLoading } = UseIdl();
+  const { idl, isLoading, setIdl } = UseIdl();
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
+  const [state, setState] = useState<SharedState | null>(null);
 
-  const currentHash = window.location.hash;
-  console.log(currentHash, "current hash");
-  if (currentHash) {
-    const decompressed = LZ.decompressFromEncodedURIComponent(
-      currentHash.replace("#status=", "")
+  useEffect(() => {
+    const currentHash = window.location.hash;
+    console.log(currentHash, "current hash");
+    if (currentHash) {
+      const decompressed = LZ.decompressFromEncodedURIComponent(
+        currentHash.replace("#status=", "")
+      );
+      const state: SharedState = JSON.parse(decompressed);
+      setIdl(state.idl);
+      setState(state);
+    }
+  }, [setIdl]);
+
+  const getAccountMapForInstruction = (instructionName: string) => {
+    const accounts = state?.instructions.find(
+      (inst) => inst.name === instructionName
+    )?.accounts;
+
+    const map = new Map<string, string | null>();
+    accounts?.forEach((acc) =>
+      map.set(acc.name, acc.address ? acc.address : null)
     );
-    console.log(JSON.parse(decompressed));
-  }
+
+    return map;
+  };
 
   if (!hasVisited) {
     return (
@@ -107,6 +127,9 @@ function App() {
                             instruction={instruction}
                             idl={idl}
                             addTransactionRecord={addTransaction}
+                            accountMapFromState={getAccountMapForInstruction(
+                              instruction.name
+                            )}
                           />
                         </AccordionContent>
                       </AccordionItem>

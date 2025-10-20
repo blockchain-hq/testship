@@ -26,7 +26,13 @@ const UseIdl = () => {
   };
 
   useEffect(() => {
-    fetchIdl();
+    const hasHash = window.location.hash.includes("#status=");
+
+    if (!hasHash) {
+      fetchIdl();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   return {
@@ -34,6 +40,7 @@ const UseIdl = () => {
     error,
     isLoading: loading,
     fetchIdl,
+    setIdl,
   };
 };
 

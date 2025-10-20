@@ -21,36 +21,35 @@ import { toast } from "sonner";
 import useTransaction from "@/hooks/useTransaction";
 import { validateField } from "@/lib/validation";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
-import UseShareState from "@/hooks/useShareState";
-import { Share } from "lucide-react";
 import ShareModal from "./ShareModal";
 
 interface InstructionFormProps {
   instruction: Idl["instructions"][number];
   idl: Idl;
   addTransactionRecord: (tx: TransactionRecord) => void;
+  accountMapFromState: Map<string, string | null> | null;
 }
 
 const InstructionForm = (props: InstructionFormProps) => {
-  const { instruction, idl, addTransactionRecord } = props;
+  const { instruction, idl, addTransactionRecord, accountMapFromState } = props;
   const [formData, setFormData] = React.useState<
     Record<string, string | number>
   >({});
   const [validationErrors, setValidationErrors] = React.useState<
     Record<string, string>
   >({});
-  const { shareUrl, prepareUrl } = UseShareState();
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
   const { execute, isExecuting } = useTransaction(idl, addTransactionRecord);
 
-  const [accountsAddressMap, setAccountsAddressMap] = useState(
-    () =>
-      new Map<string, string | null>(
-        instruction.accounts.map((account: ModIdlAccount) => [
-          account.name,
-          account.address || null,
-        ])
-      )
+  const [accountsAddressMap, setAccountsAddressMap] = useState(() =>
+    accountMapFromState
+      ? new Map(accountMapFromState)
+      : new Map<string, string | null>(
+          instruction.accounts.map((account: ModIdlAccount) => [
+            account.name,
+            account.address || null,
+          ])
+        )
   );
 
   const [signersKeypairs, setSignersKeypairs] = useState<Map<string, Keypair>>(
