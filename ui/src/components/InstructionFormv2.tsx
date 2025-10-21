@@ -3,7 +3,7 @@ import type { Idl } from "@coral-xyz/anchor";
 import ArgumentForm from "./instructionForm/ArgumentForm";
 import AccountsFormv2 from "./instructionForm/AccountsFormv2";
 import { Button, ScrollArea } from "./ui";
-import { Share } from "lucide-react";
+import { MoveRight, Share } from "lucide-react";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
@@ -31,6 +31,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
         </Button>
 
         <Button className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all">
+          <MoveRight />
           Run Instruction
         </Button>
       </div>
