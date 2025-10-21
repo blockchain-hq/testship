@@ -1,4 +1,12 @@
-import { Check, X, ExternalLink, Trash2, Filter } from "lucide-react";
+import {
+  Check,
+  X,
+  ExternalLink,
+  Trash2,
+  Filter,
+  FolderArchive,
+  ArrowUpRight,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
@@ -29,6 +37,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { Empty } from "./ui/empty";
+import { EmptyHeader } from "./ui/empty";
+import { EmptyMedia } from "./ui/empty";
+import { EmptyTitle } from "./ui/empty";
+import { EmptyDescription } from "./ui/empty";
+import { EmptyContent } from "./ui/empty";
 
 interface TransactionHistoryProps {
   transactions: TransactionRecord[];
@@ -139,9 +153,40 @@ export function TransactionHistory({
         {filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8">
             <p className="text-sm">
-              {transactions.length === 0
-                ? "No transactions yet"
-                : `No ${filter} transactions`}
+              {transactions.length === 0 ? (
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <FolderArchive />
+                    </EmptyMedia>
+                    <EmptyTitle>No Transactions Yet</EmptyTitle>
+                    <EmptyDescription>
+                      You haven&apos;t run any transactions yet. Get started by
+                      running your first transaction.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    <Button
+                      variant="default"
+                      className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
+                    >
+                      Run Transaction
+                    </Button>
+                  </EmptyContent>
+                  <Button
+                    variant="link"
+                    asChild
+                    className="text-muted-foreground"
+                    size="sm"
+                  >
+                    <a href="https://docs.testship.xyz" target="_blank">
+                      Learn More <ArrowUpRight />
+                    </a>
+                  </Button>
+                </Empty>
+              ) : (
+                `No ${filter} transactions`
+              )}
             </p>
           </div>
         ) : (

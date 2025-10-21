@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
-export const Header = () => {
+interface HeaderProps {
+  programName: string;
+}
+
+export const Header = (props: HeaderProps) => {
+  const { programName } = props;
+  console.log(programName, "programName");
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
@@ -17,14 +23,14 @@ export const Header = () => {
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <img src="/ts.png" alt="Testship Logo" width={50} height={50} />
-              <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">
-                Testship
-              </h1>
-              <span className="hidden sm:block text-sm text-foreground/60 dark:text-foreground-dark/60">
-                Interactive Testing for Anchor Programs
-              </span>
             </div>
           </div>
+
+          {programName && (
+            <h2 className="font-medium text-2xl text-foreground dark:text-foreground-dark">
+              {programName}
+            </h2>
+          )}
 
           <div className="flex items-center space-x-4">
             <Button

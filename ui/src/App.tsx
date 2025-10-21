@@ -1,24 +1,21 @@
 import "./App.css";
 import { Header } from "./components/layout/Header";
-import { Sidebar } from "./components/layout/Sidebar";
 import { Footer } from "./components/layout/Footer";
 import { TransactionHistory } from "./components/TransactionHistory";
-import InstructionForm from "./components/InstructionForm";
 import { Home } from "./pages/Home";
 import { useTransactionHistory } from "./hooks/useTransactionHistory";
 import { Skeleton } from "./components/ui/skeleton";
 import { Toaster } from "./components/ui/sonner";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionContent,
-  AccordionTrigger,
-} from "./components/ui/accordion";
+
 import useHasVisited from "./hooks/useHasVisited";
 import UseIdl from "./hooks/useIDL";
 import LZ from "lz-string";
 import type { SharedState } from "./lib/types";
 import { useEffect, useState } from "react";
+import Search from "./components/instructionForm/Search";
+import { Kbd } from "./components/ui/kbd";
+import InstructionFormv2 from "./components/InstructionFormv2";
+import { SearchIcon } from "lucide-react";
 
 function App() {
   const { idl, isLoading, setIdl } = UseIdl();
@@ -26,7 +23,18 @@ function App() {
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
   const [state, setState] = useState<SharedState | null>(null);
+  const [selectedInstructionName, setSelectedInstructionName] =
+    useState<string>(idl?.instructions[0].name || "");
 
+  useEffect(() => {
+    setSelectedInstructionName(idl?.instructions[0].name || "");
+  }, [idl]);
+
+  const getSelectedInstruction = (instructionName: string) => {
+    return idl?.instructions.find(
+      (instruction) => instruction.name === instructionName
+    );
+  };
   useEffect(() => {
     const currentHash = window.location.hash;
     console.log(currentHash, "current hash");
@@ -57,7 +65,7 @@ function App() {
   if (!hasVisited) {
     return (
       <div className="min-h-screen bg-background dark:bg-background-dark w-full">
-        <Header />
+        <Header programName={idl?.metadata.name || ""} />
         <div className="flex w-full">
           <main className="flex-1 min-h-screen w-full lg:ml-0">
             <Home onGetStarted={handleVisit} />
@@ -68,12 +76,17 @@ function App() {
     );
   }
 
+  console.log(
+    getSelectedInstruction(selectedInstructionName),
+    "selected instruction"
+  );
+  console.log(idl, "idl");
+  console.log(selectedInstructionName, "selected instruction name");
+
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark w-full">
-      <Header />
-      <div className="flex w-full">
-        <Sidebar />
-
+      <Header programName={idl?.metadata.name || ""} />
+      <div className="flex w-[90%] mx-auto">
         <main className="flex-1 min-h-screen w-full lg:ml-0">
           {isLoading ? (
             <div className="p-4 sm:p-6">
@@ -88,54 +101,30 @@ function App() {
             </div>
           ) : idl ? (
             <div className="p-4 sm:p-6">
-              {/* Program Header */}
-              <div className="mb-4 sm:mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-foreground-dark mb-2">
-                  {idl.metadata.name}
-                </h1>
-                <p className="text-sm sm:text-base text-foreground/70 dark:text-foreground-dark/70">
-                  {idl.metadata.description || "Created with Anchor"}
-                </p>
-              </div>
-
               {/* Main Grid */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Left Column - Instructions */}
                 <div className="space-y-4">
-                  <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
-                    Instructions ({idl.instructions.length})
-                  </h2>
+                  <div className="flex items-center space-x-2 gap-2">
+                    <SearchIcon />
+                    <Search
+                      instructionNames={idl.instructions.map(
+                        (instruction) => instruction.name
+                      )}
+                      selectedInstructionName={selectedInstructionName}
+                      setSelectedInstructionName={(instructionName) => {
+                        setSelectedInstructionName(instructionName);
+                      }}
+                    />
+                    <Kbd>ENTER</Kbd>
+                  </div>
 
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="border-b border-border dark:border-border-dark"
-                  >
-                    {idl.instructions.map((instruction, index) => (
-                      <AccordionItem
-                        key={instruction.name}
-                        value={`item-${index}`}
-                      >
-                        <AccordionTrigger className="text-sm sm:text-base">
-                          {instruction.name}
-                          <span className="text-xs text-muted-foreground ml-2">
-                            {instruction.accounts.length} accounts,{" "}
-                            {instruction.args.length} args
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent className="animate-in slide-in-from-top-2">
-                          <InstructionForm
-                            instruction={instruction}
-                            idl={idl}
-                            addTransactionRecord={addTransaction}
-                            accountMapFromState={getAccountMapForInstruction(
-                              instruction.name
-                            )}
-                          />
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                  <InstructionFormv2
+                    instruction={
+                      getSelectedInstruction(selectedInstructionName) ?? null
+                    }
+                    idl={idl}
+                  />
                 </div>
 
                 {/* Right Column - Transaction History */}
