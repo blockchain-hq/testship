@@ -1,4 +1,4 @@
-import { Label } from "@radix-ui/react-label";
+import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import type { ModIdlAccount } from "@/lib/types";
 
