@@ -4,13 +4,16 @@ import "./index.css";
 import App from "./App.tsx";
 import WalletContextProvider from "./providers/WalletProvider.tsx";
 import { Buffer } from "buffer";
+import { TooltipProvider } from "./components/ui/tooltip.tsx";
 
 window.Buffer = Buffer;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <WalletContextProvider>
-      <App />
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
     </WalletContextProvider>
   </StrictMode>
 );

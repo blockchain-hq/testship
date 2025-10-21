@@ -1,6 +1,7 @@
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import type { ModIdlAccount } from "@/lib/types";
+import SignerAccountInput from "../accounts/SignerAccountInput";
 
 interface AccountsFormv2Props {
   accounts: ModIdlAccount[] | null;
@@ -16,19 +17,22 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
         Accounts ({accounts.length})
       </h4>
 
-      {accounts.map((account) => (
-        <div key={account.name} className="grid w-full items-center gap-3">
-          <Label
-            htmlFor={account.name}
-            className="text-sm font-medium text-foreground text-left"
-          >
-            {account.name}
-          </Label>
-          <Input
-            id={account.name}
-            type="text"
-            placeholder={`Enter value for ${account.name}`}
-            className="bg-level-3-bg
+      {accounts.map((account) =>
+        account.signer ? (
+          <SignerAccountInput key={account.name} account={account} />
+        ) : (
+          <div key={account.name} className="grid w-full items-center gap-3">
+            <Label
+              htmlFor={account.name}
+              className="text-sm font-medium text-foreground text-left"
+            >
+              {account.name}
+            </Label>
+            <Input
+              id={account.name}
+              type="text"
+              placeholder={`Enter value for ${account.name}`}
+              className="bg-level-3-bg
     border-2 border-level-3-border
     text-foreground
     placeholder:text-muted-foreground/50
@@ -37,9 +41,10 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     focus:ring-2 focus:ring-green-500/20
     transition-all
     h-11"
-          />
-        </div>
-      ))}
+            />
+          </div>
+        )
+      )}
     </div>
   );
 };

@@ -52,7 +52,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /* Level 1: Background (Furthest back) */
-  --level-1-bg: oklch(0.04 0 0); /* #0a0a0a */
+  --level-1-bg: 2b2d42; /* #0a0a0a */
 
   /* Level 2: Surface (Cards, containers) */
   --level-2-bg: oklch(0.1 0 0); /* #1a1a1a */
