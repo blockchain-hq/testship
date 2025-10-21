@@ -12,6 +12,7 @@ import {
   InfoIcon,
   NotebookPenIcon,
   PlusIcon,
+  TriangleAlert,
   WalletIcon,
 } from "lucide-react";
 import {
@@ -132,7 +133,17 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
 
       <div className="flex flex-row items-center gap-2 bg-level-3-bg border-2 border-level-3-border text-foreground placeholder:text-muted-foreground/50 focus:bg-level-3-bg focus:border-level-3-border focus:ring-2 focus:ring-green-500/20 transition-all h-11 rounded-md px-2">
         {selectedMode === "Manual Input" ? (
-          <NotebookPenIcon />
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger>
+              <TriangleAlert color="yellow" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-accent w-64">
+              <span className="text-yellow-500 text-xs ">
+                Since private key is required for signing transaction, just
+                pubkey doesn't work.
+              </span>
+            </TooltipContent>
+          </Tooltip>
         ) : selectedMode === "Connected Wallet" && signerAccount ? (
           <CheckCircle2 color="green" className="w-8 h-8" />
         ) : selectedMode === "Generate New" && signerAccount ? (
