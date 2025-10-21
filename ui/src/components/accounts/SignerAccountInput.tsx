@@ -45,6 +45,60 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
     useState<OptionType>("Connected Wallet");
   const [open, setOpen] = useState(false);
 
+  const getIconForMode = (mode: OptionType) => {
+    switch (mode) {
+      case "Connected Wallet": {
+        return (
+          <>
+            <TooltipTrigger>
+              <WalletIcon />
+            </TooltipTrigger>
+            <TooltipContent className="bg-accent text-white">
+              <p className="w-64">
+                Use the connected wallet as the signer account.
+              </p>
+            </TooltipContent>
+          </>
+        );
+      }
+      case "Generate New": {
+        return (
+          <>
+            <TooltipTrigger>
+              <PlusIcon />
+            </TooltipTrigger>
+            <TooltipContent className="bg-accent text-white">
+              <p className="w-64">
+                Generate a new keypair as the signer account.
+              </p>
+            </TooltipContent>
+          </>
+        );
+      }
+      case "Manual Input": {
+        return (
+          <>
+            <TooltipTrigger>
+              <NotebookPenIcon />
+            </TooltipTrigger>
+            <TooltipContent className="bg-accent text-white">
+              <p className="w-64">
+                Manually input the public key as the signer account.{" "}
+                <span className="text-xs text-yellow-500">
+                  Doesn't work since Private Key is needed to sign the
+                  transaction.
+                </span>
+              </p>
+            </TooltipContent>
+          </>
+        );
+      }
+      default: {
+        return null;
+      }
+    }
+  };
+
   useEffect(() => {
     if (selectedMode === "Connected Wallet") {
       setSignerAccount(publicKey?.toString() ?? "");
@@ -123,13 +177,10 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
                         setOpen(false);
                       }}
                     >
-                      {mode === "Connected Wallet" ? (
-                        <WalletIcon />
-                      ) : mode === "Generate New" ? (
-                        <PlusIcon />
-                      ) : (
-                        <NotebookPenIcon />
-                      )}
+                      <Tooltip delayDuration={100}>
+                        {getIconForMode(mode)}
+                      </Tooltip>
+
                       {mode}
                       <Check
                         className={cn(
