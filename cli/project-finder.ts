@@ -3,6 +3,7 @@ import fs from "fs";
 import chalk from "chalk";
 import { AnchorProject } from "../shared/types";
 import { select } from "@inquirer/prompts";
+import { DEPLOY_DIR, IDL_DIR } from "../shared/constant";
 
 export const findAnchorProject = async (
   cwd: string
@@ -16,7 +17,7 @@ export const findAnchorProject = async (
   }
 
   // check idl file for program name
-  const idlDirPath = path.join(cwd, "target/idl");
+  const idlDirPath = path.join(cwd, IDL_DIR);
   if (!fs.existsSync(idlDirPath)) {
     throw new Error(
       "No IDL directory found. \n\n" + chalk.yellow("Please run: anchor build")
@@ -46,10 +47,9 @@ export const findAnchorProject = async (
     });
   }
 
-  // TODO: implement selector for multiple programs
   const programName = idlFiles[programIndex].replace(".json", "");
   const idlPath = path.join(idlDirPath, idlFiles[programIndex]);
-  const programPath = path.join(cwd, `target/deploy/${programName}.so`);
+  const programPath = path.join(cwd, `${DEPLOY_DIR}/${programName}.so`);
 
   return {
     root: cwd,

@@ -5,6 +5,7 @@ import { AnchorProject } from "../shared/types";
 import chalk from "chalk";
 import path from "path";
 import open from "open";
+import { DEFAULT_HOST, DEFAULT_PORT } from "../shared/constant";
 
 export const startDevServer = async (project: AnchorProject, port?: number) => {
   try {
@@ -40,21 +41,11 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
       res.sendFile(path.join(uiPath, "index.html"));
     });
 
-    app.listen(port || 3000, async () => {
+    app.listen(port || DEFAULT_PORT, async () => {
       // TODO: implement automatic increment of port if current one is already in use
-      console.log(chalk.green(`Dev server listening on port ${port || 3000}`));
-      console.log(
-        chalk.green(`Dev server live at: http://localhost:${port || 3000}`)
-      );
-
-      // TODO: remove conditional opening of browser
-      // this tool will be used by devs during development so
-      // their environment would be set to development then
-
-      console.log(chalk.green("Production Mode"));
 
       setTimeout(async () => {
-        await open(`http://localhost:${port || 3000}`);
+        await open(`http://${DEFAULT_HOST}:${port || DEFAULT_PORT.toString()}`);
       }, 1000);
     });
   } catch (error) {

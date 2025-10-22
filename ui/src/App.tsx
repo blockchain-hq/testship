@@ -48,7 +48,7 @@ const driverObj = driver({
 
 function App() {
   const { idl, isLoading, setIdl } = UseIdl();
-  const { transactions, clearHistory, removeTransaction, addTransaction } =
+  const { transactions, clearHistory, removeTransaction } =
     useTransactionHistory();
   const { hasVisited, handleVisit } = useHasVisited();
   const [state, setState] = useState<SharedState | null>(null);
@@ -89,18 +89,18 @@ function App() {
     }
   }, [hasVisited, idl, state]);
 
-  const getAccountMapForInstruction = (instructionName: string) => {
-    const accounts = state?.instructions.find(
-      (inst) => inst.name === instructionName
-    )?.accounts;
+  // const getAccountMapForInstruction = (instructionName: string) => {
+  //   const accounts = state?.instructions.find(
+  //     (inst) => inst.name === instructionName
+  //   )?.accounts;
 
-    const map = new Map<string, string | null>();
-    accounts?.forEach((acc) =>
-      map.set(acc.name, acc.address ? acc.address : null)
-    );
+  //   const map = new Map<string, string | null>();
+  //   accounts?.forEach((acc) =>
+  //     map.set(acc.name, acc.address ? acc.address : null)
+  //   );
 
-    return map;
-  };
+  //   return map;
+  // };
 
   if (!hasVisited) {
     return (

@@ -11,7 +11,7 @@ interface InstructionFormv2Props {
 }
 
 const InstructionFormv2 = (props: InstructionFormv2Props) => {
-  const { instruction, idl } = props;
+  const { instruction } = props;
   if (!instruction) return null;
   return (
     <div
