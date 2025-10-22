@@ -16,6 +16,35 @@ import Search from "./components/instructionForm/Search";
 import { Kbd } from "./components/ui/kbd";
 import InstructionFormv2 from "./components/InstructionFormv2";
 import { SearchIcon } from "lucide-react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+
+const driverObj = driver({
+  showProgress: true,
+  steps: [
+    {
+      element: "#search-instruction-form",
+      popover: {
+        title: "Search Instruction",
+        description: "Search for an instruction to test",
+      },
+    },
+    {
+      element: "#instruction-form",
+      popover: {
+        title: "Fill in Form",
+        description: "Fill the remaining details in form",
+      },
+    },
+    {
+      element: "#run-instruction-btn",
+      popover: {
+        title: "Run Instruction Button",
+        description: "Click the button to send transaction",
+      },
+    },
+  ],
+});
 
 function App() {
   const { idl, isLoading, setIdl } = UseIdl();
@@ -48,6 +77,17 @@ function App() {
       setState(state);
     }
   }, [setIdl]);
+
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem("hasSeenTour") === "true";
+
+    if (hasVisited && idl && (!hasSeenTour || state)) {
+      setTimeout(() => {
+        driverObj.drive();
+        localStorage.setItem("hasSeenTour", "true");
+      }, 500);
+    }
+  }, [hasVisited, idl, state]);
 
   const getAccountMapForInstruction = (instructionName: string) => {
     const accounts = state?.instructions.find(
@@ -105,7 +145,10 @@ function App() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Left Column - Instructions */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2 gap-2">
+                  <div
+                    className="flex items-center space-x-2 gap-2"
+                    id="search-instruction-form"
+                  >
                     <SearchIcon />
                     <Search
                       instructionNames={idl.instructions.map(
@@ -116,7 +159,7 @@ function App() {
                         setSelectedInstructionName(instructionName);
                       }}
                     />
-                    <Kbd>ENTER</Kbd>
+                    <Kbd>CTRL + K</Kbd>
                   </div>
 
                   <InstructionFormv2

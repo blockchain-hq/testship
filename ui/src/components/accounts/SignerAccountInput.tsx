@@ -11,6 +11,7 @@ import {
   ChevronDown,
   InfoIcon,
   NotebookPenIcon,
+  PenLineIcon,
   PlusIcon,
   TriangleAlert,
   WalletIcon,
@@ -26,6 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ModIdlAccount } from "@/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Badge } from "../ui";
 
 type OptionType = "Connected Wallet" | "Generate New" | "Manual Input";
 const options: OptionType[] = [
@@ -111,7 +113,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
 
   return (
     <div className="grid w-full items-center gap-3">
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 w-full">
         <Label
           htmlFor="signerAccount"
           className="text-sm font-medium text-foreground text-left"
@@ -129,6 +131,14 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             </p>
           </TooltipContent>
         </Tooltip>
+
+        <Badge
+          variant="outline"
+          className="self-end ml-auto text-xs gap-2 text-black bg-yellow-300/50 "
+        >
+          <PenLineIcon className="w-4 h-4" />
+          Signer
+        </Badge>
       </div>
 
       <div className="flex flex-row items-center gap-2 bg-level-3-bg border-2 border-level-3-border text-foreground placeholder:text-muted-foreground/50 focus:bg-level-3-bg focus:border-level-3-border focus:ring-2 focus:ring-green-500/20 transition-all h-11 rounded-md px-2">

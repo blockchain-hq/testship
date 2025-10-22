@@ -34,10 +34,15 @@ const Search = (props: SearchProps) => {
   } = props;
   const [open, setOpen] = React.useState(false);
 
-  useHotkeys("enter", () => {
-    // open the search popover
-    setOpen(true);
-  });
+  useHotkeys(
+    "ctrl+k",
+    () => {
+      setOpen(true);
+    },
+    {
+      enableOnFormTags: ["INPUT", "TEXTAREA", "SELECT"],
+    }
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

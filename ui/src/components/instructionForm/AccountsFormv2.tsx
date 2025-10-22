@@ -2,6 +2,9 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import type { ModIdlAccount } from "@/lib/types";
 import SignerAccountInput from "../accounts/SignerAccountInput";
+import { isAccountPda } from "@/lib/pdaUtils";
+import { Badge } from "../ui";
+import { KeyIcon } from "lucide-react";
 
 interface AccountsFormv2Props {
   accounts: ModIdlAccount[] | null;
@@ -22,12 +25,25 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
           <SignerAccountInput key={account.name} account={account} />
         ) : (
           <div key={account.name} className="grid w-full items-center gap-3">
-            <Label
-              htmlFor={account.name}
-              className="text-sm font-medium text-foreground text-left"
-            >
-              {account.name}
-            </Label>
+            <div className="flex flex-row items-center gap-2 w-full">
+              <Label
+                htmlFor={account.name}
+                className="text-sm font-medium text-foreground text-left"
+              >
+                {account.name}
+              </Label>
+
+              {isAccountPda(account) && (
+                <Badge
+                  variant="outline"
+                  className="self-end ml-auto text-xs gap-2 text-black bg-yellow-300/50 "
+                >
+                  <KeyIcon className="w-4 h-4" />
+                  PDA
+                </Badge>
+              )}
+            </div>
+
             <Input
               id={account.name}
               type="text"

@@ -14,7 +14,10 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   const { instruction, idl } = props;
   if (!instruction) return null;
   return (
-    <div className="bg-level-2-bg w-full max-w-[800px] border-level-2-border border rounded-md p-4 space-y-8">
+    <div
+      className="bg-level-2-bg w-full max-w-[800px] border-level-2-border border rounded-md p-4 space-y-8"
+      id="instruction-form"
+    >
       <ScrollArea className="h-[60vh] border border-level-2-border rounded-md overflow-hidden">
         <div className="space-y-8">
           <ArgumentForm args={instruction.args ?? null} />
@@ -30,7 +33,10 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           <Share />
         </Button>
 
-        <Button className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all">
+        <Button
+          className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
+          id="run-instruction-btn"
+        >
           <MoveRight />
           Run Instruction
         </Button>
