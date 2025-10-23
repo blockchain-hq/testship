@@ -2,14 +2,20 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import fs from "fs";
 import { AnchorProject } from "../shared/types";
-import chalk from "chalk";
 import path from "path";
 import open from "open";
+import getPort from "get-port";
 import { DEFAULT_HOST, DEFAULT_PORT } from "../shared/constant";
+import { Ora } from "ora";
+import { getMessageFromError } from "../cli/parse-error";
 
-export const startDevServer = async (project: AnchorProject, port?: number) => {
+export const startDevServer = async (
+  project: AnchorProject,
+  ora: Ora,
+  port?: number
+) => {
   try {
-    console.log("Starting dev server...");
+    ora.start("Starting dev server...");
 
     const app = express();
 
@@ -41,14 +47,44 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
       res.sendFile(path.join(uiPath, "index.html"));
     });
 
-    app.listen(port || DEFAULT_PORT, async () => {
-      // TODO: implement automatic increment of port if current one is already in use
+    const availablePort = await getPort({ port: port || DEFAULT_PORT });
 
+    const server = app.listen(availablePort, async () => {
+      const url = `http://${DEFAULT_HOST}:${availablePort}`;
       setTimeout(async () => {
-        await open(`http://${DEFAULT_HOST}:${port || DEFAULT_PORT.toString()}`);
+        ora.start("Opening browser...");
+        try {
+          await open(url);
+          ora.succeed(`Browser opened at ${url}`);
+        } catch (error) {
+          ora.fail("Could not open browser");
+          ora.info(`Please visit ${url} manually`);
+        }
       }, 1000);
     });
+
+    const shutdown = () => {
+      ora.start("Shutting down server...");
+      server.close(() => {
+        ora.succeed("Server closed");
+        process.exit(0);
+      });
+
+      // Force close after 10s
+      setTimeout(() => {
+        ora.fail("Forcing shutdown");
+        process.exit(1);
+      }, 10000);
+    };
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
+
+    return server;
   } catch (error) {
-    console.error(chalk.red(`Error starting dev server: `), error);
+    ora.fail("Error starting dev server");
+    ora.info(getMessageFromError(error));
+    process.exit(1);
+    throw error;
   }
 };

@@ -40,8 +40,7 @@ const handleStartCommand = async (options: StartOptions) => {
     console.log(chalk.gray(`  IDL: ${anchorProject.idlPath}`));
     console.log();
 
-    await startDevServer(anchorProject, port);
-    spinner.succeed(`Server running at http://localhost:${port}`);
+    await startDevServer(anchorProject, spinner, port);
   } catch (error) {
     spinner.fail("Error starting dev server");
     console.error(chalk.red(`Error: `), getMessageFromError(error));
