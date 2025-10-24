@@ -13,16 +13,15 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background dark:bg-background-dark shadow-sm border-b w-full">
+    <header className="bg-background dark:bg-background-dark shadow-sm border-b w-full h-16">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <img src="/ts.png" alt="Testship Logo" width={50} height={50} />
             </div>
+            <HeaderProgramInfo />
           </div>
-
-          <HeaderProgramInfo />
 
           <div className="flex items-center space-x-4">
             <Button
