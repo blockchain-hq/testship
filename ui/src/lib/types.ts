@@ -1,4 +1,5 @@
 import type { Idl } from "@coral-xyz/anchor";
+import type { Keypair } from "@solana/web3.js";
 
 export type PDASeed = {
   kind: string;
@@ -65,3 +66,18 @@ export interface SharedState {
   instructions: SharedInstruction[];
   timestamp: number;
 }
+
+export type InstructionState = {
+  formData: Record<string, string | number>;
+  accountsAddresses: Map<string, string | null>;
+  signersKeypairs: Map<string, Keypair>;
+  lastUpdated: Date;
+};
+
+export type GlobalInstructionsState = Record<string, InstructionState>;
+
+export type AppState = {
+  instructions: GlobalInstructionsState;
+  activeInstruction: string | null;
+  idl: Idl;
+};

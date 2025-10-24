@@ -1,14 +1,10 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { MoonIcon, SunIcon } from "lucide-react";
+import HeaderProgramInfo from "./HeaderProgramInfo";
 
-interface HeaderProps {
-  programName: string;
-}
-
-export const Header = (props: HeaderProps) => {
-  const { programName } = props;
-  console.log(programName, "programName");
+export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
@@ -17,7 +13,7 @@ export const Header = (props: HeaderProps) => {
   };
 
   return (
-    <header className="bg-surface dark:bg-surface-dark shadow-sm border-b border-border dark:border-border-dark w-full">
+    <header className="bg-background dark:bg-background-dark shadow-sm border-b w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -26,11 +22,7 @@ export const Header = (props: HeaderProps) => {
             </div>
           </div>
 
-          {programName && (
-            <h2 className="font-medium text-2xl text-foreground dark:text-foreground-dark">
-              {programName}
-            </h2>
-          )}
+          <HeaderProgramInfo />
 
           <div className="flex items-center space-x-4">
             <Button
@@ -41,11 +33,11 @@ export const Header = (props: HeaderProps) => {
             >
               {isDarkMode ? (
                 <>
-                  <span>☀️</span>
+                  <SunIcon />
                 </>
               ) : (
                 <>
-                  <span>🌙</span>
+                  <MoonIcon />
                 </>
               )}
             </Button>

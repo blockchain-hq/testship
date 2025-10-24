@@ -5,6 +5,8 @@ import App from "./App.tsx";
 import WalletContextProvider from "./providers/WalletProvider.tsx";
 import { Buffer } from "buffer";
 import { TooltipProvider } from "./components/ui/tooltip.tsx";
+import { InstructionsProvider } from "./context/InstructionsContext.tsx";
+import { IDLProvider } from "./context/IDLContext.tsx";
 
 window.Buffer = Buffer;
 
@@ -12,7 +14,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <WalletContextProvider>
       <TooltipProvider>
-        <App />
+        <IDLProvider>
+          <InstructionsProvider>
+            <App />
+          </InstructionsProvider>
+        </IDLProvider>
       </TooltipProvider>
     </WalletContextProvider>
   </StrictMode>
