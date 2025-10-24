@@ -106,7 +106,9 @@ const InstructionForm = (props: InstructionFormProps) => {
   };
 
   const handleInputChange = (name: string, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Convert unknown to string | number for formData
+    const convertedValue = value === undefined ? "" : (typeof value === "boolean" ? String(value) : value as string | number);
+    setFormData((prev) => ({ ...prev, [name]: convertedValue }));
 
     const arg = instruction.args?.find((arg) => arg.name === name);
     const argType = arg?.type;

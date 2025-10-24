@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { type Idl } from "@coral-xyz/anchor";
+import { useWebSocket } from "./useWebSocket";
 
 const UseIdl = () => {
   const [idl, setIdl] = useState<Idl | null>(null);
@@ -25,6 +26,26 @@ const UseIdl = () => {
     }
   };
 
+  // WebSocket connection for real-time updates
+  const { isConnected } = useWebSocket({
+    url: "ws://localhost:3000",
+    onMessage: (message) => {
+      if (message === "IDL_UPDATED") {
+        console.log("IDL updated, refreshing...");
+        fetchIdl();
+      }
+    },
+    onOpen: () => {
+      console.log("Connected to Testship WebSocket");
+    },
+    onClose: () => {
+      console.log("Disconnected from Testship WebSocket");
+    },
+    onError: (error) => {
+      console.error("WebSocket error:", error);
+    },
+  });
+
   useEffect(() => {
     const hasHash = window.location.hash.includes("#status=");
 
@@ -41,6 +62,7 @@ const UseIdl = () => {
     isLoading: loading,
     fetchIdl,
     setIdl,
+    isWebSocketConnected: isConnected,
   };
 };
 
