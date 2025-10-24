@@ -11,9 +11,9 @@ const ArgumentForm = (props: ArgumentFormProps) => {
 
   if (!args) return null;
   return (
-    <div className="bg-level-2-bg w-full max-w-[800px] border-level-2-border border rounded-md p-4 gap-4">
+    <div className="bg-card border border-border/50 rounded-md p-4 space-y-4">
       <h4 className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
-        Arguments ({args.length})
+        {args.length > 0 ? `Arguments (${args.length})` : "No Arguments"}
       </h4>
 
       {args.map((arg) => (
@@ -33,15 +33,6 @@ const ArgumentForm = (props: ArgumentFormProps) => {
             id={arg.name}
             type="text"
             placeholder={`Enter value for ${arg.name}`}
-            className="bg-level-3-bg
-    border-2 border-level-3-border
-    text-foreground
-    placeholder:text-muted-foreground/50
-    focus:bg-level-3-bg
-    focus:border-level-3-border
-    focus:ring-2 focus:ring-green-500/20
-    transition-all
-    h-11"
           />
         </div>
       ))}

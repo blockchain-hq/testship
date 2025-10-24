@@ -15,9 +15,9 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
 
   if (!accounts) return null;
   return (
-    <div className="flex flex-col bg-level-2-bg w-full max-w-[800px] border-level-2-border border rounded-md p-4 gap-8">
+    <div className="flex flex-col bg-card border border-border/50 rounded-md p-4 space-y-4">
       <h4 className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
-        Accounts ({accounts.length})
+        {accounts.length > 0 ? `Accounts (${accounts.length})` : "No Accounts"}
       </h4>
 
       {accounts.map((account) =>
@@ -48,15 +48,6 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
               id={account.name}
               type="text"
               placeholder={`Enter value for ${account.name}`}
-              className="bg-level-3-bg
-    border-2 border-level-3-border
-    text-foreground
-    placeholder:text-muted-foreground/50
-    focus:bg-level-3-bg
-    focus:border-level-3-border
-    focus:ring-2 focus:ring-green-500/20
-    transition-all
-    h-11"
             />
           </div>
         )

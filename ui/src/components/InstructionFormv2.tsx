@@ -15,11 +15,11 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   if (!instruction) return null;
   return (
     <div
-      className="bg-level-2-bg w-full max-w-[800px] border-level-2-border border rounded-md p-4 space-y-8"
+      className="w-full max-w-[800px] bg-card border border-border/50 rounded-md p-4 space-y-8"
       id="instruction-form"
     >
-      <ScrollArea className="h-[60vh] border border-level-2-border rounded-md overflow-hidden">
-        <div className="space-y-8">
+      <ScrollArea className="h-[60vh] rounded-md overflow-hidden">
+        <div className="space-y-4">
           <ArgumentForm args={instruction.args ?? null} />
           <AccountsFormv2 accounts={instruction.accounts ?? null} />
         </div>
