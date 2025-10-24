@@ -18,7 +18,7 @@ export const isPdaComplexToDerive = (account: ModIdlAccount) => {
     : false;
 };
 
-// NEW: Get human-readable dependencies
+// human readable dependencies
 export const getPDADependencies = (account: ModIdlAccount) => {
   if (!isAccountPda(account)) return { args: [], accounts: [], complex: [] };
 
@@ -32,10 +32,8 @@ export const getPDADependencies = (account: ModIdlAccount) => {
       args.push(seed.path);
     } else if (seed.kind === "account") {
       if (seed.account) {
-        // Complex: depends on account field
         complex.push(seed.path || "unknown");
       } else {
-        // Simple: just account address
         accounts.push(seed.path || "unknown");
       }
     }
@@ -44,7 +42,6 @@ export const getPDADependencies = (account: ModIdlAccount) => {
   return { args, accounts, complex };
 };
 
-// NEW: Get status message for PDA
 export const getPDAStatusMessage = (
   account: ModIdlAccount,
   formData: Record<string, string | number>,
@@ -55,21 +52,18 @@ export const getPDAStatusMessage = (
   const deps = getPDADependencies(account);
   const missing: string[] = [];
 
-  // Check missing args
   deps.args.forEach((argName) => {
     if (!formData[argName]) {
       missing.push(`argument: ${argName}`);
     }
   });
 
-  // Check missing accounts (simple)
   deps.accounts.forEach((accountName) => {
     if (!accountsAddressMap.get(accountName)) {
       missing.push(`account: ${accountName}`);
     }
   });
 
-  // Check complex dependencies
   deps.complex.forEach((path) => {
     const [accountName] = path.split(".");
     const address =
@@ -88,7 +82,6 @@ export const getPDAStatusMessage = (
   return `Waiting for: ${missing.join(", ")}`;
 };
 
-// NEW: Check if can attempt derivation
 export const canAttemptDerivation = (
   account: ModIdlAccount,
   formData: Record<string, string | number>,
@@ -107,13 +100,11 @@ export const canAttemptDerivation = (
 
     if (seed.kind === "account") {
       if (seed.account) {
-        // Complex: need account address (will fetch data later)
         const [accountName] = seed.path!.split(".");
         const address =
           formData[accountName] || accountsAddressMap.get(accountName);
         if (!address) return false;
       } else {
-        // Simple: just need address
         if (!accountsAddressMap.get(seed.path!)) return false;
       }
     }

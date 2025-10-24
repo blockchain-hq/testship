@@ -6,6 +6,7 @@ import NoInstructionSelectedView from "./NoInstructionSelectedView";
 import NoIDLView from "./NoIDLView";
 import { TransactionHistory } from "./TransactionHistory";
 import { useTransactionHistory } from "@/hooks/useTransactionHistory";
+import { UtilityDialog } from "./UtilityDialog";
 
 const MainView = () => {
   const { activeInstruction } = useInstructions();
@@ -43,6 +44,7 @@ const MainView = () => {
 
         {/* right col - tx history */}
         <div className="h-[calc(100vh-16rem)] sticky top-4">
+          <UtilityDialog />
           <TransactionHistory
             transactions={transactions}
             onClear={clearHistory}

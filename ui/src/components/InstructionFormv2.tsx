@@ -155,7 +155,14 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
     if (result) {
       toast.success("Instruction executed successfully");
-      // TODO: add accounts to saved accounts
+      addTransaction({
+        signature: result.signature,
+        instructionName: instruction.name,
+        programId: idl.address,
+        status: "success",
+        timestamp: Date.now(),
+        accounts: Object.fromEntries(result.accounts ?? []),
+      });
     }
   };
 
