@@ -28,27 +28,27 @@ export const UtilityDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="hover:bg-[#00bf63]/10 hover:border-[#00bf63]/50 transition-colors"
-        >
-          <WrenchIcon className="size-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="hover:bg-[#00bf63]/10 hover:border-[#00bf63]/50 transition-colors"
+            >
+              <WrenchIcon className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent sideOffset={8}>
+            <p className="w-64">
+              Helpful tools for working with Solana programs
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <WrenchIcon className="size-5" />
-              </TooltipTrigger>
-              <TooltipContent className=" text-white" sideOffset={8}>
-                <p className="w-64">
-                  Helpful tools for working with Solana programs
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <WrenchIcon className="size-5" />
           </DialogTitle>
           <DialogDescription>
             Helpful tools for working with Solana programs
