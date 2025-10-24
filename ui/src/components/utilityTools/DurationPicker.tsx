@@ -54,7 +54,6 @@ export const DurationPicker = () => {
             onChange={(e) => setDays(e.target.value)}
             placeholder="0"
             min="0"
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
         <div className="space-y-2">
@@ -67,7 +66,6 @@ export const DurationPicker = () => {
             placeholder="0"
             min="0"
             max="23"
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
         <div className="space-y-2">
@@ -80,7 +78,6 @@ export const DurationPicker = () => {
             placeholder="0"
             min="0"
             max="59"
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
         <div className="space-y-2">
@@ -93,7 +90,6 @@ export const DurationPicker = () => {
             placeholder="0"
             min="0"
             max="59"
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
       </div>

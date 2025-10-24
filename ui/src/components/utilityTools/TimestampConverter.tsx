@@ -48,7 +48,6 @@ export const TimestampConverter = () => {
             type="date"
             value={dateValue}
             onChange={(e) => setDateValue(e.target.value)}
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
         <div className="flex-1 space-y-2">
@@ -58,7 +57,6 @@ export const TimestampConverter = () => {
             type="time"
             value={timeValue}
             onChange={(e) => setTimeValue(e.target.value)}
-            className="focus-visible:ring-[#00bf63]/50"
           />
         </div>
       </div>

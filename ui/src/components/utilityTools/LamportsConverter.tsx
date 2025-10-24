@@ -49,7 +49,6 @@ export const LamportsConverter = () => {
           placeholder="9"
           min="0"
           max="18"
-          className="focus-visible:ring-[#00bf63]/50"
         />
         <p className="text-xs text-muted-foreground">
           Default is 9 for SOL. Most SPL tokens use 6 or 9.
@@ -65,7 +64,6 @@ export const LamportsConverter = () => {
           onChange={(e) => setSolAmount(e.target.value)}
           placeholder="1.5"
           step="any"
-          className="focus-visible:ring-[#00bf63]/50"
         />
         <p className="text-xs text-muted-foreground">
           Enter the amount in human-readable format (e.g., 1.5 SOL)

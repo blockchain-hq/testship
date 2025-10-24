@@ -70,7 +70,7 @@ export const StringEncoder = () => {
               value={stringValue}
               onChange={(e) => setStringValue(e.target.value)}
               placeholder='Enter string (e.g., "my-seed")'
-              className="font-mono focus-visible:ring-[#00bf63]/50 min-h-[80px]"
+              className="font-mono min-h-[80px]"
             />
             <p className="text-xs text-muted-foreground">
               UTF-8 encoded string for PDA seeds
@@ -123,7 +123,7 @@ export const StringEncoder = () => {
               value={bytesValue}
               onChange={(e) => setBytesValue(e.target.value)}
               placeholder="[109, 121, 45, 115, 101, 101, 100]"
-              className="font-mono focus-visible:ring-[#00bf63]/50 min-h-[80px]"
+              className="font-mono min-h-[80px]"
             />
             <p className="text-xs text-muted-foreground">
               Enter byte array as JSON (e.g., [109, 121, 45, 115, 101, 101,
