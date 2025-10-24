@@ -146,11 +146,11 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
         </Badge>
       </div>
 
-      <div className="flex flex-row items-center gap-2 bg-card border text-foreground placeholder:text-muted-foreground/50 focus:bg-card focus:border-border/50 focus:ring-2 focus:ring-green-500/20 transition-all h-11 rounded-md px-2">
+      <div className="flex flex-row items-center gap-2 bg-transparent border border-input rounded-md px-3 h-9 focus-within:outline-none focus-within:ring-1 focus-within:ring-ring transition-colors">
         {selectedMode === "Manual Input" ? (
           <Tooltip delayDuration={100}>
             <TooltipTrigger>
-              <TriangleAlert color="yellow" />
+              <TriangleAlert color="yellow" className="w-4 h-4 flex-shrink-0" />
             </TooltipTrigger>
             <TooltipContent className="bg-accent w-64">
               <span className="text-yellow-500 text-xs ">
@@ -160,16 +160,16 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             </TooltipContent>
           </Tooltip>
         ) : selectedMode === "Connected Wallet" && signerAccountAddress ? (
-          <CheckCircle2 color="green" className="w-8 h-8" />
+          <CheckCircle2 color="green" className="w-4 h-4 flex-shrink-0" />
         ) : selectedMode === "Generate New" && signerAccountKeypair ? (
-          <CheckCircle2 color="green" className="w-8 h-8" />
+          <CheckCircle2 color="green" className="w-4 h-4 flex-shrink-0" />
         ) : null}
 
         <Input
           id="signerAccount"
           type="text"
           placeholder="Enter value for signer account"
-          className="border-none active:ring-0 focus:ring-0"
+          className="border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0 h-auto"
           value={signerAccountAddress ?? ""}
           onChange={(e) => onChange(e.target.value, null)}
         />

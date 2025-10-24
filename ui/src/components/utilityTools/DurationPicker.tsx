@@ -43,7 +43,7 @@ export const DurationPicker = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-foreground">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="days">Days</Label>
@@ -99,7 +99,7 @@ export const DurationPicker = () => {
           variant="outline"
           size="sm"
           onClick={handleClear}
-          className="flex-1 hover:bg-[#00bf63]/10 hover:border-[#00bf63]/50"
+          className="flex-1"
         >
           Clear
         </Button>
@@ -120,7 +120,6 @@ export const DurationPicker = () => {
             size="icon"
             variant="outline"
             onClick={() => handleCopy(totalSeconds)}
-            className="hover:bg-[#00bf63]/10 hover:border-[#00bf63]"
           >
             {copied ? (
               <CheckIcon className="size-4 text-[#00bf63]" />
@@ -141,7 +140,7 @@ export const DurationPicker = () => {
             variant="outline"
             size="sm"
             onClick={() => handleSetCommonDuration({ h: 1 })}
-            className="text-xs hover:bg-[#00bf63]/10"
+            className="text-xs"
           >
             1 Hour
           </Button>
@@ -149,7 +148,7 @@ export const DurationPicker = () => {
             variant="outline"
             size="sm"
             onClick={() => handleSetCommonDuration({ d: 1 })}
-            className="text-xs hover:bg-[#00bf63]/10"
+            className="text-xs"
           >
             1 Day
           </Button>
@@ -157,7 +156,7 @@ export const DurationPicker = () => {
             variant="outline"
             size="sm"
             onClick={() => handleSetCommonDuration({ d: 7 })}
-            className="text-xs hover:bg-[#00bf63]/10"
+            className="text-xs"
           >
             1 Week
           </Button>
@@ -165,7 +164,7 @@ export const DurationPicker = () => {
             variant="outline"
             size="sm"
             onClick={() => handleSetCommonDuration({ d: 30 })}
-            className="text-xs hover:bg-[#00bf63]/10"
+            className="text-xs"
           >
             30 Days
           </Button>

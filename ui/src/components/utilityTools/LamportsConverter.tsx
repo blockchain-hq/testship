@@ -38,7 +38,7 @@ export const LamportsConverter = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-foreground">
       <div className="space-y-2">
         <Label htmlFor="decimals">Token Decimals</Label>
         <Input

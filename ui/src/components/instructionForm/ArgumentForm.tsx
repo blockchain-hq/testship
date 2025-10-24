@@ -46,10 +46,7 @@ const ArgumentForm = (props: ArgumentFormProps) => {
             placeholder={`Enter value for ${arg.name}`}
             value={formData[arg.name]}
             onChange={(e) => handleChange(arg.name, e.target.value)}
-            className={cn(
-              "border-input-border text-foreground",
-              validationErrors[arg.name] && "border-red-500"
-            )}
+            className={cn(validationErrors[arg.name] && "border-red-500")}
           />
         </div>
       ))}

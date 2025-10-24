@@ -196,19 +196,15 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       </ScrollArea>
 
       <div className="flex flex-row justify-end items-center gap-2">
-        <Button
-          variant="outline"
-          type="button"
-          className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
-        >
+        <Button variant="outline" type="button">
           <Share />
         </Button>
 
         <Button
           disabled={isExecuting}
-          className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
           id="run-instruction-btn"
           type="submit"
+          className=" transition-[width,transform,opacity] duration-300 ease-in-out"
         >
           {isExecuting ? (
             <>

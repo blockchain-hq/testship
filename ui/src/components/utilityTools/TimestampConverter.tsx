@@ -39,7 +39,7 @@ export const TimestampConverter = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-foreground">
       <div className="flex gap-4">
         <div className="flex-1 space-y-2">
           <Label htmlFor="date">Date</Label>

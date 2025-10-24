@@ -20,7 +20,6 @@ import { TimestampConverter } from "./utilityTools/TimestampConverter";
 import { LamportsConverter } from "./utilityTools/LamportsConverter";
 import { StringEncoder } from "./utilityTools/StringEncoder";
 import { DurationPicker } from "./utilityTools/DurationPicker";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);
@@ -28,27 +27,14 @@ export const UtilityDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="hover:bg-[#00bf63]/10 hover:border-[#00bf63]/50 transition-colors"
-            >
-              <WrenchIcon className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent sideOffset={8}>
-            <p className="w-64">
-              Helpful tools for working with Solana programs
-            </p>
-          </TooltipContent>
-        </Tooltip>
+        <Button variant="outline" size="icon">
+          <WrenchIcon className="size-4" />
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] border border-border/50 text-foreground bg-card">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <WrenchIcon className="size-5" />
+            <WrenchIcon className="size-5 text-foreground" />
           </DialogTitle>
           <DialogDescription>
             Helpful tools for working with Solana programs

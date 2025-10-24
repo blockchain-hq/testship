@@ -19,7 +19,7 @@ export const StringEncoder = () => {
       const bytes = encoder.encode(stringValue);
       const byteArray = Array.from(bytes);
       setBytesValue(JSON.stringify(byteArray));
-    } catch (error) {
+    } catch {
       setBytesValue("Error encoding string");
     }
   };
@@ -35,7 +35,7 @@ export const StringEncoder = () => {
       const uint8Array = new Uint8Array(byteArray);
       const decoded = decoder.decode(uint8Array);
       setStringValue(decoded);
-    } catch (error) {
+    } catch {
       setStringValue("Error decoding bytes");
     }
   };
@@ -45,17 +45,12 @@ export const StringEncoder = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-foreground">
       <div className="flex items-center justify-between">
         <Label className="text-base">
           {mode === "encode" ? "String to Bytes" : "Bytes to String"}
         </Label>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={switchMode}
-          className="hover:bg-[#00bf63]/10 hover:border-[#00bf63]/50"
-        >
+        <Button variant="outline" size="sm" onClick={switchMode}>
           <ArrowRightLeftIcon className="size-4 mr-2" />
           Switch Mode
         </Button>
@@ -80,7 +75,7 @@ export const StringEncoder = () => {
           <Button
             variant="default"
             onClick={encodeString}
-            className="w-full bg-[#00bf63] hover:bg-[#00bf63]/90 text-white"
+            className="w-full"
             disabled={!stringValue}
           >
             Encode to Bytes
@@ -102,7 +97,7 @@ export const StringEncoder = () => {
                 size="icon"
                 variant="outline"
                 onClick={() => handleCopyBytes(bytesValue)}
-                className="hover:bg-[#00bf63]/10 hover:border-[#00bf63] self-start"
+                className="self-start"
                 disabled={!bytesValue}
               >
                 {copiedBytes ? (
@@ -134,7 +129,7 @@ export const StringEncoder = () => {
           <Button
             variant="default"
             onClick={decodeBytes}
-            className="w-full bg-[#00bf63] hover:bg-[#00bf63]/90 text-white"
+            className="w-full"
             disabled={!bytesValue}
           >
             Decode to String
