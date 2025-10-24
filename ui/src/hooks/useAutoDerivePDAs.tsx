@@ -28,14 +28,8 @@ export const useAutoDerivePDAs = (
     if (!instruction || !idl) return;
 
     const pdaAccounts = instruction.accounts.filter(isAccountPda);
-    const newDerived = new Map(derivedPDAs);
 
     for (const account of pdaAccounts as ModIdlAccount[]) {
-      const existingAddress = accountsAddressMap.get(account.name);
-      if (existingAddress && !derivedPDAs.has(account.name)) {
-        continue;
-      }
-
       const canDerive = checkDependencies(
         account,
         formData,
@@ -43,46 +37,82 @@ export const useAutoDerivePDAs = (
       );
 
       if (!canDerive.ready) {
-        newDerived.set(account.name, {
-          address: "",
-          status: "idle",
+        setDerivedPDAs((prev) => {
+          const alreadyDerived = prev.get(account.name);
+          if (alreadyDerived?.status !== "idle") {
+            const newMap = new Map(prev);
+            newMap.set(account.name, {
+              address: "",
+              status: "idle",
+            });
+            return newMap;
+          }
+          return prev;
         });
         continue;
       }
 
-      try {
-        newDerived.set(account.name, {
+      setDerivedPDAs((prev) => {
+        const existingAddress = accountsAddressMap.get(account.name);
+        const alreadyDerived = prev.get(account.name);
+
+        if (
+          existingAddress &&
+          alreadyDerived?.status === "ready" &&
+          alreadyDerived.address === existingAddress
+        ) {
+          return prev;
+        }
+
+        if (alreadyDerived?.status === "deriving") {
+          return prev;
+        }
+
+        const newMap = new Map(prev);
+        newMap.set(account.name, {
           address: "",
           status: "deriving",
         });
-        setDerivedPDAs(new Map(newDerived));
 
-        const pda = await derivePDA(
-          account.pda?.seeds || [],
-          idl.address,
-          accountsAddressMap,
-          formData,
-          connection,
-          idl
-        );
+        (async () => {
+          try {
+            const pda = await derivePDA(
+              account.pda?.seeds || [],
+              idl.address,
+              accountsAddressMap,
+              formData,
+              connection,
+              idl
+            );
 
-        newDerived.set(account.name, {
-          address: pda.toBase58(),
-          status: "ready",
-        });
-      } catch (error) {
-        console.error(`Failed to derive PDA for ${account.name}:`, error);
+            setDerivedPDAs((current) => {
+              const updated = new Map(current);
+              updated.set(account.name, {
+                address: pda.toBase58(),
+                status: "ready",
+              });
+              return updated;
+            });
+          } catch (error) {
+            console.error(`Failed to derive PDA for ${account.name}:`, error);
 
-        newDerived.set(account.name, {
-          address: "",
-          status: "error",
-          error: error instanceof Error ? error.message : "Failed to derive",
-        });
-      }
+            setDerivedPDAs((current) => {
+              const updated = new Map(current);
+              updated.set(account.name, {
+                address: "",
+                status: "error",
+                error:
+                  error instanceof Error ? error.message : "Failed to derive",
+              });
+              return updated;
+            });
+          }
+        })();
+
+        return newMap;
+      });
     }
-
-    setDerivedPDAs(newDerived);
-  }, [instruction, idl, formData, accountsAddressMap, connection, derivedPDAs]);
+  }, [instruction, idl, formData, accountsAddressMap, connection]);
 
   useEffect(() => {
     if (!instruction || !idl) return;

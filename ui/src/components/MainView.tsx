@@ -10,7 +10,7 @@ import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 const MainView = () => {
   const { activeInstruction } = useInstructions();
   const { idl } = useIDL();
-  const { transactions, clearHistory, removeTransaction } =
+  const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
 
   if (!idl) return null;
@@ -28,7 +28,11 @@ const MainView = () => {
 
           {idl ? (
             instruction ? (
-              <InstructionFormv2 instruction={instruction} idl={idl} />
+              <InstructionFormv2
+                instruction={instruction}
+                idl={idl}
+                addTransaction={addTransaction}
+              />
             ) : (
               <NoInstructionSelectedView />
             )

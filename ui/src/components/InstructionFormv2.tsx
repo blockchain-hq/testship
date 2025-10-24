@@ -1,26 +1,30 @@
-import type { IdlInstruction } from "@/lib/types";
+import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import type { Idl } from "@coral-xyz/anchor";
 import ArgumentForm from "./instructionForm/ArgumentForm";
 import AccountsFormv2 from "./instructionForm/AccountsFormv2";
 import { Button, ScrollArea } from "./ui";
-import { MoveRight, Share } from "lucide-react";
+import { Loader2, MoveRight, Share } from "lucide-react";
 import { useInstructions } from "@/context/InstructionsContext";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { validateField } from "@/lib/validation";
 import { toast } from "sonner";
 import useTransaction from "@/hooks/useTransaction";
 import { useAutoDerivePDAs } from "@/hooks/useAutoDerivePDAs";
+import { useWallet } from "@solana/wallet-adapter-react";
+import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
   idl: Idl;
+  addTransaction: (transaction: TransactionRecord) => void;
 }
 
 const InstructionFormv2 = (props: InstructionFormv2Props) => {
-  const { instruction, idl } = props;
+  const { instruction, idl, addTransaction } = props;
   const { getInstructionState, updateInstructionState } = useInstructions();
+  const { publicKey: userWalletPublicKey } = useWallet();
 
-  const { execute, isExecuting } = useTransaction(idl, () => {});
+  const { execute, isExecuting } = useTransaction(idl, addTransaction);
 
   const state = getInstructionState(instruction?.name ?? "");
   // local state
@@ -44,20 +48,47 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     derivedPDAs.forEach((pda, accountName) => {
       if (pda.status === "ready" && pda.address) {
         setAccountsAddressMap((prev) => {
-          const newMap = new Map(prev);
-          if (!newMap.get(accountName)) {
+          const current = prev.get(accountName);
+
+          if (current !== pda.address) {
+            const newMap = new Map(prev);
             newMap.set(accountName, pda.address);
+            return newMap;
           }
-          return newMap;
+          return prev;
         });
       }
     });
   }, [derivedPDAs]);
 
+  const initializeSignerAccounts = useCallback(
+    (instruction: IdlInstruction) => {
+      if (!userWalletPublicKey || !instruction.accounts) return new Map();
+
+      const accountsMap = new Map<string, string | null>();
+      instruction.accounts.forEach((account: ModIdlAccount) => {
+        if (account.signer) {
+          accountsMap.set(account.name, userWalletPublicKey.toBase58());
+        } else if (account.address) {
+          accountsMap.set(account.name, account.address);
+        }
+      });
+      return accountsMap;
+    },
+    [userWalletPublicKey]
+  );
+
   useEffect(() => {
-    setFormData(state.formData);
-    setAccountsAddressMap(state.accountsAddresses);
-    setSignersKeypairs(state.signersKeypairs);
+    const newState = getInstructionState(instruction?.name ?? "");
+    setFormData(newState.formData);
+    setSignersKeypairs(newState.signersKeypairs);
+
+    // if signers keypairs are empty, set user wallet as signer
+    if (newState.accountsAddresses.size === 0 && instruction) {
+      setAccountsAddressMap(initializeSignerAccounts(instruction));
+    } else {
+      setAccountsAddressMap(newState.accountsAddresses);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instruction?.name]);
 
@@ -172,8 +203,16 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           id="run-instruction-btn"
           type="submit"
         >
-          <MoveRight />
-          Run Instruction
+          {isExecuting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Running...
+            </>
+          ) : (
+            <>
+              <MoveRight />
+              Run Instruction
+            </>
+          )}
         </Button>
       </div>
     </form>
