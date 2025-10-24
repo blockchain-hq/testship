@@ -8,6 +8,7 @@ import { KeyIcon } from "lucide-react";
 import type { Keypair } from "@solana/web3.js";
 import { cn } from "@/lib/utils";
 import { useCallback } from "react";
+import type { DerivedPDA } from "@/hooks/useAutoDerivePDAs";
 
 interface AccountsFormv2Props {
   accounts: ModIdlAccount[] | null;
@@ -16,6 +17,8 @@ interface AccountsFormv2Props {
   signersKeypairs: Map<string, Keypair>;
   onSignerChange: (signersKeypairs: Map<string, Keypair>) => void;
   validationErrors: Record<string, string>;
+  formData: Record<string, string | number>;
+  derivedPDAs: Map<string, DerivedPDA>;
 }
 
 const AccountsFormv2 = (props: AccountsFormv2Props) => {
@@ -26,6 +29,8 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     signersKeypairs,
     onSignerChange,
     validationErrors,
+    formData,
+    derivedPDAs,
   } = props;
 
   const handleAccountChange = useCallback(

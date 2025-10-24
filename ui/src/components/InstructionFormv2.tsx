@@ -9,6 +9,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { validateField } from "@/lib/validation";
 import { toast } from "sonner";
 import useTransaction from "@/hooks/useTransaction";
+import { useAutoDerivePDAs } from "@/hooks/useAutoDerivePDAs";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
@@ -18,6 +19,7 @@ interface InstructionFormv2Props {
 const InstructionFormv2 = (props: InstructionFormv2Props) => {
   const { instruction, idl } = props;
   const { getInstructionState, updateInstructionState } = useInstructions();
+
   const { execute, isExecuting } = useTransaction(idl, () => {});
 
   const state = getInstructionState(instruction?.name ?? "");
@@ -31,7 +33,27 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   );
   const [signersKeypairs, setSignersKeypairs] = useState(state.signersKeypairs);
 
-  // Sync local state with context state when instruction changes
+  const derivedPDAs = useAutoDerivePDAs(
+    instruction,
+    idl,
+    formData,
+    accountsAddressMap
+  );
+
+  useEffect(() => {
+    derivedPDAs.forEach((pda, accountName) => {
+      if (pda.status === "ready" && pda.address) {
+        setAccountsAddressMap((prev) => {
+          const newMap = new Map(prev);
+          if (!newMap.get(accountName)) {
+            newMap.set(accountName, pda.address);
+          }
+          return newMap;
+        });
+      }
+    });
+  }, [derivedPDAs]);
+
   useEffect(() => {
     setFormData(state.formData);
     setAccountsAddressMap(state.accountsAddresses);
@@ -129,6 +151,8 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
             signersKeypairs={signersKeypairs}
             onSignerChange={setSignersKeypairs}
             validationErrors={validationErrors}
+            formData={formData}
+            derivedPDAs={derivedPDAs}
           />
         </div>
       </ScrollArea>
