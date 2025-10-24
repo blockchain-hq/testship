@@ -59,7 +59,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             <TooltipTrigger>
               <WalletIcon />
             </TooltipTrigger>
-            <TooltipContent className="bg-accent text-white">
+            <TooltipContent>
               <p className="w-64">
                 Use the connected wallet as the signer account.
               </p>
@@ -73,7 +73,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             <TooltipTrigger>
               <PlusIcon />
             </TooltipTrigger>
-            <TooltipContent className="bg-accent text-white">
+            <TooltipContent>
               <p className="w-64">
                 Generate a new keypair as the signer account.
               </p>
@@ -87,7 +87,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             <TooltipTrigger>
               <NotebookPenIcon />
             </TooltipTrigger>
-            <TooltipContent className="bg-accent text-white">
+            <TooltipContent>
               <p className="w-64">
                 Manually input the public key as the signer account.{" "}
                 <span className="text-xs text-yellow-500">
@@ -129,7 +129,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
           <TooltipTrigger>
             <InfoIcon className="w-4 h-4" />
           </TooltipTrigger>
-          <TooltipContent className="bg-accent text-white">
+          <TooltipContent>
             <p className="w-64">
               This is a signer account. In most cases, it's the wallet connected
               to the app. You can use the dropdown for more options.
@@ -152,8 +152,8 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             <TooltipTrigger>
               <TriangleAlert color="yellow" className="w-4 h-4 flex-shrink-0" />
             </TooltipTrigger>
-            <TooltipContent className="bg-accent w-64">
-              <span className="text-yellow-500 text-xs ">
+            <TooltipContent className="w-64">
+              <span className="text-xs text-yellow-500">
                 Since private key is required for signing transaction, just
                 pubkey doesn't work.
               </span>
