@@ -163,3 +163,33 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 }
+
+// update wallet button as per theme: https://github.com/anza-xyz/wallet-adapter/issues/397
+.wallet-adapter-button {
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.375rem !important;
+  height: 40px !important;
+  line-height: normal !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  transition: background-color 0.2s !important;
+}
+.wallet-adapter-dropdown-list {
+  background: #00bf63 !important;
+}
+.wallet-adapter-dropdown-list,
+.wallet-adapter-modal-wrapper,
+.wallet-adapter-button {
+  background-color: #00bf63 !important;
+}
+.wallet-adapter-dropdown-list-item:hover,
+.wallet-adapter-modal-button-close,
+.wallet-adapter-button:hover {
+  color: #fff !important;
+  background-color: #00bf63 !important;
+  opacity: 0.8 !important;
+}
+
+.wallet-adapter-modal-button-close svg {
+  fill: #fff !important;
+}

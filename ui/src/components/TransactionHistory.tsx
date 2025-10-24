@@ -57,7 +57,7 @@ export function TransactionHistory({
   });
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col bg-card border border-border/50 rounded-md">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>

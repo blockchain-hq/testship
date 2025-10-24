@@ -4,10 +4,14 @@ import { useInstructions } from "@/context/InstructionsContext";
 import { useIDL } from "@/context/IDLContext";
 import NoInstructionSelectedView from "./NoInstructionSelectedView";
 import NoIDLView from "./NoIDLView";
+import { TransactionHistory } from "./TransactionHistory";
+import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 
 const MainView = () => {
   const { activeInstruction } = useInstructions();
   const { idl } = useIDL();
+  const { transactions, clearHistory, removeTransaction } =
+    useTransactionHistory();
 
   if (!idl) return null;
 
@@ -31,6 +35,15 @@ const MainView = () => {
           ) : (
             <NoIDLView />
           )}
+        </div>
+
+        {/* right col - tx history */}
+        <div className="h-[calc(100vh-16rem)] sticky top-4">
+          <TransactionHistory
+            transactions={transactions}
+            onClear={clearHistory}
+            onRemove={removeTransaction}
+          />
         </div>
       </div>
     </div>

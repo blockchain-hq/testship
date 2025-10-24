@@ -41,7 +41,7 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
   return (
     <div
       key={transaction.signature}
-      className="border rounded-lg p-3 hover:bg-muted/50 transition-colors"
+      className="bg-card border border-border/50 rounded-md p-3 hover:bg-muted/50 transition-colors"
     >
       <div className="flex items-start justify-between  gap-2">
         <div className="flex-1 min-w-0">
@@ -57,10 +57,15 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
                 <span className="text-xs font-semibold">Failed</span>
               </div>
             )}
-            <Badge variant="outline" className="text-xs">
+            <Badge
+              variant="outline"
+              className="text-xs bg-muted text-muted-foreground border-border"
+            >
               {transaction.instructionName}
             </Badge>
+          </div>
 
+          <div className="flex flex-row items-start gap-2">
             <p className="text-xs text-muted-foreground mt-1">
               {formatTimestamp(transaction.timestamp)}
             </p>

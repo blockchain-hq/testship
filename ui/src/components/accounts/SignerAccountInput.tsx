@@ -183,8 +183,8 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
               <ChevronDown className="opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
+          <PopoverContent className="w-[200px] p-0 border border-border/50 rounded-md">
+            <Command className="bg-card ">
               <CommandInput placeholder="Search mode..." className="h-9" />
               <CommandList>
                 <CommandEmpty>No mode found.</CommandEmpty>
