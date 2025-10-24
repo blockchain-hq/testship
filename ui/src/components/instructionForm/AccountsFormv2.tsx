@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import type { Keypair } from "@solana/web3.js";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Button } from "../ui/button";
 import { useSavedAccounts } from "@/context/SavedAccountsContext";
 

@@ -21,8 +21,8 @@ export const startDevServer = async (
     ora.start("Starting dev server...");
 
     const app = express();
-    const server = createServer(app);
-    const wss = new WebSocketServer({ server });
+    const httpServer = createServer(app);
+    const wss = new WebSocketServer({ server: httpServer });
 
     app.use(cors());
     app.use(express.json());
@@ -99,7 +99,7 @@ export const startDevServer = async (
 
     const availablePort = await getPort({ port: port || DEFAULT_PORT });
 
-    const server = app.listen(availablePort, async () => {
+    httpServer.listen(availablePort, async () => {
       const url = `http://${DEFAULT_HOST}:${availablePort}`;
       setTimeout(async () => {
         ora.start("Opening browser...");
@@ -115,7 +115,9 @@ export const startDevServer = async (
 
     const shutdown = () => {
       ora.start("Shutting down server...");
-      server.close(() => {
+      watcher.close();
+      wss.close();
+      httpServer.close(() => {
         ora.succeed("Server closed");
         process.exit(0);
       });
@@ -130,18 +132,7 @@ export const startDevServer = async (
     process.on("SIGTERM", shutdown);
     process.on("SIGINT", shutdown);
 
-    return server;
-
-    // Cleanup function
-    const cleanup = () => {
-      console.log(chalk.yellow('Shutting down file watcher...'));
-      watcher.close();
-      wss.close();
-    };
-
-    // Handle process termination
-    process.on('SIGINT', cleanup);
-    process.on('SIGTERM', cleanup);
+    return httpServer;
 
   } catch (error) {
     ora.fail("Error starting dev server");
