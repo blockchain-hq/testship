@@ -1,0 +1,47 @@
+import { Button } from "./ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "./ui/empty";
+import { FolderArchive } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+
+const NoIDLView = () => {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FolderArchive />
+        </EmptyMedia>
+        <EmptyTitle>No IDL Found</EmptyTitle>
+        <EmptyDescription>
+          You haven&apos;t found any IDL yet. Get started by loading the IDL.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button
+          variant="default"
+          className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
+        >
+          Load IDL
+        </Button>
+      </EmptyContent>
+      <Button
+        variant="link"
+        asChild
+        className="text-muted-foreground"
+        size="sm"
+      >
+        <a href="https://docs.testship.xyz" target="_blank">
+          Learn More <ArrowUpRight />
+        </a>
+      </Button>
+    </Empty>
+  );
+};
+
+export default NoIDLView;

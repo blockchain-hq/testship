@@ -1,4 +1,5 @@
 import { Header } from "./components/layout/Header";
+import MainView from "./components/MainView";
 import { Skeleton } from "./components/ui/skeleton";
 import { useIDL } from "./context/IDLContext";
 
@@ -22,7 +23,7 @@ const App = () => {
               </div>
             </div>
           ) : (
-            <></>
+            <MainView />
           )}
         </main>
       </div>

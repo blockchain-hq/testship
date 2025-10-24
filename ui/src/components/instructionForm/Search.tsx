@@ -46,7 +46,7 @@ const Search = (props: SearchProps) => {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild className="bg-level-4-bg">
+      <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -61,7 +61,7 @@ const Search = (props: SearchProps) => {
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border border-border/50 shadow-lg">
         <Command>
           <CommandInput
             placeholder="Search or select an instruction..."
