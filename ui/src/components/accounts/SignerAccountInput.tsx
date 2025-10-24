@@ -38,12 +38,15 @@ const options: OptionType[] = [
 
 interface SignerAccountInputProps {
   account: ModIdlAccount | null;
+  signerAccountAddress: string | null;
+  signerAccountKeypair: Keypair | null;
+  onChange: (address: string | null, keypair: Keypair | null) => void;
 }
 
 const SignerAccountInput = (props: SignerAccountInputProps) => {
-  const { account } = props;
+  const { account, onChange, signerAccountAddress, signerAccountKeypair } =
+    props;
   const { publicKey } = useWallet();
-  const [signerAccount, setSignerAccount] = useState<string>("");
   const [selectedMode, setSelectedMode] =
     useState<OptionType>("Connected Wallet");
   const [open, setOpen] = useState(false);
@@ -104,11 +107,13 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
 
   useEffect(() => {
     if (selectedMode === "Connected Wallet") {
-      setSignerAccount(publicKey?.toString() ?? "");
+      onChange(publicKey?.toBase58() ?? null, null);
     } else if (selectedMode === "Generate New") {
       const newKeyPair = Keypair.generate();
-      setSignerAccount(newKeyPair.publicKey.toString());
+      onChange(newKeyPair.publicKey.toBase58(), newKeyPair);
     }
+    // using onChange as dependency causes infinite re-render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMode, publicKey]);
 
   return (
@@ -154,9 +159,9 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
               </span>
             </TooltipContent>
           </Tooltip>
-        ) : selectedMode === "Connected Wallet" && signerAccount ? (
+        ) : selectedMode === "Connected Wallet" && signerAccountAddress ? (
           <CheckCircle2 color="green" className="w-8 h-8" />
-        ) : selectedMode === "Generate New" && signerAccount ? (
+        ) : selectedMode === "Generate New" && signerAccountKeypair ? (
           <CheckCircle2 color="green" className="w-8 h-8" />
         ) : null}
 
@@ -165,8 +170,8 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
           type="text"
           placeholder="Enter value for signer account"
           className="border-none"
-          value={signerAccount}
-          onChange={(e) => setSignerAccount(e.target.value)}
+          value={signerAccountAddress ?? ""}
+          onChange={(e) => onChange(e.target.value, null)}
         />
 
         <Popover open={open} onOpenChange={setOpen}>

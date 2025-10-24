@@ -5,13 +5,48 @@ import SignerAccountInput from "../accounts/SignerAccountInput";
 import { isAccountPda } from "@/lib/pdaUtils";
 import { Badge } from "../ui";
 import { KeyIcon } from "lucide-react";
+import type { Keypair } from "@solana/web3.js";
+import { cn } from "@/lib/utils";
+import { useCallback } from "react";
 
 interface AccountsFormv2Props {
   accounts: ModIdlAccount[] | null;
+  accountsAddressMap: Map<string, string | null>;
+  onAccountChange: (accountsAddressMap: Map<string, string | null>) => void;
+  signersKeypairs: Map<string, Keypair>;
+  onSignerChange: (signersKeypairs: Map<string, Keypair>) => void;
+  validationErrors: Record<string, string>;
 }
 
 const AccountsFormv2 = (props: AccountsFormv2Props) => {
-  const { accounts } = props;
+  const {
+    accounts,
+    accountsAddressMap,
+    onAccountChange,
+    signersKeypairs,
+    onSignerChange,
+    validationErrors,
+  } = props;
+
+  const handleAccountChange = useCallback(
+    (accountName: string, address: string | null) => {
+      const newMap = new Map(accountsAddressMap);
+      newMap.set(accountName, address);
+      onAccountChange(newMap);
+    },
+    [accountsAddressMap, onAccountChange]
+  );
+
+  const handleSignerChange = useCallback(
+    (accountName: string, keypair: Keypair | null) => {
+      if (keypair) {
+        const newSignersMap = new Map(signersKeypairs);
+        newSignersMap.set(accountName, keypair);
+        onSignerChange(newSignersMap);
+      }
+    },
+    [signersKeypairs, onSignerChange]
+  );
 
   if (!accounts) return null;
   return (
@@ -22,7 +57,16 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
 
       {accounts.map((account) =>
         account.signer ? (
-          <SignerAccountInput key={account.name} account={account} />
+          <SignerAccountInput
+            key={account.name}
+            account={account}
+            signerAccountAddress={accountsAddressMap.get(account.name) ?? null}
+            signerAccountKeypair={signersKeypairs.get(account.name) ?? null}
+            onChange={(address, keypair) => {
+              handleAccountChange(account.name, address);
+              handleSignerChange(account.name, keypair);
+            }}
+          />
         ) : (
           <div key={account.name} className="grid w-full items-center gap-3">
             <div className="flex flex-row items-center gap-2 w-full">
@@ -47,8 +91,21 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
             <Input
               id={account.name}
               type="text"
+              value={accountsAddressMap.get(account.name) ?? ""}
               placeholder={`Enter value for ${account.name}`}
+              onChange={(e) =>
+                handleAccountChange(account.name, e.target.value)
+              }
+              className={cn(
+                "border-input-border text-foreground",
+                validationErrors[account.name] && "border-red-500"
+              )}
             />
+            {validationErrors[account.name] && (
+              <p className="text-red-500 text-sm">
+                {validationErrors[account.name]}
+              </p>
+            )}
           </div>
         )
       )}

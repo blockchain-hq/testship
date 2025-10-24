@@ -1,13 +1,21 @@
 import type { IdlField } from "@coral-xyz/anchor/dist/cjs/idl";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
 
 interface ArgumentFormProps {
   args: IdlField[] | null;
+  formData: Record<string, string | number>;
+  onChange: (formData: Record<string, string | number>) => void;
+  validationErrors: Record<string, string>;
 }
 
 const ArgumentForm = (props: ArgumentFormProps) => {
-  const { args } = props;
+  const { args, formData, onChange, validationErrors } = props;
+
+  const handleChange = (name: string, value: string | number) => {
+    onChange({ ...formData, [name]: value });
+  };
 
   if (!args) return null;
   return (
@@ -29,10 +37,19 @@ const ArgumentForm = (props: ArgumentFormProps) => {
               </span>
             )}
           </Label>
+          {validationErrors[arg.name] && (
+            <p className="text-red-500 text-sm">{validationErrors[arg.name]}</p>
+          )}
           <Input
             id={arg.name}
             type="text"
             placeholder={`Enter value for ${arg.name}`}
+            value={formData[arg.name]}
+            onChange={(e) => handleChange(arg.name, e.target.value)}
+            className={cn(
+              "border-input-border text-foreground",
+              validationErrors[arg.name] && "border-red-500"
+            )}
           />
         </div>
       ))}
