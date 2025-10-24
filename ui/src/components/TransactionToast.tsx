@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import UseCopy from "@/hooks/useCopy";
 
 interface TransactionToastProps {
   signature?: string;
@@ -35,21 +36,9 @@ export function TransactionToast({
   logs,
   cluster = "custom",
 }: TransactionToastProps) {
-  const [copied, setCopied] = useState(false);
+  const { copied, handleCopy } = UseCopy();
   const [showLogs, setShowLogs] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const handleCopy = async () => {
-    if (!signature) return;
-    await navigator.clipboard.writeText(signature);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleCopyLogs = async () => {
-    if (!logs) return;
-    await navigator.clipboard.writeText(formatLogs(logs));
-  };
 
   const getExplorerUrl = () => {
     if (!signature) return "";
@@ -86,7 +75,7 @@ export function TransactionToast({
               variant="ghost"
               size="icon"
               className="h-7 w-7 flex-shrink-0"
-              onClick={handleCopy}
+              onClick={() => handleCopy(signature)}
             >
               {copied ? (
                 <Check className="h-3 w-3 text-green-500" />
@@ -139,8 +128,8 @@ export function TransactionToast({
                     <Maximize2 className="h-3 w-3" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[80vh]">
-                  <DialogHeader>
+                <DialogContent className="max-w-3xl max-h-[80vh] bg-card border border-border/50 text-foreground">
+                  <DialogHeader className="border-b border-border/50">
                     <DialogTitle>Transaction Logs</DialogTitle>
                     <DialogDescription>
                       {signature && (
@@ -155,13 +144,13 @@ export function TransactionToast({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={handleCopyLogs}
+                        onClick={() => handleCopy(formatLogs(logs))}
                       >
                         <Copy className="h-3 w-3 mr-2" />
                         Copy Logs
                       </Button>
                     </div>
-                    <div className="bg-muted/10 rounded-lg p-4 overflow-auto max-h-[60vh]">
+                    <div className="bg-card border border-border/50 rounded-lg p-4 overflow-auto max-h-[60vh]">
                       <pre className="text-xs whitespace-pre-wrap break-words">
                         {formatLogs(logs)}
                       </pre>
@@ -174,7 +163,7 @@ export function TransactionToast({
 
           {showLogs && (
             <div className="mt-2 max-h-40 overflow-y-auto overflow-x-auto">
-              <pre className="text-xs bg-muted/10 p-2 rounded whitespace-pre-wrap break-words">
+              <pre className="text-xs bg-card border border-border/50 p-2 rounded whitespace-pre-wrap break-words">
                 {formatLogs(logs)}
               </pre>
             </div>
