@@ -77,7 +77,7 @@ export function TransactionHistory({
                 <Filter className="h-3 w-3 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card border border-border/50 rounded-md">
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="success">Success</SelectItem>
                 <SelectItem value="error">Failed</SelectItem>
@@ -96,9 +96,9 @@ export function TransactionHistory({
                   Clear
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-card border border-border/50 rounded-md">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
+                  <AlertDialogTitle className="text-foreground">
                     Clear transaction history?
                   </AlertDialogTitle>
                   <AlertDialogDescription>
@@ -107,7 +107,9 @@ export function TransactionHistory({
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="text-foreground">
+                    Cancel
+                  </AlertDialogCancel>
                   <AlertDialogAction onClick={onClear}>
                     Clear All
                   </AlertDialogAction>

@@ -146,7 +146,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
         </Badge>
       </div>
 
-      <div className="flex flex-row items-center gap-2 bg-card border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:bg-card focus:border-border/50 focus:ring-2 focus:ring-green-500/20 transition-all h-11 rounded-md px-2">
+      <div className="flex flex-row items-center gap-2 bg-card border text-foreground placeholder:text-muted-foreground/50 focus:bg-card focus:border-border/50 focus:ring-2 focus:ring-green-500/20 transition-all h-11 rounded-md px-2">
         {selectedMode === "Manual Input" ? (
           <Tooltip delayDuration={100}>
             <TooltipTrigger>
@@ -169,7 +169,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
           id="signerAccount"
           type="text"
           placeholder="Enter value for signer account"
-          className="border-none"
+          className="border-none active:ring-0 focus:ring-0"
           value={signerAccountAddress ?? ""}
           onChange={(e) => onChange(e.target.value, null)}
         />
