@@ -3,7 +3,7 @@ import type { Idl } from "@coral-xyz/anchor";
 import ArgumentForm from "./instructionForm/ArgumentForm";
 import AccountsFormv2 from "./instructionForm/AccountsFormv2";
 import { Button, ScrollArea } from "./ui";
-import { Loader2, MoveRight, Share } from "lucide-react";
+import { Loader2, MoveRight } from "lucide-react";
 import { useInstructions } from "@/context/InstructionsContext";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { validateField } from "@/lib/validation";
@@ -13,6 +13,7 @@ import { useAutoDerivePDAs } from "@/hooks/useAutoDerivePDAs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 import { useSavedAccounts } from "@/context/SavedAccountsContext";
+import ShareModal from "./ShareModal";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
@@ -211,9 +212,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       </ScrollArea>
 
       <div className="flex flex-row justify-end items-center gap-2">
-        <Button variant="outline" type="button">
-          <Share />
-        </Button>
+        <ShareModal />
 
         <Button
           disabled={isExecuting}
