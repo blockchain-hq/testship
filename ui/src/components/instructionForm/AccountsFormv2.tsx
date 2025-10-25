@@ -65,13 +65,15 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
   );
 
   const handleSignerChange = useCallback(
-    (accountName: string, keypair: Keypair | null) => {
-      handleAccountChange(accountName, keypair?.publicKey.toBase58() ?? null);
+    (accountName: string, address: string | null, keypair: Keypair | null) => {
+      handleAccountChange(accountName, address);
+      const newSignersMap = new Map(signersKeypairs);
       if (keypair) {
-        const newSignersMap = new Map(signersKeypairs);
         newSignersMap.set(accountName, keypair);
-        onSignerChange(newSignersMap);
+      } else {
+        newSignersMap.delete(accountName);
       }
+      onSignerChange(newSignersMap);
     },
     [signersKeypairs, onSignerChange, handleAccountChange]
   );
@@ -305,13 +307,9 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
             account={account}
             signerAccountAddress={accountsAddressMap.get(account.name) ?? null}
             signerAccountKeypair={signersKeypairs.get(account.name) ?? null}
-            onChange={(address, keypair) => {
-              if (keypair) {
-                handleSignerChange(account.name, keypair);
-              } else {
-                handleAccountChange(account.name, address);
-              }
-            }}
+            onChange={(address, keypair) =>
+              handleSignerChange(account.name, address, keypair)
+            }
           />
         ) : (
           <div
