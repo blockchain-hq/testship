@@ -13,10 +13,11 @@ import UseCopy from "@/hooks/useCopy";
 import UseShareState from "@/hooks/useShareState";
 import type { IdlInstruction } from "@/lib/types";
 import type { Idl } from "@coral-xyz/anchor";
-import { Check, Copy, Share } from "lucide-react";
-import { useState } from "react";
+import { Check, Copy, ExternalLink, Share } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "./ui";
 import { toCamelCase } from "@/lib/utils";
+import BaseUrlInput from "./BaseUrlInput";
 
 interface ShareModalProps {
   idl: Idl;
@@ -26,17 +27,14 @@ interface ShareModalProps {
 }
 
 const ShareModal = (props: ShareModalProps) => {
-  const { idl, accountMap, instructions, formData } = props;
+  const { accountMap, instructions, formData } = props;
   const { shareUrl, prepareUrl } = UseShareState();
+  const [baseUrl, setBaseUrl] = useState<string>("https://app.testship.xyz");
   const { copied, handleCopy } = UseCopy();
 
-  useState(() => {
-    prepareUrl(idl, accountMap, instructions, formData);
-  });
-
-  const truncatedUrl = shareUrl
-    ? `${shareUrl.slice(0, 30)}...${shareUrl.slice(-12)}`
-    : "";
+  useEffect(() => {
+    prepareUrl(baseUrl);
+  }, [baseUrl, prepareUrl]);
 
   return (
     <Dialog>
@@ -45,7 +43,7 @@ const ShareModal = (props: ShareModalProps) => {
           <Share />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
           <DialogDescription>
@@ -53,7 +51,7 @@ const ShareModal = (props: ShareModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="h-[60vh] rounded-md overflow-hidden">
+        <ScrollArea className="h-[50vh] rounded-md overflow-hidden">
           <div className="flex flex-col">
             <div>
               {instructions.map((instruction) => (
@@ -96,29 +94,49 @@ const ShareModal = (props: ShareModalProps) => {
                 </div>
               ))}
             </div>
-
-            {shareUrl && (
-              <div className="flex items-center gap-2 mt-8 w-[85%] px-2">
-                <p className="text-xs bg-muted-foreground/20 px-2 py-1 rounded flex-1 overflow-hidden text-ellipsis">
-                  {truncatedUrl}
-                </p>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 flex-shrink-0"
-                  onClick={() => handleCopy(shareUrl)}
-                >
-                  {copied ? (
-                    <Check className="h-3 w-3 text-green-500" />
-                  ) : (
-                    <Copy className="h-3 w-3" />
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
         </ScrollArea>
+
+        <BaseUrlInput baseUrl={baseUrl} onChange={setBaseUrl} />
+
+        <div className="flex flex-col items-center gap-2 mt-8 w-full px-2">
+          {shareUrl && (
+            <div className="flex items-center gap-2 w-full px-2">
+              <p className="text-xs bg-muted-foreground/20 px-2 py-1 rounded flex-1 overflow-hidden text-ellipsis">
+                {shareUrl
+                  ? `${shareUrl.slice(0, 30)}...${shareUrl.slice(-12)}`
+                  : ""}
+              </p>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 flex-shrink-0"
+                onClick={() => handleCopy(shareUrl)}
+              >
+                {copied ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 flex-shrink-0"
+              >
+                <a
+                  href={`${shareUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </Button>
+            </div>
+          )}
+        </div>
 
         <DialogFooter>
           <DialogClose asChild>
