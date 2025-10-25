@@ -1,9 +1,9 @@
+import { useIDL } from "@/context/IDLContext";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import UseIdl from "../../hooks/useIDL";
 import IDLLoaderModal from "./IDLLoaderModal";
 
 export const Sidebar = () => {
-  const { idl } = UseIdl();
+  const { idl } = useIDL();
 
   return (
     <aside className="w-64 bg-surface-secondary dark:bg-surface-dark-secondary border-r border-border dark:border-border-dark min-h-screen hidden lg:block">

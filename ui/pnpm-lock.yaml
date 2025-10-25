@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@coral-xyz/anchor':
+        specifier: ^0.32.1
+        version: 0.32.1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -59,6 +62,12 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.14
         version: 4.1.14(vite@7.1.9(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
+      bn.js:
+        specifier: ^5.2.2
+        version: 5.2.2
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -74,6 +83,9 @@ importers:
       lucide-react:
         specifier: ^0.545.0
         version: 0.545.0(react@19.2.0)
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -102,6 +114,9 @@ importers:
       '@eslint/js':
         specifier: ^9.36.0
         version: 9.37.0
+      '@types/bn.js':
+        specifier: ^5.2.0
+        version: 5.2.0
       '@types/node':
         specifier: ^24.7.2
         version: 24.7.2
@@ -318,6 +333,20 @@ packages:
   '@babel/types@7.28.4':
     resolution: {integrity: sha512-bkFqkLhh3pMBUQQkpVgWDWq/lqzc2678eUyDlTBhRqhCHFguYYGM0Efga7tYk4TogG/3x0EEl66/OQ+WGbWB/Q==}
     engines: {node: '>=6.9.0'}
+
+  '@coral-xyz/anchor-errors@0.31.1':
+    resolution: {integrity: sha512-NhNEku4F3zzUSBtrYz84FzYWm48+9OvmT1Hhnwr6GnPQry2dsEqH/ti/7ASjjpoFTWRnPXrjAIT1qM6Isop+LQ==}
+    engines: {node: '>=10'}
+
+  '@coral-xyz/anchor@0.32.1':
+    resolution: {integrity: sha512-zAyxFtfeje2FbMA1wzgcdVs7Hng/MijPKpRijoySPCicnvcTQs/+dnPZ/cR+LcXM9v9UYSyW81uRNYZtN5G4yg==}
+    engines: {node: '>=17'}
+
+  '@coral-xyz/borsh@0.31.1':
+    resolution: {integrity: sha512-9N8AU9F0ubriKfNE3g1WF0/4dtlGXoBN/hd1PvbNBamBNwRgHxH4P+o3Zt7rSEloW1HUs6LfZEchlx9fW7POYw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      '@solana/web3.js': ^1.69.0
 
   '@emurgo/cardano-serialization-lib-browser@13.2.1':
     resolution: {integrity: sha512-7RfX1gI16Vj2DgCp/ZoXqyLAakWo6+X95ku/rYGbVzuS/1etrlSiJmdbmdm+eYmszMlGQjrtOJQeVLXoj4L/Ag==}
@@ -2308,6 +2337,9 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
+  '@types/bn.js@5.2.0':
+    resolution: {integrity: sha512-DLbJ1BPqxvQhIGbeu8VbUC1DiAiahHtAYvA0ZEAa4P31F7IaArc8z3C3BRQdWX4mtLQuABG4yzp76ZrS02Ui1Q==}
+
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
@@ -2857,6 +2889,10 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  buffer-layout@1.2.2:
+    resolution: {integrity: sha512-kWSuLN694+KTk8SrYvCqwP2WcgQjoRCiF5b4QDvkkz8EmgD+aWAIceGFKMIAdmF/pH+vpgNV3d3kAKorcdAmWA==}
+    engines: {node: '>=4.5'}
 
   buffer-xor@1.0.3:
     resolution: {integrity: sha512-571s0T7nZWK6vB67HI5dyUF7wXiNcfaPPPTl6zYCNApANjIvYJTg7hlud/+cJpdAhS7dVzqMLmfhfHR3rAcOjQ==}
@@ -3974,6 +4010,10 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  lz-string@1.5.0:
+    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
+    hasBin: true
+
   magic-string@0.30.19:
     resolution: {integrity: sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw==}
 
@@ -4270,6 +4310,9 @@ packages:
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
+
+  pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -4808,6 +4851,9 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  superstruct@0.15.5:
+    resolution: {integrity: sha512-4AOeU+P5UuE/4nOUkmcQdW5y7i9ndt1cQd/3iUe+LTz3RxESf/W/5lg4B74HbDMMv8PHnPnGCQFH45kBcrQYoQ==}
 
   superstruct@2.0.2:
     resolution: {integrity: sha512-uV+TFRZdXsqXTL2pRvujROjdZQ4RAlBUS5BTh9IGm+jTqQntYThciG/qu57Gs69yjnVUSqdxF9YLmSnpupBW9A==}
@@ -5529,6 +5575,35 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
+
+  '@coral-xyz/anchor-errors@0.31.1': {}
+
+  '@coral-xyz/anchor@0.32.1(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@coral-xyz/anchor-errors': 0.31.1
+      '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))
+      '@noble/hashes': 1.8.0
+      '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      bn.js: 5.2.2
+      bs58: 4.0.1
+      buffer-layout: 1.2.2
+      camelcase: 6.3.0
+      cross-fetch: 3.2.0
+      eventemitter3: 4.0.7
+      pako: 2.1.0
+      superstruct: 0.15.5
+      toml: 3.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+
+  '@coral-xyz/borsh@0.31.1(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)
+      bn.js: 5.2.2
+      buffer-layout: 1.2.2
 
   '@emurgo/cardano-serialization-lib-browser@13.2.1': {}
 
@@ -8235,6 +8310,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.28.4
 
+  '@types/bn.js@5.2.0':
+    dependencies:
+      '@types/node': 24.7.2
+
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 24.7.2
@@ -9327,6 +9406,8 @@ snapshots:
   buffer-equal-constant-time@1.0.1: {}
 
   buffer-from@1.1.2: {}
+
+  buffer-layout@1.2.2: {}
 
   buffer-xor@1.0.3: {}
 
@@ -10518,6 +10599,8 @@ snapshots:
     dependencies:
       react: 19.2.0
 
+  lz-string@1.5.0: {}
+
   magic-string@0.30.19:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -10909,6 +10992,8 @@ snapshots:
       p-limit: 3.1.0
 
   p-try@2.2.0: {}
+
+  pako@2.1.0: {}
 
   parent-module@1.0.1:
     dependencies:
@@ -11561,6 +11646,8 @@ snapshots:
       ansi-regex: 5.0.1
 
   strip-json-comments@3.1.1: {}
+
+  superstruct@0.15.5: {}
 
   superstruct@2.0.2: {}
 

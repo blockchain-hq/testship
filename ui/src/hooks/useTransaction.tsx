@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import { Program, AnchorProvider, AnchorError } from "@coral-xyz/anchor";
 import type { Idl } from "@coral-xyz/anchor";
 import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import type { Keypair } from "@solana/web3.js";
@@ -9,7 +9,7 @@ import { toAnchorType, derivePDA } from "@/lib/solana";
 import { toCamelCase } from "@/lib/utils";
 import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import { useTransactionToast } from "./useTransactionToast";
-import { parseSolanaError } from "@/lib/errorParser";
+import { parseSolanaError, type ErrorWithLogs } from "@/lib/errorParser";
 import { type TransactionRecord } from "./useTransactionHistory";
 
 export default function useTransaction(
@@ -111,16 +111,19 @@ export default function useTransaction(
       });
 
       return { signature, accounts: accountMap };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Transaction error:", error);
 
       txToast.dismiss(toastId);
 
-      const parsedError = parseSolanaError(error);
+      const parsedError = parseSolanaError(
+        error as Error | AnchorError | ErrorWithLogs
+      );
 
       txToast.error(parsedError);
 
-      const errorSignature = (error as any)?.signature;
+      const errorSignature = (error as unknown as { signature?: string })
+        ?.signature;
       if (errorSignature) {
         addTransaction({
           signature: errorSignature,

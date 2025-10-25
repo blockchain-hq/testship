@@ -1,3 +1,5 @@
+import type { AnchorError } from "@coral-xyz/anchor";
+
 export interface ParsedError {
   title: string;
   message: string;
@@ -5,16 +7,24 @@ export interface ParsedError {
   suggestion?: string;
 }
 
-export function parseSolanaError(error: any): ParsedError {
-  const errorMessage = error?.message || String(error);
+export interface ErrorWithLogs extends Error {
+  logs?: string[];
+  getLogs?: () => string[];
+}
 
-  // Extract logs if available
+export function parseSolanaError(
+  error: Error | AnchorError | ErrorWithLogs
+): ParsedError {
+  const errorMessage = (error as Error)?.message || String(error);
+
   let logs: string[] = [];
-  if (error?.logs) {
-    logs = error.logs;
-  } else if (typeof error?.getLogs === "function") {
+  const errorWithLogs = error as ErrorWithLogs;
+
+  if (errorWithLogs?.logs) {
+    logs = errorWithLogs.logs;
+  } else if (typeof errorWithLogs?.getLogs === "function") {
     try {
-      logs = error.getLogs();
+      logs = errorWithLogs.getLogs();
     } catch {
       // getLogs() failed, continue without logs
     }
