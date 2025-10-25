@@ -42,6 +42,53 @@ const AccountsForm = (props: AccountsFormProps) => {
   const { connection } = useConnection();
   const [derivingPda, setDerivingPda] = useState<string | null>(null);
 
+  // Create a unique key for this instruction's account data
+  const accountsDataKey = `testship_accounts_${instruction.name}`;
+
+  // Load account data from localStorage on component mount
+  React.useEffect(() => {
+    console.log('AccountsForm mounting for:', instruction.name);
+    console.log('Accounts data key:', accountsDataKey);
+    try {
+      const saved = localStorage.getItem(accountsDataKey);
+      console.log('Loaded accounts from localStorage:', saved);
+      if (saved) {
+        const savedAccounts = JSON.parse(saved);
+        const newMap = new Map(accountsMap);
+        Object.entries(savedAccounts).forEach(([key, value]) => {
+          if (value && typeof value === 'string') {
+            newMap.set(key, value);
+          }
+        });
+        setAccountsMap(newMap);
+        console.log('Restored accounts from localStorage');
+      }
+    } catch (error) {
+      console.error('Error loading accounts from localStorage:', error);
+    }
+  }, [instruction.name, accountsDataKey, setAccountsMap]);
+
+  // Save account data to localStorage whenever accountsMap changes
+  React.useEffect(() => {
+    const hasData = Array.from(accountsMap.values()).some(value => 
+      value && value.trim() !== ""
+    );
+    
+    if (hasData) {
+      const accountsData = Object.fromEntries(accountsMap);
+      console.log('Saving accounts data:', accountsData, 'to key:', accountsDataKey);
+      try {
+        localStorage.setItem(accountsDataKey, JSON.stringify(accountsData));
+        console.log('Accounts data saved successfully');
+      } catch (error) {
+        console.warn("Failed to save accounts data to localStorage:", error);
+      }
+    } else {
+      console.log('Skipping accounts save - no meaningful data');
+    }
+  }, [accountsMap, accountsDataKey]);
+
+
   const onChange = useCallback(
     (accountName: string, value: string) => {
       const newMap = new Map(accountsMap);
