@@ -32,14 +32,45 @@ interface InstructionFormProps {
 
 const InstructionForm = (props: InstructionFormProps) => {
   const { instruction, idl, addTransactionRecord, accountMapFromState } = props;
+  
+  // Create a unique key for this instruction's form data
+  const formDataKey = `testship_form_${instruction.name}`;
+  
+  // Load form data from localStorage on component mount
   const [formData, setFormData] = React.useState<
     Record<string, string | number>
-  >({});
+  >(() => {
+    try {
+      const saved = localStorage.getItem(formDataKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [validationErrors, setValidationErrors] = React.useState<
     Record<string, string>
   >({});
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
   const { execute, isExecuting } = useTransaction(idl, addTransactionRecord);
+
+  // Save form data to localStorage whenever it changes
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(formDataKey, JSON.stringify(formData));
+    } catch (error) {
+      console.warn("Failed to save form data to localStorage:", error);
+    }
+  }, [formData, formDataKey]);
+
+  // Function to clear saved form data
+  const clearFormData = () => {
+    setFormData({});
+    try {
+      localStorage.removeItem(formDataKey);
+    } catch (error) {
+      console.warn("Failed to clear form data from localStorage:", error);
+    }
+  };
 
   const [accountsAddressMap, setAccountsAddressMap] = useState(() =>
     accountMapFromState
@@ -314,6 +345,14 @@ const InstructionForm = (props: InstructionFormProps) => {
               instructions={[instruction]}
               key={instruction.name}
             />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={clearFormData}
+              disabled={isExecuting}
+            >
+              Clear Form
+            </Button>
             <Button
               type="submit"
               disabled={isExecuting}
