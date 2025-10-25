@@ -13,6 +13,7 @@ type InstructionsContextType = {
   getInstructionState: (name: string) => InstructionState;
   clearInstructionState: (name: string) => void;
   clearAllState: () => void;
+  setAllInstructionsState: (state: GlobalInstructionsState) => void;
 };
 
 const InstructionsContext = createContext<InstructionsContextType | null>(null);
@@ -39,6 +40,13 @@ export const InstructionsProvider = ({
           lastUpdated: new Date(),
         },
       }));
+    },
+    []
+  );
+
+  const setAllInstructionsState = useCallback(
+    (state: GlobalInstructionsState) => {
+      setInstructionsState(state);
     },
     []
   );
@@ -78,6 +86,7 @@ export const InstructionsProvider = ({
         getInstructionState,
         clearInstructionState,
         clearAllState,
+        setAllInstructionsState,
       }}
     >
       {children}

@@ -1,10 +1,24 @@
+import { Loader2 } from "lucide-react";
 import { Header } from "./components/layout/Header";
 import MainView from "./components/MainView";
 import { Skeleton } from "./components/ui/skeleton";
 import { useIDL } from "./context/IDLContext";
+import useLoadSharedState from "./hooks/useLoadSharedState";
 
 const App = () => {
   const { isLoading } = useIDL();
+  const { isLoading: isLoadingSharedState } = useLoadSharedState();
+
+  if (isLoadingSharedState) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p>Loading shared session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground dark:text-foreground-dark">
