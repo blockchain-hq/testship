@@ -4,10 +4,87 @@ import MainView from "./components/MainView";
 import { Skeleton } from "./components/ui/skeleton";
 import { useIDL } from "./context/IDLContext";
 import useLoadSharedState from "./hooks/useLoadSharedState";
+import useHasVisited from "./hooks/useHasVisited";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+import { useEffect } from "react";
+import { useInstructions } from "./context/InstructionsContext";
+
+const driverObj = driver({
+  showProgress: true,
+  steps: [
+    {
+      element: "#search-bar",
+      popover: {
+        title: "Search",
+        description: "Search for an instruction to get started.",
+      },
+    },
+    {
+      element: "#instruction-form",
+      popover: {
+        title: "Instruction Form",
+        description: "Fill in the form to run the instruction.",
+      },
+    },
+    {
+      element: "#run-instruction-btn",
+      popover: {
+        title: "Run Instruction",
+        description: "Click to run the instruction.",
+      },
+    },
+    {
+      element: "#utility-dialog-trigger",
+      popover: {
+        title: "Utility Dialog",
+        description:
+          "Use utility tools to convert timestamps, lamports, strings, and durations.",
+      },
+    },
+    {
+      element: "#transaction-history",
+      popover: {
+        title: "Transaction History",
+        description: "View the transaction history.",
+      },
+    },
+    {
+      popover: {
+        title: "Happy Testing!",
+        description: "That's all. Start testing your program!",
+      },
+    },
+  ],
+});
 
 const App = () => {
   const { isLoading } = useIDL();
   const { isLoading: isLoadingSharedState } = useLoadSharedState();
+  const { hasVisited, handleVisit } = useHasVisited();
+  const { idl } = useIDL();
+  const { setActiveInstruction, activeInstruction } = useInstructions();
+
+  useEffect(() => {
+    if (!hasVisited && !isLoading && idl && idl.instructions.length > 0) {
+      if (!activeInstruction) {
+        setActiveInstruction(idl.instructions[0].name);
+      }
+
+      setTimeout(() => {
+        driverObj.drive();
+      }, 300);
+
+      handleVisit();
+    }
+  }, [
+    hasVisited,
+    isLoading,
+    idl,
+    setActiveInstruction,
+    activeInstruction,
+    handleVisit,
+  ]);
 
   if (isLoadingSharedState) {
     return (

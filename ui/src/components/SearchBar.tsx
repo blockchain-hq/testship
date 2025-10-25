@@ -11,10 +11,7 @@ const SearchBar = () => {
   if (!idl) return null;
 
   return (
-    <div
-      className="flex items-center space-x-2 gap-2"
-      id="search-instruction-form"
-    >
+    <div className="flex items-center space-x-2 gap-2" id="search-bar">
       <SearchIcon className="size-4" />
       <Search
         instructionNames={idl.instructions.map(

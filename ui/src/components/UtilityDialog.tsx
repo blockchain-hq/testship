@@ -27,7 +27,7 @@ export const UtilityDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" id="utility-dialog-trigger">
           <WrenchIcon className="size-4" />
         </Button>
       </DialogTrigger>
