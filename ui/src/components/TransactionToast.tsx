@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import UseCopy from "@/hooks/useCopy";
+import { useCluster } from "@/context/ClusterContext";
 
 interface TransactionToastProps {
   signature?: string;
@@ -34,20 +35,12 @@ export function TransactionToast({
   message,
   suggestion,
   logs,
-  cluster = "custom",
 }: TransactionToastProps) {
   const { copied, handleCopy } = UseCopy();
   const [showLogs, setShowLogs] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const getExplorerUrl = () => {
-    if (!signature) return "";
-    const baseUrl = "https://explorer.solana.com/tx";
-    if (cluster === "custom") {
-      return `${baseUrl}/${signature}?cluster=custom&customUrl=http://localhost:8899`;
-    }
-    return `${baseUrl}/${signature}?cluster=${cluster}`;
-  };
+  const { getExplorerUrl } = useCluster();
 
   const truncatedSig = signature
     ? `${signature.slice(0, 8)}...${signature.slice(-8)}`
@@ -89,10 +82,12 @@ export function TransactionToast({
             variant="link"
             size="sm"
             className="p-0 h-auto justify-start text-accent-primary hover:text-accent-primary/80"
-            onClick={() => window.open(getExplorerUrl(), "_blank")}
+            asChild
           >
-            View on Explorer
-            <ExternalLink className="ml-1 h-3 w-3" />
+            <a href={getExplorerUrl(`tx/${signature}`)} target="_blank">
+              View on Explorer
+              <ExternalLink className="ml-1 h-3 w-3" />
+            </a>
           </Button>
         </>
       )}

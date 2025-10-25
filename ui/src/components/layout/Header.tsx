@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MoonIcon, SunIcon } from "lucide-react";
 import HeaderProgramInfo from "./HeaderProgramInfo";
+import ClusterSelect from "../ClusterSelect";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -34,6 +35,8 @@ export const Header = () => {
             </Button>
 
             <WalletMultiButton />
+
+            <ClusterSelect />
           </div>
         </div>
       </div>

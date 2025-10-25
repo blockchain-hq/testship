@@ -1,3 +1,4 @@
+import { useCluster } from "@/context/ClusterContext";
 import { useIDL } from "@/context/IDLContext";
 import { useInstructions } from "@/context/InstructionsContext";
 import { decodeStateFromURL } from "@/lib/sharing";
@@ -11,6 +12,7 @@ const useLoadSharedState = () => {
 
   const { setIdl } = useIDL();
   const { setActiveInstruction, setAllInstructionsState } = useInstructions();
+  const { setCluster, cluster } = useCluster();
 
   // load shared state from URL
   useEffect(() => {
@@ -47,6 +49,10 @@ const useLoadSharedState = () => {
 
         if (sharedState.activeInstruction) {
           setActiveInstruction(sharedState.activeInstruction);
+        }
+
+        if (sharedState.cluster && sharedState.cluster.name !== cluster.name) {
+          setCluster(sharedState.cluster);
         }
 
         toast.success("Successfully loaded shared state!");

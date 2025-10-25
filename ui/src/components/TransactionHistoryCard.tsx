@@ -3,6 +3,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Check, Copy, ExternalLink, X } from "lucide-react";
 import UseCopy from "@/hooks/useCopy";
+import { useCluster } from "@/context/ClusterContext";
 
 interface TransactionHistoryCardProps {
   transaction: TransactionRecord;
@@ -11,10 +12,10 @@ interface TransactionHistoryCardProps {
 }
 
 const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
-  const { transaction, cluster = "custom", onRemove } = props;
+  const { transaction, onRemove } = props;
 
   const { copied, handleCopy } = UseCopy();
-
+  const { getExplorerUrl } = useCluster();
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -28,14 +29,6 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
     return date.toLocaleDateString();
-  };
-
-  const getExplorerUrl = (signature: string) => {
-    const baseUrl = "https://explorer.solana.com/tx";
-    if (cluster === "custom") {
-      return `${baseUrl}/${signature}?cluster=custom&customUrl=http://localhost:8899`;
-    }
-    return `${baseUrl}/${signature}?cluster=${cluster}`;
   };
 
   return (
@@ -80,7 +73,10 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
               size="sm"
               className="h-6 px-2 text-xs"
               onClick={() =>
-                window.open(getExplorerUrl(transaction.signature), "_blank")
+                window.open(
+                  getExplorerUrl(`tx/${transaction.signature}`),
+                  "_blank"
+                )
               }
             >
               <ExternalLink className="h-3 w-3" />

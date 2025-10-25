@@ -1,3 +1,4 @@
+import type { SolanaCluster } from "@/context/ClusterContext";
 import type { Idl } from "@coral-xyz/anchor";
 import type { Keypair } from "@solana/web3.js";
 
@@ -80,4 +81,5 @@ export type AppState = {
   instructions: GlobalInstructionsState;
   activeInstruction: string | null;
   idl: Idl;
+  cluster?: SolanaCluster;
 };
