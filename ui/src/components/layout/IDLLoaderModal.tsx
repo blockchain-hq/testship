@@ -18,9 +18,55 @@ const IDLLoaderModal = () => {
   const [idlFile, setIdlFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Create a unique key for IDL loader data
+  const idlLoaderKey = 'testship_idl_loader';
+
+  // Load IDL loader data from localStorage on component mount
   useEffect(() => {
-    console.log(idlFile);
+    console.log('IDLLoaderModal mounting');
+    try {
+      const saved = localStorage.getItem(idlLoaderKey);
+      console.log('Loaded IDL loader data from localStorage:', saved);
+      if (saved) {
+        const savedData = JSON.parse(saved);
+        if (savedData.lastFileName) {
+          console.log('Restored last file name:', savedData.lastFileName);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading IDL loader data from localStorage:', error);
+    }
+  }, []);
+
+  // Save IDL loader data to localStorage whenever idlFile changes
+  useEffect(() => {
+    if (idlFile) {
+      const loaderData = {
+        lastFileName: idlFile.name,
+        lastModified: idlFile.lastModified,
+        timestamp: Date.now()
+      };
+      console.log('Saving IDL loader data:', loaderData, 'to key:', idlLoaderKey);
+      try {
+        localStorage.setItem(idlLoaderKey, JSON.stringify(loaderData));
+        console.log('IDL loader data saved successfully');
+      } catch (error) {
+        console.warn("Failed to save IDL loader data to localStorage:", error);
+      }
+    }
   }, [idlFile]);
+
+  // Function to clear saved IDL loader data
+  const clearIdlLoaderData = () => {
+    setIdlFile(null);
+    setError(null);
+    try {
+      localStorage.removeItem(idlLoaderKey);
+      console.log('Cleared IDL loader data from localStorage');
+    } catch (error) {
+      console.warn("Failed to clear IDL loader data from localStorage:", error);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -93,6 +139,14 @@ const IDLLoaderModal = () => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={clearIdlLoaderData}
+              className="mr-2"
+            >
+              Clear History
+            </Button>
             <Button type="submit">Load</Button>
           </DialogFooter>
         </DialogContent>
