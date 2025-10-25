@@ -8,6 +8,7 @@ import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import { InstructionsProvider } from "./context/InstructionsContext.tsx";
 import { IDLProvider } from "./context/IDLContext.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
+import { SavedAccountsProvider } from "./context/SavedAccountsContext.tsx";
 
 window.Buffer = Buffer;
 
@@ -18,7 +19,9 @@ createRoot(document.getElementById("root")!).render(
       <TooltipProvider>
         <IDLProvider>
           <InstructionsProvider>
-            <App />
+            <SavedAccountsProvider>
+              <App />
+            </SavedAccountsProvider>
           </InstructionsProvider>
         </IDLProvider>
       </TooltipProvider>

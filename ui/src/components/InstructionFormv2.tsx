@@ -12,6 +12,7 @@ import useTransaction from "@/hooks/useTransaction";
 import { useAutoDerivePDAs } from "@/hooks/useAutoDerivePDAs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
+import { useSavedAccounts } from "@/context/SavedAccountsContext";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
@@ -32,6 +33,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
+  const { addSavedAccount } = useSavedAccounts();
   const [accountsAddressMap, setAccountsAddressMap] = useState(
     state.accountsAddresses
   );
@@ -155,6 +157,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
     if (result) {
       toast.success("Instruction executed successfully");
+      // save the transaction to history
       addTransaction({
         signature: result.signature,
         instructionName: instruction.name,
@@ -162,6 +165,18 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
         status: "success",
         timestamp: Date.now(),
         accounts: Object.fromEntries(result.accounts ?? []),
+      });
+
+      // save the saved accounts
+      accountsAddressMap.forEach((address, name) => {
+        if (!address) return;
+        addSavedAccount({
+          accountName: name,
+          address,
+          instructionName: instruction.name,
+          programId: idl.address,
+          timestamp: Date.now(),
+        });
       });
     }
   };

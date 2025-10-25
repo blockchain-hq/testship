@@ -21,6 +21,7 @@ import type { Keypair } from "@solana/web3.js";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect } from "react";
 import { Button } from "../ui/button";
+import { useSavedAccounts } from "@/context/SavedAccountsContext";
 
 interface AccountsFormv2Props {
   accounts: ModIdlAccount[] | null;
@@ -51,6 +52,8 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     formData,
     derivedPDAs,
   } = props;
+
+  const { savedAccounts } = useSavedAccounts();
 
   const handleAccountChange = useCallback(
     (accountName: string, address: string | null) => {
@@ -259,6 +262,17 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
 
   if (!accounts) return null;
 
+  const getDataListId = (accountName: string) => {
+    return `${accountName}-suggestions`;
+  };
+
+  const getFilteredSuggestions = (accountName: string) => {
+    return savedAccounts
+      .filter((savedAcc) => savedAcc.accountName === accountName)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 10);
+  };
+
   return (
     <div className="flex flex-col bg-card border border-border/50 rounded-md p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -356,7 +370,14 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
                   isAccountPda(account) &&
                   derivedPDAs.get(account.name)?.status === "deriving"
                 }
+                list={getDataListId(account.name)}
               />
+
+              <datalist id={getDataListId(account.name)}>
+                {getFilteredSuggestions(account.name).map((savedAcc) => (
+                  <option key={savedAcc.address} value={savedAcc.address} />
+                ))}
+              </datalist>
 
               {isAccountPda(account) &&
                 derivedPDAs.get(account.name)?.status === "ready" && (
