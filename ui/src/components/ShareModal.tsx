@@ -53,7 +53,7 @@ const ShareModal = (props: ShareModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea>
+        <ScrollArea className="h-[60vh] rounded-md overflow-hidden">
           <div className="flex flex-col">
             <div>
               {instructions.map((instruction) => (
