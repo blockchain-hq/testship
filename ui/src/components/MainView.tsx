@@ -14,9 +14,7 @@ const MainView = () => {
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
 
-  if (!idl) return null;
-
-  const instruction = idl.instructions.find(
+  const instruction = idl?.instructions.find(
     (instruction) => instruction.name === activeInstruction
   );
 
@@ -30,7 +28,7 @@ const MainView = () => {
           {idl ? (
             instruction ? (
               <InstructionFormv2
-                instruction={instruction}
+                instruction={instruction ?? null}
                 idl={idl}
                 addTransaction={addTransaction}
               />

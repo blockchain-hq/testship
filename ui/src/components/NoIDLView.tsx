@@ -23,12 +23,7 @@ const NoIDLView = () => {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button
-          variant="default"
-          className="bg-level-4-primary hover:bg-level-4-primary/90 text-white shadow-lg shadow-level-4-primary/30 hover:shadow-xl hover:shadow-level-4-primary/50  transition-all"
-        >
-          Load IDL
-        </Button>
+        <Button variant="default">Load IDL</Button>
       </EmptyContent>
       <Button
         variant="link"
