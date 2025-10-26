@@ -11,23 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import UseCopy from "@/hooks/useCopy";
 import UseShareState from "@/hooks/useShareState";
-import type { IdlInstruction } from "@/lib/types";
-import type { Idl } from "@coral-xyz/anchor";
 import { Check, Copy, ExternalLink, Share } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ScrollArea } from "./ui";
-import { toCamelCase } from "@/lib/utils";
 import BaseUrlInput from "./BaseUrlInput";
 
-interface ShareModalProps {
-  idl: Idl;
-  accountMap: Map<string, string | null>;
-  instructions: IdlInstruction[];
-  formData: Record<string, string | number>;
-}
-
-const ShareModal = (props: ShareModalProps) => {
-  const { accountMap, instructions, formData } = props;
+const ShareModal = () => {
   const { shareUrl, prepareUrl } = UseShareState();
   const [baseUrl, setBaseUrl] = useState<string>("https://app.testship.xyz");
   const { copied, handleCopy } = UseCopy();
@@ -51,51 +39,27 @@ const ShareModal = (props: ShareModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="h-[50vh] rounded-md overflow-hidden">
+        {/* <ScrollArea className="h-[50vh] rounded-md overflow-hidden">
           <div className="flex flex-col">
-            <div>
-              {instructions.map((instruction) => (
-                <div className="flex flex-col justify-center items-start gap-1 border">
-                  <p>
-                    <span className="text-muted-foreground">
-                      Instruction Name:{" "}
-                    </span>
-                    {instruction.name}
-                  </p>
-
-                  {instruction.args.length > 0 && (
-                    <div className="flex flex-col justify-center items-start gap-1">
-                      <h4>Arguments</h4>
-                      {instruction.args.map((arg) => (
-                        <p>
-                          <span className="text-muted-foreground">
-                            {arg.name}:{" "}
-                          </span>
-                          {formData[arg.name]}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  {instruction.accounts.length > 0 && (
-                    <div className="flex flex-col justify-center items-start gap-1">
-                      <h4>Accounts</h4>
-                      {instruction.accounts.map((acc) => (
-                        <p>
-                          <span className="text-muted-foreground">
-                            {acc.name}:{" "}
-                          </span>
-                          {accountMap.get(acc.name) ||
-                            accountMap.get(toCamelCase(acc.name))}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="summary">
+              <p className="text-sm text-gray-600">This URL contains:</p>
+              <ul className="space-y-1 mt-2">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span>{instructionsCount} instructions</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span>{uniqueAccountsWithAddressesCount} accounts</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span>{allFormValuesCount} form values</span>
+                </li>
+              </ul>
             </div>
           </div>
-        </ScrollArea>
+        </ScrollArea> */}
 
         <BaseUrlInput baseUrl={baseUrl} onChange={setBaseUrl} />
 

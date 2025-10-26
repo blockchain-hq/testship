@@ -201,12 +201,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       </ScrollArea>
 
       <div className="flex flex-row justify-end items-center gap-2">
-        <ShareModal
-          idl={idl}
-          accountMap={accountsAddressMap}
-          instructions={idl.instructions}
-          formData={formData}
-        />
+        <ShareModal />
 
         <Button
           disabled={isExecuting}
