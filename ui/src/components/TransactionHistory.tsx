@@ -1,4 +1,11 @@
-import { Trash2, Filter, FolderArchive, ArrowUpRight } from "lucide-react";
+import {
+  Trash2,
+  Filter,
+  FolderArchive,
+  ArrowUpRight,
+  MoveRight,
+  Loader2,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import {
@@ -35,24 +42,67 @@ import { EmptyTitle } from "./ui/empty";
 import { EmptyDescription } from "./ui/empty";
 import { EmptyContent } from "./ui/empty";
 import TransactionHistoryCard from "./TransactionHistoryCard";
+import useTransaction from "@/hooks/useTransaction";
+import { useInstructions } from "@/context/InstructionsContext";
+import { useIDL } from "@/context/IDLContext";
+import { toast } from "sonner";
+import { useSavedAccounts } from "@/context/SavedAccountsContext";
 
 interface TransactionHistoryProps {
   transactions: TransactionRecord[];
   onClear: () => void;
   onRemove: (signature: string) => void;
+  addTransaction: (transaction: TransactionRecord) => void;
 }
 
 export function TransactionHistory({
   transactions,
   onClear,
   onRemove,
+  addTransaction,
 }: TransactionHistoryProps) {
   const [filter, setFilter] = useState<"all" | "success" | "error">("all");
-
+  const { execute, isExecuting } = useTransaction(addTransaction);
+  const { activeInstruction, getInstructionState } = useInstructions();
+  const { addSavedAccount } = useSavedAccounts();
+  const { idl } = useIDL();
   const filteredTransactions = transactions.filter((tx) => {
     if (filter === "all") return true;
     return tx.status === filter;
   });
+
+  const handleRunTransaction = async () => {
+    const instruction = idl?.instructions.find(
+      (instruction) => instruction.name === activeInstruction
+    );
+    const instructionState = getInstructionState(activeInstruction ?? "");
+
+    if (!instruction) {
+      toast.error("Instruction not found");
+      return;
+    }
+
+    const result = await execute(
+      instruction,
+      instructionState.accountsAddresses,
+      instructionState.formData,
+      instructionState.signersKeypairs
+    );
+
+    if (result) {
+      // save the saved accounts
+      instructionState.accountsAddresses.forEach((address, name) => {
+        if (!address) return;
+        addSavedAccount({
+          accountName: name,
+          address,
+          instructionName: instruction.name,
+          programId: idl?.address ?? "",
+          timestamp: Date.now(),
+        });
+      });
+    }
+  };
 
   return (
     <Card
@@ -138,7 +188,14 @@ export function TransactionHistory({
                     </EmptyDescription>
                   </EmptyHeader>
                   <EmptyContent>
-                    <Button variant="default">Run Transaction</Button>
+                    <Button variant="default" onClick={handleRunTransaction}>
+                      {isExecuting ? (
+                        <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                      ) : (
+                        <MoveRight className="h-3 w-3 mr-2" />
+                      )}{" "}
+                      Run Transaction
+                    </Button>
                   </EmptyContent>
                   <Button
                     variant="link"

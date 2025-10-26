@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Program, AnchorProvider, AnchorError } from "@coral-xyz/anchor";
-import type { Idl } from "@coral-xyz/anchor";
 import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import type { Keypair } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
@@ -11,11 +10,12 @@ import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import { useTransactionToast } from "./useTransactionToast";
 import { parseSolanaError, type ErrorWithLogs } from "@/lib/errorParser";
 import { type TransactionRecord } from "./useTransactionHistory";
+import { useIDL } from "@/context/IDLContext";
 
 export default function useTransaction(
-  idl: Idl,
   addTransaction: (tx: TransactionRecord) => void
 ) {
+  const { idl } = useIDL();
   const [isExecuting, setIsExecuting] = useState(false);
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -29,6 +29,11 @@ export default function useTransaction(
   ) => {
     if (!wallet) {
       toast.error("Connect your wallet first");
+      return null;
+    }
+
+    if (!idl) {
+      toast.error("IDL not found");
       return null;
     }
 

@@ -47,6 +47,7 @@ const MainView = () => {
             transactions={transactions}
             onClear={clearHistory}
             onRemove={removeTransaction}
+            addTransaction={addTransaction}
           />
         </div>
       </div>

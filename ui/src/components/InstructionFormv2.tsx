@@ -26,7 +26,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   const { getInstructionState, updateInstructionState } = useInstructions();
   const { publicKey: userWalletPublicKey } = useWallet();
 
-  const { execute, isExecuting } = useTransaction(idl, addTransaction);
+  const { execute, isExecuting } = useTransaction(addTransaction);
 
   const state = getInstructionState(instruction?.name ?? "");
   // local state
@@ -157,17 +157,6 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     );
 
     if (result) {
-      toast.success("Instruction executed successfully");
-      // save the transaction to history
-      addTransaction({
-        signature: result.signature,
-        instructionName: instruction.name,
-        programId: idl.address,
-        status: "success",
-        timestamp: Date.now(),
-        accounts: Object.fromEntries(result.accounts ?? []),
-      });
-
       // save the saved accounts
       accountsAddressMap.forEach((address, name) => {
         if (!address) return;
