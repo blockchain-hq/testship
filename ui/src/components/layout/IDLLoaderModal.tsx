@@ -21,24 +21,17 @@ const IDLLoaderModal = () => {
   // Create a unique key for IDL loader data
   const idlLoaderKey = 'testship_idl_loader';
 
-  // Load IDL loader data from localStorage on component mount
   useEffect(() => {
-    console.log('IDLLoaderModal mounting');
     try {
       const saved = localStorage.getItem(idlLoaderKey);
-      console.log('Loaded IDL loader data from localStorage:', saved);
       if (saved) {
-        const savedData = JSON.parse(saved);
-        if (savedData.lastFileName) {
-          console.log('Restored last file name:', savedData.lastFileName);
-        }
+        JSON.parse(saved);
       }
     } catch (error) {
-      console.error('Error loading IDL loader data from localStorage:', error);
+      // Ignore loading errors
     }
   }, []);
 
-  // Save IDL loader data to localStorage whenever idlFile changes
   useEffect(() => {
     if (idlFile) {
       const loaderData = {
@@ -46,23 +39,19 @@ const IDLLoaderModal = () => {
         lastModified: idlFile.lastModified,
         timestamp: Date.now()
       };
-      console.log('Saving IDL loader data:', loaderData, 'to key:', idlLoaderKey);
       try {
         localStorage.setItem(idlLoaderKey, JSON.stringify(loaderData));
-        console.log('IDL loader data saved successfully');
       } catch (error) {
         console.warn("Failed to save IDL loader data to localStorage:", error);
       }
     }
   }, [idlFile]);
 
-  // Function to clear saved IDL loader data
   const clearIdlLoaderData = () => {
     setIdlFile(null);
     setError(null);
     try {
       localStorage.removeItem(idlLoaderKey);
-      console.log('Cleared IDL loader data from localStorage');
     } catch (error) {
       console.warn("Failed to clear IDL loader data from localStorage:", error);
     }
@@ -82,8 +71,6 @@ const IDLLoaderModal = () => {
       let parsed;
       try {
         parsed = JSON.parse(text);
-        console.log("✅ Valid JSON:", parsed);
-        // You can add Anchor IDL structure validation here later
       } catch (jsonErr: any) {
         console.error("❌ JSON parsing failed:", jsonErr);
         setError("File content is not valid JSON.");

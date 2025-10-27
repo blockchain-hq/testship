@@ -32,13 +32,11 @@ export const startDevServer = async (
     // WebSocket clients storage
     const clients = new Set<any>();
 
-    // WebSocket connection handling
     wss.on('connection', (ws) => {
       console.log(chalk.blue('Client connected to WebSocket'));
       clients.add(ws);
 
       ws.on('close', () => {
-        console.log(chalk.yellow('Client disconnected from WebSocket'));
         clients.delete(ws);
       });
 
@@ -70,8 +68,6 @@ export const startDevServer = async (
 
     watcher.on('change', (filePath) => {
       console.log(chalk.green(`IDL file changed: ${filePath}`));
-      console.log(chalk.blue('Notifying clients to refresh IDL...'));
-      console.log(chalk.yellow(`Active clients: ${clients.size}`));
       notifyClients('IDL_UPDATED');
     });
 

@@ -40,14 +40,10 @@ const InstructionForm = (props: InstructionFormProps) => {
   const [formData, setFormData] = React.useState<
     Record<string, string | number>
   >(() => {
-    console.log('InstructionForm mounting for:', instruction.name);
-    console.log('Form data key:', formDataKey);
     try {
       const saved = localStorage.getItem(formDataKey);
-      console.log('Loaded from localStorage:', saved);
       return saved ? JSON.parse(saved) : {};
     } catch (error) {
-      console.error('Error loading from localStorage:', error);
       return {};
     }
   });
@@ -57,38 +53,28 @@ const InstructionForm = (props: InstructionFormProps) => {
   const { addSavedAccount, savedAccounts } = UseSavedAccounts();
   const { execute, isExecuting } = useTransaction(idl, addTransactionRecord);
 
-  // Save form data to localStorage whenever it changes
   React.useEffect(() => {
-    // Only save if formData has actual values
     const hasData = Object.values(formData).some(value => 
       value !== "" && value !== undefined && value !== null
     );
     
     if (hasData) {
-      console.log('Saving form data:', formData, 'to key:', formDataKey);
       try {
         localStorage.setItem(formDataKey, JSON.stringify(formData));
-        console.log('Form data saved successfully');
       } catch (error) {
         console.warn("Failed to save form data to localStorage:", error);
       }
-    } else {
-      console.log('Skipping save - no meaningful data:', formData);
     }
   }, [formData, formDataKey]);
 
-  // Function to clear saved form data (both arguments and accounts)
   const clearFormData = () => {
-    // Clear arguments data
     setFormData({});
     try {
       localStorage.removeItem(formDataKey);
-      console.log('Cleared arguments data from localStorage');
     } catch (error) {
       console.warn("Failed to clear arguments data from localStorage:", error);
     }
 
-    // Clear accounts data
     const newAccountsMap = new Map<string, string | null>();
     instruction.accounts.forEach((account: ModIdlAccount) => {
       newAccountsMap.set(account.name, account.address || null);
@@ -98,7 +84,6 @@ const InstructionForm = (props: InstructionFormProps) => {
     try {
       const accountsDataKey = `testship_accounts_${instruction.name}`;
       localStorage.removeItem(accountsDataKey);
-      console.log('Cleared accounts data from localStorage');
     } catch (error) {
       console.warn("Failed to clear accounts data from localStorage:", error);
     }
@@ -169,14 +154,11 @@ const InstructionForm = (props: InstructionFormProps) => {
   };
 
   const handleInputChange = (name: string, value: unknown) => {
-    console.log('Input change:', name, '=', value);
-    // Convert unknown to string | number for formData
     const convertedValue = value === undefined ? "" : (typeof value === "boolean" ? String(value) : value as string | number);
-    setFormData((prev) => {
-      const newData = { ...prev, [name]: convertedValue };
-      console.log('New form data:', newData);
-      return newData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: convertedValue
+    }));
 
     const arg = instruction.args?.find((arg) => arg.name === name);
     const argType = arg?.type;
@@ -267,7 +249,6 @@ const InstructionForm = (props: InstructionFormProps) => {
             id={arg.name}
             value={typeof value === "number" ? value : ""}
             onChange={(e) => {
-              console.log('NUMBER INPUT CHANGE v4:', arg.name, e.target.value);
               const inputValue = e.target.value;
               // Convert empty string to undefined, otherwise convert to number
               const numericValue =
@@ -289,7 +270,6 @@ const InstructionForm = (props: InstructionFormProps) => {
           <Select
             value={value === "" ? "true" : String(value)}
             onValueChange={(val) => {
-              console.log('SELECT INPUT CHANGE:', arg.name, val);
               handleInputChange(arg.name, val === "true");
             }}
           >
@@ -308,7 +288,6 @@ const InstructionForm = (props: InstructionFormProps) => {
             id={arg.name}
             value={value as string}
             onChange={(e) => {
-              console.log('TEXTAREA INPUT CHANGE:', arg.name, e.target.value);
               handleInputChange(arg.name, e.target.value);
             }}
             placeholder={`Enter ${arg.name} (${

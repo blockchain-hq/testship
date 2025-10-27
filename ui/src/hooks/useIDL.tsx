@@ -28,33 +28,23 @@ const UseIdl = () => {
     }
   };
 
-  // Debounced refresh function
   const debouncedRefresh = () => {
-    // Clear existing timeout
     if (debounceTimeoutRef.current) {
-      console.log("Cancelling previous debounce, scheduling new one...");
       clearTimeout(debounceTimeoutRef.current);
-    } else {
-      console.log("Scheduling debounced IDL refresh (500ms delay)...");
     }
     
-    // Set debouncing state
     setIsDebouncing(true);
     
-    // Set new timeout (500ms debounce)
     debounceTimeoutRef.current = setTimeout(() => {
-      console.log("Debounced IDL refresh triggered - fetching new IDL");
       setIsDebouncing(false);
       fetchIdl();
     }, 500);
   };
 
-  // WebSocket connection for real-time updates
   const { isConnected } = useWebSocket({
     url: "ws://localhost:3000",
     onMessage: (message) => {
       if (message === "IDL_UPDATED") {
-        console.log("Received IDL_UPDATED message from server");
         debouncedRefresh();
       }
     },
@@ -78,7 +68,6 @@ const UseIdl = () => {
       setLoading(false);
     }
 
-    // Cleanup timeout on unmount
     return () => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);

@@ -39,11 +39,9 @@ export const useWebSocket = ({
       };
 
       ws.onclose = () => {
-        console.log("WebSocket disconnected");
         setIsConnected(false);
         onClose?.();
         
-        // Attempt to reconnect
         if (reconnectAttempts < maxReconnectAttempts) {
           console.log(`Attempting to reconnect... (${reconnectAttempts + 1}/${maxReconnectAttempts})`);
           setReconnectAttempts(prev => prev + 1);
