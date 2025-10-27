@@ -1,4 +1,3 @@
-import { useIDL } from "@/context/IDLContext";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import IDLLoaderModal from "./IDLLoaderModal";
 import type { Idl } from "@coral-xyz/anchor";

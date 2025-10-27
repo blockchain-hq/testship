@@ -45,6 +45,7 @@ const UseIdl = () => {
     url: "ws://localhost:3000",
     onMessage: (message) => {
       if (message === "IDL_UPDATED") {
+        console.log("IDL updated, refreshing...");
         debouncedRefresh();
       }
     },

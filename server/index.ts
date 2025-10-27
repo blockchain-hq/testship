@@ -24,6 +24,8 @@ export const startDevServer = async (
     const httpServer = createServer(app);
     const wss = new WebSocketServer({ server: httpServer });
 
+    console.log(chalk.gray('WebSocket server created and attached to httpServer'));
+
     app.use(cors());
     app.use(express.json());
 
@@ -35,14 +37,18 @@ export const startDevServer = async (
     wss.on('connection', (ws) => {
       console.log(chalk.blue('Client connected to WebSocket'));
       clients.add(ws);
+      console.log(chalk.gray(`Total clients: ${clients.size}`));
 
       ws.on('close', () => {
+        console.log(chalk.yellow('Client disconnected from WebSocket'));
         clients.delete(ws);
+        console.log(chalk.gray(`Total clients: ${clients.size}`));
       });
 
       ws.on('error', (error) => {
         console.error(chalk.red('WebSocket error:'), error);
         clients.delete(ws);
+        console.log(chalk.gray(`Total clients: ${clients.size}`));
       });
     });
 
@@ -102,6 +108,9 @@ export const startDevServer = async (
 
     httpServer.listen(availablePort, async () => {
       const url = `http://${DEFAULT_HOST}:${availablePort}`;
+      ora.succeed(`HTTP server listening on port ${availablePort}`);
+      ora.info(`WebSocket server ready on ws://${DEFAULT_HOST}:${availablePort}`);
+      
       setTimeout(async () => {
         ora.start("Opening browser...");
         try {
