@@ -1,9 +1,13 @@
 import { useIDL } from "@/context/IDLContext";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import IDLLoaderModal from "./IDLLoaderModal";
+import type { Idl } from "@coral-xyz/anchor";
 
-export const Sidebar = () => {
-  const { idl } = useIDL();
+interface SidebarProps {
+  idl: Idl | null;
+}
+
+export const Sidebar = ({ idl }: SidebarProps) => {
 
   return (
     <aside className="w-64 bg-surface-secondary dark:bg-surface-dark-secondary border-r border-border dark:border-border-dark min-h-screen hidden lg:block">
