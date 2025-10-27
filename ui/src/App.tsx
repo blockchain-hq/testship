@@ -9,7 +9,7 @@ import "driver.js/dist/driver.css";
 import { useEffect } from "react";
 import { useInstructions } from "./context/InstructionsContext";
 import useTour from "./hooks/useTour";
-
+import { Sidebar } from "./components/layout/Sidebar";
 const App = () => {
   const { isLoading } = useIDL();
   const { isLoading: isLoadingSharedState } = useLoadSharedState();
@@ -54,7 +54,9 @@ const App = () => {
   return (
     <div className="min-h-screen w-full bg-background text-foreground dark:text-foreground-dark">
       <Header />
-      <div className="flex w-[90%] mx-auto">
+      <div className="flex w-full">
+        <Sidebar idl={idl} />
+
         <main className="flex-1 min-h-screen w-full lg:ml-0">
           {isLoading ? (
             <div className="p-4 sm:p-6">

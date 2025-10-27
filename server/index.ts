@@ -8,7 +8,10 @@ import getPort from "get-port";
 import { DEFAULT_HOST, DEFAULT_PORT } from "../shared/constant";
 import { Ora } from "ora";
 import { getMessageFromError } from "../cli/parse-error";
-
+import chokidar from "chokidar";
+import { WebSocketServer } from "ws";
+import { createServer } from "http";
+import chalk from "chalk";
 export const startDevServer = async (
   project: AnchorProject,
   ora: Ora,
@@ -18,11 +21,59 @@ export const startDevServer = async (
     ora.start("Starting dev server...");
 
     const app = express();
+    const httpServer = createServer(app);
+    const wss = new WebSocketServer({ server: httpServer });
 
     app.use(cors());
     app.use(express.json());
 
     const uiPath = path.join(__dirname, "../ui");
+
+    // WebSocket clients storage
+    const clients = new Set<any>();
+
+    wss.on('connection', (ws) => {
+      console.log(chalk.blue('Client connected to WebSocket'));
+      clients.add(ws);
+
+      ws.on('close', () => {
+        clients.delete(ws);
+      });
+
+      ws.on('error', (error) => {
+        console.error(chalk.red('WebSocket error:'), error);
+        clients.delete(ws);
+      });
+    });
+
+    // Function to notify all clients about IDL changes
+    const notifyClients = (message: string) => {
+      console.log(chalk.cyan(`Sending "${message}" to ${clients.size} clients`));
+      let sentCount = 0;
+      clients.forEach((client) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+          client.send(message);
+          sentCount++;
+        }
+      });
+      console.log(chalk.cyan(`Message sent to ${sentCount} clients`));
+    };
+
+    // Watch for IDL file changes
+    console.log(chalk.blue(`Watching IDL file: ${project.idlPath}`));
+    const watcher = chokidar.watch(project.idlPath, {
+      persistent: true,
+      ignoreInitial: true,
+    });
+
+    watcher.on('change', (filePath) => {
+      console.log(chalk.green(`IDL file changed: ${filePath}`));
+      notifyClients('IDL_UPDATED');
+    });
+
+    watcher.on('error', (error) => {
+      console.error(chalk.red('File watcher error:'), error);
+    });
 
     app.get("/api/idl", (req: Request, res: Response) => {
       try {
@@ -49,7 +100,7 @@ export const startDevServer = async (
 
     const availablePort = await getPort({ port: port || DEFAULT_PORT });
 
-    const server = app.listen(availablePort, async () => {
+    httpServer.listen(availablePort, async () => {
       const url = `http://${DEFAULT_HOST}:${availablePort}`;
       setTimeout(async () => {
         ora.start("Opening browser...");
@@ -65,7 +116,9 @@ export const startDevServer = async (
 
     const shutdown = () => {
       ora.start("Shutting down server...");
-      server.close(() => {
+      watcher.close();
+      wss.close();
+      httpServer.close(() => {
         ora.succeed("Server closed");
         process.exit(0);
       });
@@ -80,7 +133,8 @@ export const startDevServer = async (
     process.on("SIGTERM", shutdown);
     process.on("SIGINT", shutdown);
 
-    return server;
+    return httpServer;
+
   } catch (error) {
     ora.fail("Error starting dev server");
     ora.info(getMessageFromError(error));

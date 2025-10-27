@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import type { Keypair } from "@solana/web3.js";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Button } from "../ui/button";
 import { useSavedAccounts } from "@/context/SavedAccountsContext";
 
@@ -85,9 +85,6 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     [handleAccountChange]
   );
 
-  useEffect(() => {
-    console.log("accountsAddressMap", accountsAddressMap);
-  }, [accountsAddressMap]);
 
   const getPDABadge = (account: ModIdlAccount) => {
     if (!isAccountPda(account)) return null;

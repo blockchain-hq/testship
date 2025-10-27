@@ -18,9 +18,44 @@ const IDLLoaderModal = () => {
   const [idlFile, setIdlFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Create a unique key for IDL loader data
+  const idlLoaderKey = 'testship_idl_loader';
+
   useEffect(() => {
-    console.log(idlFile);
+    try {
+      const saved = localStorage.getItem(idlLoaderKey);
+      if (saved) {
+        JSON.parse(saved);
+      }
+    } catch (error) {
+      // Ignore loading errors
+    }
+  }, []);
+
+  useEffect(() => {
+    if (idlFile) {
+      const loaderData = {
+        lastFileName: idlFile.name,
+        lastModified: idlFile.lastModified,
+        timestamp: Date.now()
+      };
+      try {
+        localStorage.setItem(idlLoaderKey, JSON.stringify(loaderData));
+      } catch (error) {
+        console.warn("Failed to save IDL loader data to localStorage:", error);
+      }
+    }
   }, [idlFile]);
+
+  const clearIdlLoaderData = () => {
+    setIdlFile(null);
+    setError(null);
+    try {
+      localStorage.removeItem(idlLoaderKey);
+    } catch (error) {
+      console.warn("Failed to clear IDL loader data from localStorage:", error);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -36,8 +71,6 @@ const IDLLoaderModal = () => {
       let parsed;
       try {
         parsed = JSON.parse(text);
-        console.log("✅ Valid JSON:", parsed);
-        // You can add Anchor IDL structure validation here later
       } catch (jsonErr: any) {
         console.error("❌ JSON parsing failed:", jsonErr);
         setError("File content is not valid JSON.");
@@ -93,6 +126,14 @@ const IDLLoaderModal = () => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={clearIdlLoaderData}
+              className="mr-2"
+            >
+              Clear History
+            </Button>
             <Button type="submit">Load</Button>
           </DialogFooter>
         </DialogContent>
