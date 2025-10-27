@@ -50,11 +50,15 @@ export const startDevServer = async (
 
     // Function to notify all clients about IDL changes
     const notifyClients = (message: string) => {
+      console.log(chalk.cyan(`Sending "${message}" to ${clients.size} clients`));
+      let sentCount = 0;
       clients.forEach((client) => {
         if (client.readyState === 1) { // WebSocket.OPEN
           client.send(message);
+          sentCount++;
         }
       });
+      console.log(chalk.cyan(`Message sent to ${sentCount} clients`));
     };
 
     // Watch for IDL file changes
@@ -67,6 +71,7 @@ export const startDevServer = async (
     watcher.on('change', (filePath) => {
       console.log(chalk.green(`IDL file changed: ${filePath}`));
       console.log(chalk.blue('Notifying clients to refresh IDL...'));
+      console.log(chalk.yellow(`Active clients: ${clients.size}`));
       notifyClients('IDL_UPDATED');
     });
 
