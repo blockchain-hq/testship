@@ -85,9 +85,6 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     [handleAccountChange]
   );
 
-  useEffect(() => {
-    console.log("accountsAddressMap", accountsAddressMap);
-  }, [accountsAddressMap]);
 
   const getPDABadge = (account: ModIdlAccount) => {
     if (!isAccountPda(account)) return null;

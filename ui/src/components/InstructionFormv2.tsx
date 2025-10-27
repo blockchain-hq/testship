@@ -28,17 +28,82 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
   const { execute, isExecuting } = useTransaction(addTransaction);
 
+  const formDataKey = instruction?.name ? `testship_form_${instruction.name}` : null;
+  const accountsDataKey = instruction?.name ? `testship_accounts_${instruction.name}` : null;
+
   const state = getInstructionState(instruction?.name ?? "");
-  // local state
-  const [formData, setFormData] = useState(state.formData);
+  
+  // Load form data from localStorage on mount
+  const [formData, setFormData] = useState(() => {
+    if (!formDataKey) return state.formData;
+    try {
+      const saved = localStorage.getItem(formDataKey);
+      return saved ? JSON.parse(saved) : state.formData;
+    } catch (error) {
+      return state.formData;
+    }
+  });
+
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
   const { addSavedAccount } = useSavedAccounts();
-  const [accountsAddressMap, setAccountsAddressMap] = useState(
-    state.accountsAddresses
-  );
+  
+  // Load account data from localStorage on mount
+  const [accountsAddressMap, setAccountsAddressMap] = useState(() => {
+    if (!accountsDataKey) return state.accountsAddresses;
+    try {
+      const saved = localStorage.getItem(accountsDataKey);
+      if (saved) {
+        const savedAccounts = JSON.parse(saved);
+        const newMap = new Map(state.accountsAddresses);
+        Object.entries(savedAccounts).forEach(([key, value]) => {
+          if (value && typeof value === 'string') {
+            newMap.set(key, value);
+          }
+        });
+        return newMap;
+      }
+    } catch (error) {
+      console.error('Error loading accounts from localStorage:', error);
+    }
+    return state.accountsAddresses;
+  });
+  
   const [signersKeypairs, setSignersKeypairs] = useState(state.signersKeypairs);
+
+  // Save form data to localStorage
+  useEffect(() => {
+    if (!formDataKey) return;
+    const hasData = Object.values(formData).some(value => 
+      value !== "" && value !== undefined && value !== null
+    );
+    
+    if (hasData) {
+      try {
+        localStorage.setItem(formDataKey, JSON.stringify(formData));
+      } catch (error) {
+        console.warn("Failed to save form data to localStorage:", error);
+      }
+    }
+  }, [formData, formDataKey]);
+
+  // Save accounts data to localStorage
+  useEffect(() => {
+    if (!accountsDataKey) return;
+    const hasData = Array.from(accountsAddressMap.values()).some(value => 
+      value && value.trim() !== ""
+    );
+    
+    if (hasData) {
+      const accountsData = Object.fromEntries(accountsAddressMap);
+      try {
+        localStorage.setItem(accountsDataKey, JSON.stringify(accountsData));
+      } catch (error) {
+        console.warn("Failed to save accounts data to localStorage:", error);
+      }
+    }
+  }, [accountsAddressMap, accountsDataKey]);
 
   const derivedPDAs = useAutoDerivePDAs(
     instruction,
@@ -83,14 +148,60 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
   useEffect(() => {
     const newState = getInstructionState(instruction?.name ?? "");
-    setFormData(newState.formData);
+    
+    // Load from localStorage when instruction name changes (hot-reload)
+    if (formDataKey) {
+      try {
+        const savedFormData = localStorage.getItem(formDataKey);
+        if (savedFormData) {
+          setFormData(JSON.parse(savedFormData));
+        } else {
+          setFormData(newState.formData);
+        }
+      } catch (error) {
+        setFormData(newState.formData);
+      }
+    } else {
+      setFormData(newState.formData);
+    }
+    
     setSignersKeypairs(newState.signersKeypairs);
 
-    // if signers keypairs are empty, set user wallet as signer
-    if (newState.accountsAddresses.size === 0 && instruction) {
-      setAccountsAddressMap(initializeSignerAccounts(instruction));
+    // Load accounts from localStorage when instruction name changes (hot-reload)
+    if (accountsDataKey) {
+      try {
+        const savedAccounts = localStorage.getItem(accountsDataKey);
+        if (savedAccounts) {
+          const parsedAccounts = JSON.parse(savedAccounts);
+          const newMap = new Map(newState.accountsAddresses);
+          Object.entries(parsedAccounts).forEach(([key, value]) => {
+            if (value && typeof value === 'string') {
+              newMap.set(key, value);
+            }
+          });
+          setAccountsAddressMap(newMap);
+        } else {
+          // if signers keypairs are empty, set user wallet as signer
+          if (newState.accountsAddresses.size === 0 && instruction) {
+            setAccountsAddressMap(initializeSignerAccounts(instruction));
+          } else {
+            setAccountsAddressMap(newState.accountsAddresses);
+          }
+        }
+      } catch (error) {
+        if (newState.accountsAddresses.size === 0 && instruction) {
+          setAccountsAddressMap(initializeSignerAccounts(instruction));
+        } else {
+          setAccountsAddressMap(newState.accountsAddresses);
+        }
+      }
     } else {
-      setAccountsAddressMap(newState.accountsAddresses);
+      // if signers keypairs are empty, set user wallet as signer
+      if (newState.accountsAddresses.size === 0 && instruction) {
+        setAccountsAddressMap(initializeSignerAccounts(instruction));
+      } else {
+        setAccountsAddressMap(newState.accountsAddresses);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instruction?.name]);
