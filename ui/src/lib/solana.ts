@@ -40,29 +40,106 @@ export const toBuffer = (value: unknown, type: IdlType) => {
   throw new Error(`Unsupported type: ${type}`);
 };
 
-export const toAnchorType = (value: unknown, type: IdlType) => {
-  if (typeof type !== "string") return value;
+export const toAnchorType = (value: unknown, type: IdlType): unknown => {
+  // Helpers
+  const parseJsonArray = (v: unknown): unknown[] | null => {
+    if (Array.isArray(v)) return v as unknown[];
+    if (typeof v === "string") {
+      const trimmed = v.trim();
+      // Try JSON first
+      if ((trimmed.startsWith("[") && trimmed.endsWith("]")) || trimmed === "[]") {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) return parsed as unknown[];
+        } catch {
+          // fallthrough
+        }
+      }
+      // Fallback: comma-separated list
+      if (trimmed.includes(",")) {
+        return trimmed
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+      }
+      // Single scalar -> wrap as one element
+      if (trimmed.length > 0) return [trimmed];
+    }
+    return null;
+  };
 
-  switch (type) {
-    case "u8":
-    case "u16":
-    case "u32":
-    case "u64":
-    case "i8":
-    case "i16":
-    case "i32":
-    case "i64":
-      // @ts-expect-error: unknown type due to type not known at compile time
-      return new BN(value);
-    case "bool":
-      return typeof value === "boolean" ? value : value === "true";
-    case "string":
-      return String(value);
-    case "pubkey":
-      return new PublicKey(value as string);
-    default:
+  // Handle complex container types first (vec / array / option / coption)
+  if (typeof type === "object" && type !== null) {
+    // Vec<T>
+    if ("vec" in type && (type as any).vec !== undefined) {
+      const inner = (type as any).vec as IdlType;
+      const arr = parseJsonArray(value);
+      if (arr) {
+        const mapped: unknown[] = arr.map((item) => toAnchorType(item, inner));
+        return mapped;
+      }
       return value;
+    }
+
+    // [T; N]
+    if ("array" in type && (type as any).array) {
+      const [inner, len] = (type as any).array as [IdlType, number];
+      const arr = parseJsonArray(value);
+      if (arr) {
+        const coerced: unknown[] = arr.map((item) => toAnchorType(item, inner));
+        if (typeof len === "number") {
+          // pad or trim to required length
+          if (coerced.length < len) coerced.push(...Array(len - coerced.length).fill(undefined));
+          return coerced.slice(0, len);
+        }
+        return coerced;
+      }
+      return value;
+    }
+
+    // Option<T>
+    if ("option" in type && (type as any).option !== undefined) {
+      const inner = (type as any).option as IdlType;
+      if (value === null || value === undefined || value === "") return null;
+      return toAnchorType(value, inner);
+    }
+
+    // COption<T>
+    if ("coption" in type && (type as any).coption !== undefined) {
+      const inner = (type as any).coption as IdlType;
+      if (value === null || value === undefined || value === "") return null;
+      return toAnchorType(value, inner);
+    }
+
+    // Defined/custom types: pass-through (Anchor expects structured objects if provided)
+    return value;
   }
+
+  // Handle primitives (string type tag)
+  if (typeof type === "string") {
+    switch (type) {
+      case "u8":
+      case "u16":
+      case "u32":
+      case "u64":
+      case "i8":
+      case "i16":
+      case "i32":
+      case "i64":
+        // @ts-expect-error: unknown type due to type not known at compile time
+        return new BN(value);
+      case "bool":
+        return typeof value === "boolean" ? value : value === "true";
+      case "string":
+        return String(value);
+      case "pubkey":
+        return new PublicKey(value as string);
+      default:
+        return value;
+    }
+  }
+
+  return value;
 };
 
 export const derivePDA = async (
