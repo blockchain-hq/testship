@@ -82,12 +82,12 @@ const ShareModal = (props: ShareModalProps) => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild> 
         <Button variant="outline">
           <Share />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto border border-border/50 text-foreground bg-card">
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
           <DialogDescription>
