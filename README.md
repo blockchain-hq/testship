@@ -166,7 +166,7 @@ will transition to MIT License as soon as the competition concludes!
 | ✅ Share your experience | ❌ Use commercially without permission |
 | ✅ Provide testimonials | ❌ Copy code for your projects |
 
-**Starting December 1, 2025:**
+**Starting November 1, 2025:**
 | Everything Above + | Full MIT Freedom |
 |-------------------|------------------|
 | ✅ Fork and modify | ✅ Use in commercial projects |

@@ -9,7 +9,7 @@ This software is currently under a restrictive license to protect the original
 work during the Solana Cypherpunk Hackathon period.
 
 AUTOMATIC TRANSITION TO OPEN SOURCE
-On December 1, 2025 at 00:00:00 UTC, this license automatically converts to
+On November 1, 2025 at 00:00:00 UTC, this license automatically converts to
 the MIT License, making this software fully open source.
 
 ================================================================================
@@ -18,13 +18,13 @@ WHY THIS APPROACH?
 
 We believe in open source and community collaboration. This temporary
 restriction exists solely to ensure fair competition during the Solana
-Cypherpunk Hackathon (October-November 2025).
+Cypherpunk Hackathon (October 2025).
 
 We're excited to welcome contributors and make this fully open source once
 the competition concludes!
 
 ================================================================================
-CURRENT TERMS (October 18, 2025 - November 30, 2025)
+CURRENT TERMS (October 18, 2025 - October 31, 2025)
 ================================================================================
 
 GRANT OF LIMITED RIGHTS
@@ -62,12 +62,12 @@ Violation of these terms constitutes copyright infringement and breach of
 license agreement.
 
 ================================================================================
-FUTURE TERMS (December 1, 2025 onwards)
+FUTURE TERMS (November 1, 2025 onwards)
 ================================================================================
 
 AUTOMATIC MIT LICENSE
 
-On December 1, 2025, this entire license is superseded by the MIT License:
+On November 1, 2025, this entire license is superseded by the MIT License:
 
 ---
 
@@ -97,17 +97,17 @@ SOFTWARE.
 
 TRANSITION MECHANISM
 
-The transition to MIT License occurs automatically on December 1, 2025.
+The transition to MIT License occurs automatically on November 1, 2025.
 No action by users or BlockchainHQ is required for the legal effect.
 
 BlockchainHQ will update repository files (LICENSE, README.md, package.json)
-on or after December 1, 2025 to reflect this change. However, if the date has
+on or after November 1, 2025 to reflect this change. However, if the date has
 passed and files are not yet updated, the MIT License governs regardless.
 
 EARLY TRANSITION
 
 BlockchainHQ reserves the right to transition to MIT License earlier than
-December 1, 2025 at its sole discretion, particularly if:
+November 1, 2025 at its sole discretion, particularly if:
 
 - The Solana Cypherpunk Hackathon concludes early
 - BlockchainHQ wins or is eliminated from the competition
@@ -139,5 +139,5 @@ Open an issue on GitHub or contact via the repository.
 
 ================================================================================
 EFFECTIVE DATE: October 18, 2025
-TRANSITION DATE: December 1, 2025
+TRANSITION DATE: November 1, 2025
 ================================================================================
