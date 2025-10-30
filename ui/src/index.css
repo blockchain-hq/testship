@@ -197,3 +197,7 @@ button:hover {
 .wallet-adapter-modal-button-close svg {
   fill: #fff !important;
 }
+ 
+.toaster [data-sonner-toast] {
+  --initial-height: auto !important;
+}
