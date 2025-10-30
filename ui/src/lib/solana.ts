@@ -115,8 +115,18 @@ export const derivePDA = async (
     }
   }
 
+  // Ensure each seed is <= 32 bytes. If longer, hash with SHA-256 to 32 bytes.
+  const normalizedBuffers = await Promise.all(
+    buffers.map(async (b) => {
+      if (b.length <= 32) return b; 
+      const data = new Uint8Array(b);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return new Uint8Array(digest);
+    })
+  );
+
   const [pda] = PublicKey.findProgramAddressSync(
-    buffers,
+    normalizedBuffers,
     new PublicKey(programId)
   );
   return pda;
