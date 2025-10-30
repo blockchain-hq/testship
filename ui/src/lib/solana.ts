@@ -40,7 +40,7 @@ export const toBuffer = (value: unknown, type: IdlType) => {
   throw new Error(`Unsupported type: ${type}`);
 };
 
-export const toAnchorType = (value: unknown, type: IdlType): unknown => {
+export const toAnchorType = (value: unknown, type: IdlType, idl?: Idl): unknown => {
   // Helpers
   const parseJsonArray = (v: unknown): unknown[] | null => {
     if (Array.isArray(v)) return v as unknown[];
@@ -70,12 +70,106 @@ export const toAnchorType = (value: unknown, type: IdlType): unknown => {
 
   // Handle complex container types first (vec / array / option / coption)
   if (typeof type === "object" && type !== null) {
+    // Defined/custom structs and enums passed as plain JS objects
+    if ("defined" in type) {
+      // Accept JSON string or object
+      let parsed: any = value;
+      if (typeof value === "string") {
+        try {
+          parsed = JSON.parse(value);
+        } catch {
+          return value; // leave as-is if not valid JSON
+        }
+      }
+      
+      // Get the defined type name
+      const typeName = typeof (type as any).defined === 'string' 
+        ? (type as any).defined 
+        : (type as any).defined?.name;
+      
+      // Find the type definition in IDL if available
+      if (idl && typeName) {
+        const typeDef = idl.types?.find((t) => t.name === typeName);
+        if (typeDef) {
+          const kind = (typeDef as any)?.type?.kind;
+          
+          if (kind === 'struct') {
+            // Process struct fields recursively
+            const fields = (typeDef as any)?.type?.fields as Array<{name: string, type: IdlType}>;
+            if (fields && parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              const processed: any = {};
+              for (const field of fields) {
+                const fieldValue = parsed[field.name];
+                if (fieldValue !== undefined) {
+                  processed[field.name] = toAnchorType(fieldValue, field.type, idl);
+                } else {
+                  // Provide defaults for missing fields
+                  processed[field.name] = getDefaultForType(field.type);
+                }
+              }
+              return processed;
+            }
+          } else if (kind === 'enum') {
+            // Process enum with toAnchorEnum, then recursively process variant payloads
+            const enumResult = toAnchorEnum(parsed);
+            if (enumResult && typeof enumResult === 'object' && !Array.isArray(enumResult)) {
+              const variants = (typeDef as any)?.type?.variants as Array<{name: string, fields?: any}>;
+              if (variants) {
+                // Find which variant was selected
+                const variantKeys = Object.keys(enumResult);
+                if (variantKeys.length === 1) {
+                  const variantName = variantKeys[0];
+                  const variantDef = variants.find(v => 
+                    v.name.toLowerCase() === variantName.toLowerCase()
+                  );
+                  
+                  if (variantDef && variantDef.fields && enumResult[variantName]) {
+                    const payload = enumResult[variantName];
+                    const fields = variantDef.fields;
+                    
+                    // Handle struct variant (named fields)
+                    if (Array.isArray(fields) && fields.length > 0 && typeof fields[0] === 'object' && 'name' in fields[0]) {
+                      const processedPayload: any = {};
+                      for (const field of fields as Array<{name: string, type: IdlType}>) {
+                        const fieldValue = payload[field.name];
+                        if (fieldValue !== undefined) {
+                          processedPayload[field.name] = toAnchorType(fieldValue, field.type, idl);
+                        }
+                      }
+                      return { [variantName]: processedPayload };
+                    }
+                    // Handle tuple variant (unnamed fields) like Email(string)
+                    else if (Array.isArray(fields) && fields.length > 0 && typeof fields[0] !== 'object') {
+                      // Single unnamed field
+                      if (fields.length === 1) {
+                        return { [variantName]: toAnchorType(payload, fields[0] as IdlType, idl) };
+                      }
+                      // Multiple unnamed fields (tuple)
+                      else {
+                        const processedTuple = Array.isArray(payload)
+                          ? payload.map((item, idx) => toAnchorType(item, fields[idx] as IdlType, idl))
+                          : [payload]; // wrap single value
+                        return { [variantName]: processedTuple };
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            return enumResult;
+          }
+        }
+      }
+      
+      // Fallback to basic enum processing
+      return toAnchorEnum(parsed);
+    }
     // Vec<T>
     if ("vec" in type && (type as any).vec !== undefined) {
       const inner = (type as any).vec as IdlType;
       const arr = parseJsonArray(value);
       if (arr) {
-        const mapped: unknown[] = arr.map((item) => toAnchorType(item, inner));
+        const mapped: unknown[] = arr.map((item) => toAnchorType(item, inner, idl));
         return mapped;
       }
       return value;
@@ -86,10 +180,10 @@ export const toAnchorType = (value: unknown, type: IdlType): unknown => {
       const [inner, len] = (type as any).array as [IdlType, number];
       const arr = parseJsonArray(value);
       if (arr) {
-        const coerced: unknown[] = arr.map((item) => toAnchorType(item, inner));
+        const coerced: unknown[] = arr.map((item) => toAnchorType(item, inner, idl));
         if (typeof len === "number") {
           // pad or trim to required length
-          if (coerced.length < len) coerced.push(...Array(len - coerced.length).fill(undefined));
+          if (coerced.length < len) coerced.push(...Array(len - coerced.length).fill(0));
           return coerced.slice(0, len);
         }
         return coerced;
@@ -101,14 +195,14 @@ export const toAnchorType = (value: unknown, type: IdlType): unknown => {
     if ("option" in type && (type as any).option !== undefined) {
       const inner = (type as any).option as IdlType;
       if (value === null || value === undefined || value === "") return null;
-      return toAnchorType(value, inner);
+      return toAnchorType(value, inner, idl);
     }
 
     // COption<T>
     if ("coption" in type && (type as any).coption !== undefined) {
       const inner = (type as any).coption as IdlType;
       if (value === null || value === undefined || value === "") return null;
-      return toAnchorType(value, inner);
+      return toAnchorType(value, inner, idl);
     }
 
     // Defined/custom types: pass-through (Anchor expects structured objects if provided)
@@ -121,19 +215,37 @@ export const toAnchorType = (value: unknown, type: IdlType): unknown => {
       case "u8":
       case "u16":
       case "u32":
-      case "u64":
       case "i8":
       case "i16":
       case "i32":
+        // For smaller integer types, use plain numbers (Anchor handles these natively)
+        const smallNumValue = typeof value === "string" ? (value === "" ? 0 : Number(value)) : value;
+        if (BN.isBN(smallNumValue)) return smallNumValue.toNumber();
+        return Number(smallNumValue);
+      case "u64":
       case "i64":
+        // For 64-bit integers, use BN (too large for JS number)
+        const bigNumValue = typeof value === "string" ? (value === "" ? 0 : Number(value)) : value;
+        if (BN.isBN(bigNumValue)) return bigNumValue;
         // @ts-expect-error: unknown type due to type not known at compile time
-        return new BN(value);
+        return new BN(bigNumValue);
       case "bool":
         return typeof value === "boolean" ? value : value === "true";
       case "string":
         return String(value);
       case "pubkey":
         return new PublicKey(value as string);
+      case "bytes":
+        // Handle bytes type
+        if (Array.isArray(value)) return value;
+        if (typeof value === "string") {
+          try {
+            return JSON.parse(value);
+          } catch {
+            return [];
+          }
+        }
+        return [];
       default:
         return value;
     }
@@ -141,6 +253,39 @@ export const toAnchorType = (value: unknown, type: IdlType): unknown => {
 
   return value;
 };
+
+// Helper to get default values for types
+function getDefaultForType(type: IdlType): any {
+  if (typeof type === "string") {
+    if (type === "bytes") return [];
+    // Small integers use plain numbers, large ones use BN
+    if (["u8","u16","u32","i8","i16","i32"].includes(type)) return 0;
+    if (["u64","i64"].includes(type)) return new BN(0);
+    if (type === "bool") return false;
+    if (type === "string") return "";
+    if (type === "pubkey") return null; // PublicKey requires valid address
+    return null;
+  }
+  if (typeof type === "object" && type !== null) {
+    if ("vec" in type) return [];
+    if ("array" in type) {
+      const len = (type as any).array[1];
+      const innerType = (type as any).array[0];
+      // Fill with appropriate defaults based on inner type
+      if (typeof innerType === "string" && ["u8","u16","u32","i8","i16","i32"].includes(innerType)) {
+        return Array(len).fill(0);
+      }
+      return Array(len).fill(getDefaultForType(innerType));
+    }
+    if ("option" in type) return null;
+    if ("coption" in type) return null;
+    if ("defined" in type) {
+      // For custom types, return empty object or null
+      return null;
+    }
+  }
+  return null;
+}
 
 export const derivePDA = async (
   seeds: PDASeed[],
@@ -243,3 +388,22 @@ const extractAccountSeed = async (
   }
   return toBuffer(value, field.type);
 };
+
+export function toAnchorEnum(val: any): any {
+  if (val == null || typeof val !== 'object' || Array.isArray(val)) return val;
+  const keys = Object.keys(val);
+  if (keys.length !== 1) return val;
+  const variant = keys[0].charAt(0).toLowerCase() + keys[0].slice(1);
+  const payload = val[keys[0]];
+  if (payload == null || (typeof payload === 'object' && Object.keys(payload).length === 0)) {
+    return { [variant]: {} };
+  }
+  if (typeof payload === 'object' && !Array.isArray(payload)) {
+    // Remove numeric keys for Anchor struct fields
+    const cleanPayload = Object.fromEntries(
+      Object.entries(payload).filter(([k]) => isNaN(Number(k)))
+    );
+    return { [variant]: cleanPayload };
+  }
+  return { [variant]: payload };
+}

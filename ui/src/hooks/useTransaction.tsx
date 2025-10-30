@@ -78,8 +78,49 @@ export default function useTransaction(
         if (value === undefined || value === null) {
           throw new Error(`Missing argument: ${arg.name}`);
         }
-        return toAnchorType(value, arg.type);
+        const converted = toAnchorType(value, arg.type, idl);
+        // Debug logs for inputs → processed values
+        try {
+          // Helper to serialize BN and complex objects for logging
+          const serializeForLog = (obj: any): any => {
+            if (obj === null || obj === undefined) return obj;
+            if (typeof obj === 'number') return obj; // Show plain numbers as-is
+            if (typeof obj !== 'object') return obj;
+            if (Array.isArray(obj)) return obj.map(serializeForLog);
+            if (obj.constructor?.name === 'BN') {
+              return `BN(${obj.toString()})`;
+            }
+            const result: any = {};
+            for (const [k, v] of Object.entries(obj)) {
+              result[k] = serializeForLog(v);
+            }
+            return result;
+          };
+
+          const previewOriginal =
+            typeof value === "string" && value.length > 400
+              ? value.slice(0, 400) + "…"
+              : value;
+          const previewConverted = serializeForLog(converted);
+          
+          console.log("[Arg]", {
+            name: arg.name,
+            idlType: arg.type,
+            original: previewOriginal,
+            converted: previewConverted,
+          });
+        } catch (e) {
+          console.log(`[Arg:${arg.name}] log error`, e);
+        }
+        return converted;
       });
+
+      try {
+        console.log("[Args Summary]", {
+          count: anchorArgs.length,
+          types: instruction.args.map((a) => a.type),
+        });
+      } catch {}
 
       for (const [name, pubkey] of Object.entries(accountPubkeys)) {
         const balance = await connection.getBalance(pubkey as PublicKey);

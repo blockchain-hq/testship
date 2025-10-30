@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import type { IdlField, IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
+import type { Idl, IdlField, IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { cn, formatIdlType } from "@/lib/utils";
+import { useIDL } from "@/context/IDLContext";
 
 interface ArgumentFormProps {
   args: IdlField[] | null;
@@ -11,8 +12,136 @@ interface ArgumentFormProps {
   validationErrors: Record<string, string>;
 }
 
+interface EnumValueEditorProps {
+  enumName: string;
+  current: any;
+  onChange: (val: any) => void;
+  onBlur?: () => void;
+}
+
+const EnumValueEditor = ({ enumName, current, onChange, onBlur }: EnumValueEditorProps) => {
+  const { idl } = useIDL();
+  const enumType = (idl as Idl)?.types?.find((t) => t.name === enumName);
+  // @ts-expect-error dynamic
+  const variants = enumType?.type?.variants as any[] | undefined;
+
+  // Helper for extracting variant/payload from incoming current
+  const getCurrentKV = () => {
+    if (current && typeof current === "object") {
+      const keys = Object.keys(current);
+      if (keys.length) return [keys[0], current[keys[0]]];
+    }
+    return [variants?.[0]?.name ?? "", ""];
+  };
+
+  const [variant, setVariant] = useState<string>(() => getCurrentKV()[0]);
+  const [payload, setPayload] = useState<any>(() => getCurrentKV()[1]);
+
+  // Only update local if variant changes from outside (not on every prop change)
+  useEffect(() => {
+    const [newVariant, newPayload] = getCurrentKV();
+    if (newVariant !== variant) {
+      setVariant(newVariant);
+      setPayload(newPayload);
+    }
+  }, [current, variants]);
+
+  const vMeta = variants?.find((v) => v.name === variant);
+  const vFields = vMeta?.fields;
+  const isStructVariant = Array.isArray(vFields) && vFields.length > 0 && typeof vFields[0] === "object" && "name" in (vFields[0] as any);
+  const isTupleVariant = Array.isArray(vFields) && !isStructVariant;
+
+  const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const nv = e.target.value;
+    setVariant(nv);
+    const meta = variants?.find((vv: any) => vv.name === nv);
+    let nextPayload = {};
+    if (meta?.fields) nextPayload = Array.isArray(meta.fields) ? (meta.fields.length === 1 ? "" : meta.fields.map(() => "")) : {};
+    setPayload(nextPayload);
+    onChange({ [nv]: nextPayload });
+  };
+
+  const handlePayloadChange = (val: any) => {
+  setPayload(val);
+  onChange({ [variant]: val });
+};
+
+  const handleBlur = () => {
+    if (onBlur) onBlur();
+  };
+
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex items-center gap-2">
+        <select
+          className="border rounded px-2 py-1 text-sm"
+          value={variant}
+          onChange={handleVariantChange}
+        >
+          {variants?.map((v: any) => (
+            <option key={v.name} value={v.name}>{v.name}</option>
+          ))}
+        </select>
+      </div>
+      {!vFields ? null : isTupleVariant ? (
+        <div className="flex flex-col gap-2">
+          {vFields.map((ft: any, idx: number) => (
+            <Input
+              key={`enum-${enumName}-${variant}-t-${idx}`}
+              placeholder={`(${formatIdlType(ft)})`}
+              value={Array.isArray(payload) ? String(payload[idx] ?? "") : (idx === 0 && typeof payload === "string" ? payload : "")}
+              onChange={e => {
+                if (vFields.length === 1) handlePayloadChange(e.target.value);
+                else {
+                  const arr = Array.isArray(payload) ? [...payload] : [];
+                  arr[idx] = e.target.value;
+                  handlePayloadChange(arr);
+                }
+              }}
+              onBlur={handleBlur}
+            />
+          ))}
+        </div>
+      ) : isStructVariant ? (
+        <div className="flex flex-col gap-2">
+          {vFields?.map((f: any) => {
+            const fieldType = f.type;
+            const isNumericType = typeof fieldType === 'string' && 
+              ['u8','u16','u32','u64','i8','i16','i32','i64'].includes(fieldType);
+            
+            return (
+              <div className="flex items-center gap-2" key={`enum-${enumName}-${variant}-s-${f.name}`}>
+                <div className="w-32 text-xs text-muted-foreground">{f.name}</div>
+                <Input
+                  placeholder={formatIdlType(f.type)}
+                  type={isNumericType ? "number" : "text"}
+                  value={payload ? String(payload[f.name] ?? "") : ""}
+                  onChange={e => {
+                    const next = { ...(payload || {}) };
+                    // Convert to number for numeric types
+                    if (isNumericType) {
+                      const numVal = e.target.value === '' ? '' : Number(e.target.value);
+                      next[f.name] = numVal;
+                    } else {
+                      next[f.name] = e.target.value;
+                    }
+                    handlePayloadChange(next);
+                  }}
+                  className="flex-1"
+                  onBlur={handleBlur}
+                />
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const ArgumentForm = (props: ArgumentFormProps) => {
   const { args, formData, onChange, validationErrors } = props;
+  const { idl } = useIDL();
 
   const handleChange = (name: string, value: string | number) => {
     onChange({ ...formData, [name]: value });
@@ -24,6 +153,16 @@ const ArgumentForm = (props: ArgumentFormProps) => {
 
   const isFixedArrayType = (type?: IdlType): type is { array: [IdlType, number] } => {
     return !!type && typeof type === "object" && "array" in type;
+  };
+
+  const getDefinedName = (type?: IdlType): string | null => {
+    if (!type || typeof type !== "object") return null;
+    if ("defined" in type) {
+      const v: any = (type as any).defined;
+      if (typeof v === "string") return v;
+      if (v && typeof v === "object" && "name" in v) return String(v.name);
+    }
+    return null;
   };
 
   const VecInput = ({
@@ -122,6 +261,152 @@ const ArgumentForm = (props: ArgumentFormProps) => {
             ))}
           </div>
         )}
+      </div>
+    );
+  };
+
+  const StructInput = ({
+    name,
+    type,
+    value,
+  }: {
+    name: string;
+    type: IdlType; // defined struct
+    value: string | number | undefined;
+  }) => {
+    const { idl } = useIDL();
+    const definedName = getDefinedName(type);
+    const [obj, setObj] = useState<Record<string, any>>({});
+
+    // Initialize from existing value
+    useEffect(() => {
+      // Only hydrate from external value if we don't have local edits yet
+      if (Object.keys(obj).length > 0) return;
+      if (typeof value === "string" && value.trim()) {
+        try {
+          const parsed = JSON.parse(value);
+          if (parsed && typeof parsed === "object") {
+            const next: Record<string, any> = {};
+            Object.keys(parsed).forEach((k) => (next[k] = (parsed as any)[k]));
+            setObj(next);
+          }
+        } catch {}
+      }
+    }, [value]);
+
+    const schema = useMemo(() => {
+      if (!idl || !definedName) return null;
+      const t = (idl as Idl).types?.find((x) => x.name === definedName);
+      // @ts-expect-error - IDL schema is dynamic
+      const fields = t?.type?.fields as { name: string; type: IdlType }[] | undefined;
+      return fields ?? null;
+    }, [idl, definedName]);
+
+    const getDefaultForField = (field: { name: string; type: IdlType }): any => {
+      // Specific defaults for ExtraInfo struct
+      if (definedName === "ExtraInfo") {
+        switch (field.name) {
+          case "tags": return [];
+          case "scores": return [];
+          case "data": return [];
+          case "favorite_numbers": return [0, 0, 0, 0];
+          case "nicknames": return null;
+          default: return "";
+        }
+      }
+      // General defaults based on type
+      const fieldType = field.type;
+      if (typeof fieldType === "object" && fieldType !== null) {
+        if ("vec" in fieldType) return [];
+        if ("array" in fieldType) {
+          const len = (fieldType as any).array?.[1] ?? 0;
+          return Array(len).fill(0);
+        }
+        if ("option" in fieldType) return null;
+      }
+      return "";
+    };
+
+    const updateParent = (next: Record<string, any>) => {
+      // Ensure all schema fields are present with proper defaults
+      const complete: Record<string, any> = {};
+      if (schema) {
+        for (const field of schema) {
+          if (field.name in next && next[field.name] !== undefined) {
+            complete[field.name] = next[field.name];
+          } else {
+            complete[field.name] = getDefaultForField(field);
+          }
+        }
+      } else {
+        Object.assign(complete, next);
+      }
+      handleChange(name, JSON.stringify(complete));
+    };
+
+    if (!schema) {
+      return (
+        <Input
+          placeholder={`Enter JSON for ${definedName ?? "object"}`}
+          value={typeof value === "string" ? value : ""}
+          onChange={(e) => handleChange(name, e.target.value)}
+        />
+      );
+    }
+
+    // Use the top-level EnumValueEditor to avoid remounting on every render
+
+    return (
+      <div className="space-y-3">
+        {schema.map((field) => (
+          <div className="flex items-center gap-2" key={`${name}.${field.name}`}>
+            <div className="w-40 text-sm text-muted-foreground">{field.name}</div>
+            {(() => {
+              const def = getDefinedName(field.type);
+              if (def) {
+                // Determine kind from IDL
+                const t = (idl as Idl)?.types?.find((tt) => tt.name === def);
+                const kind: string | undefined = (t as any)?.type?.kind;
+                if (kind === "enum") {
+                  return (
+                    <EnumValueEditor
+                      enumName={def}
+                      current={obj[field.name]}
+                      onChange={(tagged: any) => {
+                        const next = { ...obj, [field.name]: tagged };
+                        setObj(next);
+                      }}
+                      onBlur={() => updateParent({ ...obj, [field.name]: obj[field.name] })}
+                    />
+                  );
+                }
+              }
+              // Check if field is numeric type
+              const isNumericType = typeof field.type === 'string' && 
+                ['u8','u16','u32','u64','i8','i16','i32','i64'].includes(field.type);
+              
+              return (
+                <Input
+                  placeholder={`Enter ${formatIdlType(field.type)}`}
+                  type={isNumericType ? "number" : "text"}
+                  value={obj[field.name] ?? ""}
+                  onChange={(e) => {
+                    const next = { ...obj };
+                    // Convert to number for numeric types
+                    if (isNumericType) {
+                      next[field.name] = e.target.value === '' ? '' : Number(e.target.value);
+                    } else {
+                      next[field.name] = e.target.value;
+                    }
+                    setObj(next);
+                  }}
+                  onBlur={() => updateParent(obj as any)}
+                  className="flex-1"
+                />
+              );
+            })()}
+          </div>
+        ))}
       </div>
     );
   };
@@ -260,7 +545,17 @@ const ArgumentForm = (props: ArgumentFormProps) => {
             {arg.name}
             {arg.type && (
               <span className="text-xs text-muted-foreground/50">
-                ({formatIdlType(arg.type)})
+                {(() => {
+                  const base = formatIdlType(arg.type);
+                  const defined = getDefinedName(arg.type);
+                  if (defined && idl?.types) {
+                    const t = idl.types.find((tt) => tt.name === defined);
+                    const kind: string | undefined = (t as any)?.type?.kind;
+                    if (kind === "struct") return `(${base}, struct)`;
+                    if (kind === "enum") return `(${base}, enum)`;
+                  }
+                  return `(${base})`;
+                })()}
               </span>
             )}
           </Label>
@@ -271,6 +566,46 @@ const ArgumentForm = (props: ArgumentFormProps) => {
             <VecInput name={arg.name} type={arg.type} value={formData[arg.name]} />
           ) : isFixedArrayType(arg.type) ? (
             <FixedArrayInput name={arg.name} type={arg.type} value={formData[arg.name]} />
+      ) : getDefinedName(arg.type) ? (
+        (() => {
+          const def = getDefinedName(arg.type);
+          const t = idl?.types?.find((tt) => tt.name === def);
+          const kind: string | undefined = (t as any)?.type?.kind;
+          if (kind === "struct") {
+            return (
+              <StructInput name={arg.name} type={arg.type as IdlType} value={formData[arg.name]} />
+            );
+          }
+          if (kind === "enum") {
+            // parse current value if available
+            let current: any = undefined;
+            const val = formData[arg.name];
+            if (typeof val === "string" && val.trim()) {
+              try { current = JSON.parse(val); } catch {}
+            }
+            return (
+              // Reuse the same stable editor for top-level enum args
+              <div className="w-full">
+                <EnumValueEditor
+                  enumName={def as string}
+                  current={current}
+                  onChange={(tagged: any) => handleChange(arg.name, JSON.stringify(tagged))}
+                />
+              </div>
+            );
+          }
+          // Fallback
+          return (
+            <Input
+              id={arg.name}
+              type="text"
+              placeholder={`Enter value for ${arg.name}`}
+              value={formData[arg.name]}
+              onChange={(e) => handleChange(arg.name, e.target.value)}
+              className={cn(validationErrors[arg.name] && "border-red-500")}
+            />
+          );
+        })()
           ) : (
             <Input
               id={arg.name}

@@ -126,7 +126,7 @@ export function TransactionHistory({
             >
               <SelectTrigger className="w-[120px] h-8">
                 <Filter className="h-3 w-3 mr-2" />
-                <SelectValue />
+                <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent className="bg-card border border-border/50 rounded-md">
                 <SelectItem value="all">All</SelectItem>
