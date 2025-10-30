@@ -1,57 +1,59 @@
-import "./App.css";
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Header } from "./components/layout/Header";
-import { Sidebar } from "./components/layout/Sidebar";
-import { Footer } from "./components/layout/Footer";
-import { TransactionHistory } from "./components/TransactionHistory";
-import InstructionForm from "./components/InstructionForm";
-import { Home } from "./pages/Home";
-import UseIdl from "./hooks/useIDL";
-import { useTransactionHistory } from "./hooks/useTransactionHistory";
+import MainView from "./components/MainView";
 import { Skeleton } from "./components/ui/skeleton";
-import { Toaster } from "./components/ui/sonner";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionContent,
-  AccordionTrigger,
-} from "./components/ui/accordion";
+import { useIDL } from "./context/IDLContext";
+import useLoadSharedState from "./hooks/useLoadSharedState";
+import useHasVisited from "./hooks/useHasVisited";
+import "driver.js/dist/driver.css";
+import { useEffect } from "react";
+import { useInstructions } from "./context/InstructionsContext";
+import useTour from "./hooks/useTour";
+const App = () => {
+  const { isLoading } = useIDL();
+  const { isLoading: isLoadingSharedState } = useLoadSharedState();
+  const { hasVisited, handleVisit } = useHasVisited();
+  const { idl } = useIDL();
+  const { setActiveInstruction, activeInstruction } = useInstructions();
+  const { showTour } = useTour();
 
-const getHasVisitedFromLocalStorage = () =>
-  localStorage.getItem("hasVisited") === "true";
-const setHasVisitedToLocalStorage = () =>
-  localStorage.setItem("hasVisited", "true");
+  useEffect(() => {
+    if (!hasVisited && !isLoading && idl && idl.instructions.length > 0) {
+      if (!activeInstruction) {
+        setActiveInstruction(idl.instructions[0].name);
+      }
 
-function App() {
-  const { idl, isLoading } = UseIdl();
-  const [hasVisited, setHasVisited] = useState(getHasVisitedFromLocalStorage());
-  const { transactions, clearHistory, removeTransaction, addTransaction } =
-    useTransactionHistory();
+      setTimeout(() => {
+        showTour();
+      }, 300);
 
-  const handleGetStarted = () => {
-    setHasVisited(true);
-    setHasVisitedToLocalStorage();
-  };
+      handleVisit();
+    }
+  }, [
+    hasVisited,
+    isLoading,
+    idl,
+    setActiveInstruction,
+    activeInstruction,
+    handleVisit,
+    showTour,
+  ]);
 
-  if (!hasVisited) {
+  if (isLoadingSharedState) {
     return (
-      <div className="min-h-screen bg-background dark:bg-background-dark w-full">
-        <Header />
-        <div className="flex w-full">
-          <main className="flex-1 min-h-screen w-full lg:ml-0">
-            <Home onGetStarted={handleGetStarted} />
-          </main>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p>Loading shared session...</p>
         </div>
-        <Toaster />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background-dark w-full">
+    <div className="min-h-screen w-full bg-background text-foreground dark:text-foreground-dark">
       <Header />
       <div className="flex w-full">
-        <Sidebar />
 
         <main className="flex-1 min-h-screen w-full lg:ml-0">
           {isLoading ? (
@@ -65,84 +67,13 @@ function App() {
                 </div>
               </div>
             </div>
-          ) : idl ? (
-            <div className="p-4 sm:p-6">
-              {/* Program Header */}
-              <div className="mb-4 sm:mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-foreground-dark mb-2">
-                  {idl.metadata.name}
-                </h1>
-                <p className="text-sm sm:text-base text-foreground/70 dark:text-foreground-dark/70">
-                  {idl.metadata.description || "Created with Anchor"}
-                </p>
-              </div>
-
-              {/* Main Grid */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-                {/* Left Column - Instructions */}
-                <div className="space-y-4">
-                  <h2 className="text-base sm:text-lg font-semibold text-foreground dark:text-foreground-dark">
-                    Instructions ({idl.instructions.length})
-                  </h2>
-
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="border-b border-border dark:border-border-dark"
-                  >
-                    {idl.instructions.map((instruction, index) => (
-                      <AccordionItem
-                        key={instruction.name}
-                        value={`item-${index}`}
-                      >
-                        <AccordionTrigger className="text-sm sm:text-base">
-                          {instruction.name}
-                          <span className="text-xs text-muted-foreground ml-2">
-                            {instruction.accounts.length} accounts,{" "}
-                            {instruction.args.length} args
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent className="animate-in slide-in-from-top-2">
-                          <InstructionForm
-                            instruction={instruction}
-                            idl={idl}
-                            addTransactionRecord={addTransaction}
-                          />
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </div>
-
-                {/* Right Column - Transaction History */}
-                <div className="h-[calc(100vh-16rem)] sticky top-4">
-                  <TransactionHistory
-                    transactions={transactions}
-                    onClear={clearHistory}
-                    onRemove={removeTransaction}
-                  />
-                </div>
-              </div>
-            </div>
           ) : (
-            <div className="p-4 sm:p-6">
-              <div className="text-center py-8 sm:py-12">
-                <h2 className="text-lg sm:text-xl font-semibold text-foreground dark:text-foreground-dark mb-2">
-                  No IDL Loaded
-                </h2>
-                <p className="text-sm sm:text-base text-foreground/70 dark:text-foreground-dark/70 mb-4">
-                  Load an Anchor program IDL to start testing instructions
-                </p>
-              </div>
-            </div>
+            <MainView />
           )}
         </main>
       </div>
-
-      <Footer />
-      <Toaster />
     </div>
   );
-}
+};
 
 export default App;

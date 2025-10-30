@@ -1,6 +1,6 @@
 {
   "name": "@blockchain-hq/testship",
-  "version": "0.1.8",
+  "version": "0.2.0-alpha.0",
   "description": "Interactive testing for Solana Anchor programs in the browser. Zero config, auto-generated forms, smart PDA derivation. Will be MIT licensed Dec 1, 2025.",
   "main": "index.js",
   "bin": {
@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "tsx cli/index.ts",
-    "build": "tsc && cd ui && npm run build",
+    "build": "tsc && cd ui && npm run build && cd .. && chmod +x dist/cli/index.js",
     "relink": "npm run build && sudo npm link",
     "test": "npm run dev start"
   },
@@ -54,6 +54,7 @@
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
     "@inquirer/prompts": "^7.9.0",
+    "@types/ws": "^8.18.1",
     "bn.js": "^5.2.2",
     "buffer": "^6.0.3",
     "chalk": "4.1.2",
@@ -61,7 +62,11 @@
     "commander": "^14.0.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "open": "^10.2.0"
+    "get-port": "^7.1.0",
+    "lz-string": "^1.5.0",
+    "open": "^10.2.0",
+    "ora": "^9.0.0",
+    "ws": "^8.18.3"
   },
   "engines": {
     "node": ">=18.0.0"

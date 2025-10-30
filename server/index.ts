@@ -2,20 +2,84 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import fs from "fs";
 import { AnchorProject } from "../shared/types";
-import chalk from "chalk";
 import path from "path";
 import open from "open";
-
-export const startDevServer = async (project: AnchorProject, port?: number) => {
+import getPort from "get-port";
+import { DEFAULT_HOST, DEFAULT_PORT } from "../shared/constant";
+import { Ora } from "ora";
+import { getMessageFromError } from "../cli/parse-error";
+import chokidar from "chokidar";
+import { WebSocketServer } from "ws";
+import { createServer } from "http";
+import chalk from "chalk";
+export const startDevServer = async (
+  project: AnchorProject,
+  ora: Ora,
+  port?: number
+) => {
   try {
-    console.log("Starting dev server...");
+    ora.start("Starting dev server...");
 
     const app = express();
+    const httpServer = createServer(app);
+    const wss = new WebSocketServer({ server: httpServer });
+
+    console.log(chalk.gray('WebSocket server created and attached to httpServer'));
 
     app.use(cors());
     app.use(express.json());
 
     const uiPath = path.join(__dirname, "../ui");
+
+    // WebSocket clients storage
+    const clients = new Set<any>();
+
+    wss.on('connection', (ws) => {
+      console.log(chalk.blue('Client connected to WebSocket'));
+      clients.add(ws);
+      console.log(chalk.gray(`Total clients: ${clients.size}`));
+
+      ws.on('close', () => {
+        console.log(chalk.yellow('Client disconnected from WebSocket'));
+        clients.delete(ws);
+        console.log(chalk.gray(`Total clients: ${clients.size}`));
+      });
+
+      ws.on('error', (error) => {
+        console.error(chalk.red('WebSocket error:'), error);
+        clients.delete(ws);
+        console.log(chalk.gray(`Total clients: ${clients.size}`));
+      });
+    });
+
+    // Function to notify all clients about IDL changes
+    const notifyClients = (message: string) => {
+      console.log(chalk.cyan(`Sending "${message}" to ${clients.size} clients`));
+      let sentCount = 0;
+      clients.forEach((client) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+          client.send(message);
+          sentCount++;
+        }
+      });
+      console.log(chalk.cyan(`Message sent to ${sentCount} clients`));
+    };
+
+    // Watch for IDL file changes
+    console.log(chalk.blue(`Watching IDL file: ${project.idlPath}`));
+    const watcher = chokidar.watch(project.idlPath, {
+      persistent: true,
+      ignoreInitial: true,
+    });
+
+    watcher.on('change', (filePath) => {
+      console.log(chalk.green(`IDL file changed: ${filePath}`));
+      notifyClients('IDL_UPDATED');
+    });
+
+    watcher.on('error', (error) => {
+      console.error(chalk.red('File watcher error:'), error);
+    });
 
     app.get("/api/idl", (req: Request, res: Response) => {
       try {
@@ -40,24 +104,50 @@ export const startDevServer = async (project: AnchorProject, port?: number) => {
       res.sendFile(path.join(uiPath, "index.html"));
     });
 
-    app.listen(port || 3000, async () => {
-      // TODO: implement automatic increment of port if current one is already in use
-      console.log(chalk.green(`Dev server listening on port ${port || 3000}`));
-      console.log(
-        chalk.green(`Dev server live at: http://localhost:${port || 3000}`)
-      );
+    const availablePort = await getPort({ port: port || DEFAULT_PORT });
 
-      // TODO: remove conditional opening of browser
-      // this tool will be used by devs during development so
-      // their environment would be set to development then
-
-      console.log(chalk.green("Production Mode"));
-
+    httpServer.listen(availablePort, async () => {
+      const url = `http://${DEFAULT_HOST}:${availablePort}`;
+      ora.succeed(`HTTP server listening on port ${availablePort}`);
+      ora.info(`WebSocket server ready on ws://${DEFAULT_HOST}:${availablePort}`);
+      
       setTimeout(async () => {
-        await open(`http://localhost:${port || 3000}`);
+        ora.start("Opening browser...");
+        try {
+          await open(url);
+          ora.succeed(`Browser opened at ${url}`);
+        } catch (error) {
+          ora.fail("Could not open browser");
+          ora.info(`Please visit ${url} manually`);
+        }
       }, 1000);
     });
+
+    const shutdown = () => {
+      ora.start("Shutting down server...");
+      watcher.close();
+      wss.close();
+      httpServer.close(() => {
+        ora.succeed("Server closed");
+        process.exit(0);
+      });
+
+      // Force close after 10s
+      setTimeout(() => {
+        ora.fail("Forcing shutdown");
+        process.exit(1);
+      }, 10000);
+    };
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
+
+    return httpServer;
+
   } catch (error) {
-    console.error(chalk.red(`Error starting dev server: `), error);
+    ora.fail("Error starting dev server");
+    ora.info(getMessageFromError(error));
+    process.exit(1);
+    throw error;
   }
 };

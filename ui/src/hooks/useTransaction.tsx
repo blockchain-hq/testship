@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Program, AnchorProvider } from "@coral-xyz/anchor";
-import type { Idl } from "@coral-xyz/anchor";
+import { Program, AnchorProvider, AnchorError } from "@coral-xyz/anchor";
 import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import type { Keypair } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
@@ -9,13 +8,14 @@ import { toAnchorType, derivePDA } from "@/lib/solana";
 import { toCamelCase } from "@/lib/utils";
 import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import { useTransactionToast } from "./useTransactionToast";
-import { parseSolanaError } from "@/lib/errorParser";
+import { parseSolanaError, type ErrorWithLogs } from "@/lib/errorParser";
 import { type TransactionRecord } from "./useTransactionHistory";
+import { useIDL } from "@/context/IDLContext";
 
 export default function useTransaction(
-  idl: Idl,
   addTransaction: (tx: TransactionRecord) => void
 ) {
+  const { idl } = useIDL();
   const [isExecuting, setIsExecuting] = useState(false);
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -29,6 +29,11 @@ export default function useTransaction(
   ) => {
     if (!wallet) {
       toast.error("Connect your wallet first");
+      return null;
+    }
+
+    if (!idl) {
+      toast.error("IDL not found");
       return null;
     }
 
@@ -111,16 +116,19 @@ export default function useTransaction(
       });
 
       return { signature, accounts: accountMap };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Transaction error:", error);
 
       txToast.dismiss(toastId);
 
-      const parsedError = parseSolanaError(error);
+      const parsedError = parseSolanaError(
+        error as Error | AnchorError | ErrorWithLogs
+      );
 
       txToast.error(parsedError);
 
-      const errorSignature = (error as any)?.signature;
+      const errorSignature = (error as unknown as { signature?: string })
+        ?.signature;
       if (errorSignature) {
         addTransaction({
           signature: errorSignature,

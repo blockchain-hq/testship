@@ -1,13 +1,15 @@
 // Ref: https://github.com/anza-xyz/wallet-adapter/blob/master/APP.md
 
 import type React from "react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { useCluster } from "@/context/ClusterContext";
+import { WalletError } from "@solana/wallet-adapter-base";
 
 interface WalletContextProviderProps {
   children: React.ReactNode;
@@ -16,15 +18,13 @@ interface WalletContextProviderProps {
 const WalletContextProvider = (props: WalletContextProviderProps) => {
   const { children } = props;
 
-  //   const network = WalletAdapterNetwork.Devnet;
-  //   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const wallets = useMemo(() => [], ["localnet"]);
+  const { cluster } = useCluster();
+  const endpoint = useMemo(() => cluster.endpoint, [cluster]);
+  const onError = useCallback((error: WalletError) => console.log(error), []);
 
   return (
-    <ConnectionProvider endpoint={"http://127.0.0.1:8899"}>
-      <WalletProvider wallets={wallets} autoConnect>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={[]} autoConnect onError={onError}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

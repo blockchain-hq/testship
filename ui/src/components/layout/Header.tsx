@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { MoonIcon, SunIcon } from "lucide-react";
+import HeaderProgramInfo from "./HeaderProgramInfo";
+import ClusterSelect from "../ClusterSelect";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -11,19 +14,14 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-surface dark:bg-surface-dark shadow-sm border-b border-border dark:border-border-dark w-full">
+    <header className="bg-background dark:bg-background-dark shadow-sm border-b w-full h-16">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <img src="/ts.png" alt="Testship Logo" width={50} height={50} />
-              <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">
-                Testship
-              </h1>
-              <span className="hidden sm:block text-sm text-foreground/60 dark:text-foreground-dark/60">
-                Interactive Testing for Anchor Programs
-              </span>
             </div>
+            <HeaderProgramInfo />
           </div>
 
           <div className="flex items-center space-x-4">
@@ -31,20 +29,14 @@ export const Header = () => {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="flex cursor-pointer items-center space-x-2 border-border dark:border-border-dark hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary"
+              className="flex cursor-pointer"
             >
-              {isDarkMode ? (
-                <>
-                  <span>☀️</span>
-                </>
-              ) : (
-                <>
-                  <span>🌙</span>
-                </>
-              )}
+              {isDarkMode ? <SunIcon /> : <MoonIcon />}
             </Button>
 
             <WalletMultiButton />
+
+            <ClusterSelect />
           </div>
         </div>
       </div>
