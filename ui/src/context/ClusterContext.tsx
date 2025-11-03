@@ -22,11 +22,13 @@ export interface SolanaCluster {
   active?: boolean;
 }
 
-// by default, we don't configure the mainnet-beta cluster
-// the endpoint provided by `clusterApiUrl(mainnet-beta)` doesn't allow from the browser due to CORS
-// to use the mainnet-beta cluster, provide a custom endpoint
 // eslint-disable-next-line react-refresh/only-export-components
 export const defaultClusters: SolanaCluster[] = [
+  {
+    name: "mainnet-beta",
+    endpoint: "https://api.mainnet-beta.solana.com",
+    network: ClusterNetwork.Mainnet,
+  },
   {
     name: "devnet",
     endpoint: clusterApiUrl(ClusterNetwork.Devnet),
