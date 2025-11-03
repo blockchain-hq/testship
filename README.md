@@ -13,9 +13,9 @@
 
 ## 🎥 Demo
 
-[![Testship Demo](https://img.youtube.com/vi/zxEXkeOBNp8/maxresdefault.jpg)](https://youtu.be/zxEXkeOBNp8)
+[![Testship Demo](https://img.youtube.com/vi/upQIqKl43ss/maxresdefault.jpg)](https://youtu.be/upQIqKl43ss)
 
-**[► Watch on YouTube](https://youtu.be/zxEXkeOBNp8)** (2 min)
+**[► Watch on YouTube](https://youtu.be/upQIqKl43ss)** (2 min)
 
 See how Testship makes testing Anchor programs interactive and visual. This silent demo shows:
 
@@ -166,7 +166,7 @@ will transition to MIT License as soon as the competition concludes!
 | ✅ Share your experience | ❌ Use commercially without permission |
 | ✅ Provide testimonials | ❌ Copy code for your projects |
 
-**Starting December 1, 2025:**
+**Starting November 1, 2025:**
 | Everything Above + | Full MIT Freedom |
 |-------------------|------------------|
 | ✅ Fork and modify | ✅ Use in commercial projects |
