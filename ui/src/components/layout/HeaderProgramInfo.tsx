@@ -1,5 +1,5 @@
 import { useIDL } from "@/context/IDLContext";
-import { useCluster } from "@/context/ClusterContext";
+import { useCluster, getClusterUrlParam } from "@/context/ClusterContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { Badge } from "../ui";
 import { InfoIcon, ExternalLink, Code } from "lucide-react";
@@ -13,44 +13,16 @@ const HeaderProgramInfo = () => {
   const programId = idl.address;
   const instructions = idl.instructions || [];
 
-  // Get cluster parameter for URLs based on current network
-  const getClusterParam = () => {
-    if (cluster.network === "devnet") {
-      return "?cluster=devnet";
-    } else if (cluster.network === "testnet") {
-      return "?cluster=testnet";
-    } else if (cluster.network === "mainnet-beta") {
-      // mainnet is default, no param needed
-      return "";
-    } else {
-      // Custom cluster
-      return `?cluster=custom&customUrl=${encodeURIComponent(cluster.endpoint)}`;
-    }
-  };
-
   // Get explorer URL for program
   const getProgramExplorerUrl = () => {
-    // Use Solana Explorer format: https://explorer.solana.com/address/{programId}?cluster=...
     const baseUrl = `https://explorer.solana.com/address/${programId}`;
-    return `${baseUrl}${getClusterParam()}`;
+    return `${baseUrl}${getClusterUrlParam(cluster)}`;
   };
 
   // Get Solana Scan URL based on current network selection
   const getSolanaScanUrl = () => {
     const baseUrl = `https://solscan.io/account/${programId}`;
-    
-    // Solana Scan uses different URL patterns for different networks
-    if (cluster.network === "devnet") {
-      return `${baseUrl}?cluster=devnet`;
-    } else if (cluster.network === "testnet") {
-      return `${baseUrl}?cluster=testnet`;
-    } else if (cluster.network === "mainnet-beta") {
-      // Mainnet is default, no cluster param needed
-      return baseUrl;
-    } else {
-      // Custom cluster
-      return `${baseUrl}?cluster=custom&customUrl=${encodeURIComponent(cluster.endpoint)}`;
-    }
+    return `${baseUrl}${getClusterUrlParam(cluster)}`;
   };
 
   const formatProgramId = (id: string) => {
