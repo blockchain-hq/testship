@@ -110,27 +110,27 @@ const EnumValueEditor = ({ enumName, current, onChange, onBlur }: EnumValueEdito
               ['u8','u16','u32','u64','i8','i16','i32','i64'].includes(fieldType);
             
             return (
-              <div className="flex items-center gap-2" key={`enum-${enumName}-${variant}-s-${f.name}`}>
-                <div className="w-32 text-xs text-muted-foreground">{f.name}</div>
-                <Input
-                  placeholder={formatIdlType(f.type)}
+            <div className="flex items-center gap-2" key={`enum-${enumName}-${variant}-s-${f.name}`}>
+              <div className="w-32 text-xs text-muted-foreground">{f.name}</div>
+              <Input
+                placeholder={formatIdlType(f.type)}
                   type={isNumericType ? "number" : "text"}
-                  value={payload ? String(payload[f.name] ?? "") : ""}
-                  onChange={e => {
-                    const next = { ...(payload || {}) };
+                value={payload ? String(payload[f.name] ?? "") : ""}
+                onChange={e => {
+                  const next = { ...(payload || {}) };
                     // Convert to number for numeric types
                     if (isNumericType) {
                       const numVal = e.target.value === '' ? '' : Number(e.target.value);
                       next[f.name] = numVal;
                     } else {
-                      next[f.name] = e.target.value;
+                  next[f.name] = e.target.value;
                     }
-                    handlePayloadChange(next);
-                  }}
-                  className="flex-1"
-                  onBlur={handleBlur}
-                />
-              </div>
+                  handlePayloadChange(next);
+                }}
+                className="flex-1"
+                onBlur={handleBlur}
+              />
+            </div>
             );
           })}
         </div>
@@ -302,6 +302,20 @@ const ArgumentForm = (props: ArgumentFormProps) => {
       return fields ?? null;
     }, [idl, definedName]);
 
+    // Initialize defaults once so nested editors have concrete shapes
+    useEffect(() => {
+      if (!schema) return;
+      if (Object.keys(obj).length > 0) return;
+      const next: Record<string, any> = {};
+      for (const f of schema) {
+        // Reuse helper from above
+        const defVal = getDefaultForField ? getDefaultForField(f) : (typeof f.type === 'object' && 'vec' in f.type ? [] : typeof f.type === 'object' && 'array' in f.type ? Array((f.type as any).array?.[1] ?? 0).fill(0) : typeof f.type === 'object' && 'option' in f.type ? null : '');
+        next[f.name] = defVal;
+      }
+      setObj(next);
+      updateParent(next as any);
+    }, [schema]);
+
     const getDefaultForField = (field: { name: string; type: IdlType }): any => {
       // Specific defaults for ExtraInfo struct
       if (definedName === "ExtraInfo") {
@@ -367,6 +381,7 @@ const ArgumentForm = (props: ArgumentFormProps) => {
                 // Determine kind from IDL
                 const t = (idl as Idl)?.types?.find((tt) => tt.name === def);
                 const kind: string | undefined = (t as any)?.type?.kind;
+                
                 if (kind === "enum") {
                   return (
                     <EnumValueEditor
@@ -380,7 +395,262 @@ const ArgumentForm = (props: ArgumentFormProps) => {
                     />
                   );
                 }
+                
+                if (kind === "struct") {
+                  // Nested struct - render recursively
+                  return (
+                    <div className="flex-1">
+                      <StructInput
+                        name={`${name}.${field.name}`}
+                        type={field.type}
+                        value={typeof obj[field.name] === 'string' ? obj[field.name] : JSON.stringify(obj[field.name] || {})}
+                      />
+                    </div>
+                  );
+                }
               }
+
+              // Nested helpers for vec/array/option/bytes
+              const renderVecEditor = () => {
+                const inner = (field.type as any).vec as IdlType;
+                const isInnerNumeric = typeof inner === 'string' && ['u8','u16','u32','i8','i16','i32'].includes(inner);
+
+                const Items = () => {
+                  const [draft, setDraft] = useState<string>("");
+                  const items: any[] = Array.isArray(obj[field.name]) ? (obj[field.name] as any[]) : [];
+
+                  const addItem = () => {
+                    const raw = draft.trim();
+                    if (!raw) return;
+                    const value = isInnerNumeric ? Number(raw) : raw;
+                    const nextArr = [...items, value];
+                    const next = { ...obj, [field.name]: nextArr };
+                    setDraft("");
+                    setObj(next);
+                    updateParent(next as any);
+                  };
+
+                  const removeAt = (idx: number) => {
+                    const nextArr = items.filter((_, i) => i !== idx);
+                    const next = { ...obj, [field.name]: nextArr };
+                    setObj(next);
+                    updateParent(next as any);
+                  };
+
+                  return (
+                    <div className="flex flex-col gap-3 w-full">
+                      <div className="flex flex-wrap gap-2">
+                        {items.map((it, idx) => (
+                          <div key={idx} className="px-2 py-1 rounded border text-xs flex items-center gap-2 bg-white">
+                            <span>{String(it)}</span>
+                            <button type="button" className="text-red-500 hover:text-red-600" onClick={() => removeAt(idx)}>✕</button>
+                          </div>
+                        ))}
+                        {items.length === 0 && (
+                          <div className="text-xs text-muted-foreground">No items</div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder={`Add ${formatIdlType(inner)}`}
+                          value={draft}
+                          type={isInnerNumeric ? "number" : "text"}
+                          onChange={(e) => setDraft(e.target.value)}
+                          className="max-w-xs"
+                        />
+                        <button type="button" onClick={addItem} className="h-8 px-3 rounded border bg-primary text-primary-foreground hover:opacity-90">Add</button>
+                      </div>
+                    </div>
+                  );
+                };
+
+                return <Items />;
+              };
+
+              const renderFixedArrayEditor = () => {
+                const [inner, len] = (field.type as any).array as [IdlType, number];
+                const isInnerNumeric = typeof inner === 'string' && ['u8','u16','u32','i8','i16','i32'].includes(inner);
+                const current: any[] = Array.isArray(obj[field.name]) ? (obj[field.name] as any[]) : Array(len).fill(isInnerNumeric ? 0 : "");
+
+                const changeAt = (idx: number, v: string) => {
+                  const nextArr = [...current];
+                  nextArr[idx] = isInnerNumeric ? (v === '' ? 0 : Number(v)) : v;
+                  const next = { ...obj, [field.name]: nextArr.slice(0, len) };
+                  setObj(next);
+                  updateParent(next as any);
+                };
+
+                return (
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="grid grid-cols-4 gap-2">
+                      {Array.from({ length: len }).map((_, idx) => (
+                        <Input
+                          key={idx}
+                          placeholder={`${formatIdlType(inner)}[${idx}]`}
+                          type={isInnerNumeric ? "number" : "text"}
+                          value={current[idx] ?? (isInnerNumeric ? 0 : "")}
+                          onChange={(e) => changeAt(idx, e.target.value)}
+                        />
+                      ))}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Length: {len}</div>
+                  </div>
+                );
+              };
+
+              const renderOptionEditor = () => {
+                const inner = (field.type as any).option as IdlType;
+                const isVecInner = typeof inner === 'object' && inner !== null && 'vec' in inner;
+                const isArrayInner = typeof inner === 'object' && inner !== null && 'array' in inner;
+                const current = obj[field.name];
+
+                // Specialized editor for Option<Vec<T>>
+                const OptionVecEditor = () => {
+                  const innerType = (inner as any).vec as IdlType;
+                  const isNum = typeof innerType === 'string' && ['u8','u16','u32','i8','i16','i32'].includes(innerType);
+                  const items: any[] = Array.isArray(obj[field.name]) ? (obj[field.name] as any[]) : [];
+                  const [draft, setDraft] = useState<string>("");
+                  const addItem = () => {
+                    const raw = draft.trim();
+                    if (!raw) return;
+                    const value = isNum ? Number(raw) : raw;
+                    const next = { ...obj, [field.name]: [...items, value] };
+                    setDraft("");
+                    setObj(next);
+                    updateParent(next as any);
+                  };
+                  const removeAt = (idx: number) => {
+                    const nextArr = items.filter((_, i) => i !== idx);
+                    const next = { ...obj, [field.name]: nextArr };
+                    setObj(next);
+                    updateParent(next as any);
+                  };
+                  return (
+                    <div className="flex flex-col gap-3 w-full">
+                      <div className="flex flex-wrap gap-2">
+                        {items.map((it, idx) => (
+                          <div key={idx} className="px-2 py-1 rounded border text-xs flex items-center gap-2 bg-white">
+                            <span>{String(it)}</span>
+                            <button type="button" className="text-red-500 hover:text-red-600" onClick={() => removeAt(idx)}>✕</button>
+                          </div>
+                        ))}
+                        {items.length === 0 && <div className="text-xs text-muted-foreground">No items</div>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder={`Add ${formatIdlType(innerType)}`}
+                          value={draft}
+                          type={isNum ? 'number' : 'text'}
+                          onChange={(e) => setDraft(e.target.value)}
+                          className="max-w-xs"
+                        />
+                        <button type="button" onClick={addItem} className="h-8 px-3 rounded border bg-primary text-primary-foreground hover:opacity-90">Add</button>
+                      </div>
+                    </div>
+                  );
+                };
+
+                return (
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        className={`h-8 px-3 rounded border ${current == null ? 'bg-primary text-primary-foreground' : 'bg-white'}`}
+                        onClick={() => {
+                          const next = { ...obj, [field.name]: null };
+                          setObj(next);
+                          updateParent(next as any);
+                        }}
+                      >None</button>
+                      <button
+                        type="button"
+                        className={`h-8 px-3 rounded border ${current != null ? 'bg-primary text-primary-foreground' : 'bg-white'}`}
+                        onClick={() => {
+                          const defaultSome = isVecInner ? [] : (isArrayInner ? [] : "");
+                          const next = { ...obj, [field.name]: current ?? defaultSome };
+                          setObj(next);
+                          updateParent(next as any);
+                        }}
+                      >Some</button>
+                    </div>
+                    {current != null && (
+                      <div className="p-2">
+                        {isVecInner ? (
+                          <OptionVecEditor />
+                        ) : isArrayInner ? (
+                          <div className="w-full">{renderFixedArrayEditor()}</div>
+                        ) : (
+                          <Input
+                            placeholder={`Enter ${formatIdlType(inner)}`}
+                            value={typeof current === 'string' ? current : ''}
+                            onChange={(e) => {
+                              const next = { ...obj, [field.name]: e.target.value };
+                              setObj(next);
+                            }}
+                            onBlur={() => updateParent(obj as any)}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              };
+
+              const renderBytesEditor = () => {
+                const items: number[] = Array.isArray(obj[field.name]) ? (obj[field.name] as number[]) : [];
+                const [draft, setDraft] = useState<string>("");
+
+                const addByte = () => {
+                  const n = Number(draft);
+                  if (Number.isNaN(n)) return;
+                  const clamped = Math.max(0, Math.min(255, n));
+                  const next = { ...obj, [field.name]: [...items, clamped] };
+                  setDraft("");
+                  setObj(next);
+                  updateParent(next as any);
+                };
+
+                const removeAt = (idx: number) => {
+                  const nextArr = items.filter((_, i) => i !== idx);
+                  const next = { ...obj, [field.name]: nextArr };
+                  setObj(next);
+                  updateParent(next as any);
+                };
+
+                return (
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-wrap gap-2">
+                      {items.map((b, idx) => (
+                        <div key={idx} className="px-2 py-1 rounded border text-xs flex items-center gap-2 bg-white">
+                          <span>{b}</span>
+                          <button type="button" className="text-red-500 hover:text-red-600" onClick={() => removeAt(idx)}>✕</button>
+                        </div>
+                      ))}
+                      {items.length === 0 && <div className="text-xs text-muted-foreground">No bytes</div>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder="Add byte (0-255)"
+                        value={draft}
+                        type="number"
+                        onChange={(e) => setDraft(e.target.value)}
+                        className="max-w-[160px]"
+                      />
+                      <button type="button" onClick={addByte} className="h-8 px-3 rounded border bg-primary text-primary-foreground hover:opacity-90">Add</button>
+                    </div>
+                  </div>
+                );
+              };
+
+              // Render specialized editors for nested field kinds
+              if (typeof field.type === 'object' && field.type !== null) {
+                if ('vec' in field.type) return renderVecEditor();
+                if ('array' in field.type) return renderFixedArrayEditor();
+                if ('option' in field.type) return renderOptionEditor();
+              }
+              // bytes as primitive
+              if (typeof field.type === 'string' && field.type === 'bytes') return renderBytesEditor();
+
               // Check if field is numeric type
               const isNumericType = typeof field.type === 'string' && 
                 ['u8','u16','u32','u64','i8','i16','i32','i64'].includes(field.type);

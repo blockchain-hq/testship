@@ -133,7 +133,30 @@ export default function useTransaction(
         );
       }
 
-      const signature = await program.methods[toCamelCase(instruction.name)](
+      // Deep inspection of args before sending
+      console.log("[DEEP INSPECT anchorArgs]", anchorArgs.map((arg, idx) => ({
+        index: idx,
+        type: typeof arg,
+        constructor: arg?.constructor?.name,
+        value: arg,
+        json: JSON.stringify(arg, null, 2)
+      })));
+
+      // Log the method we're calling and the exact args structure
+      const methodName = toCamelCase(instruction.name);
+      console.log("[CALLING METHOD]", methodName, "with args:", anchorArgs);
+      console.log("[ARG 0 DETAILED]", JSON.stringify(anchorArgs[0], null, 2));
+      
+      // Try to serialize to see if Anchor can handle it
+      try {
+        const coder = program.coder.instruction;
+        const encoded = coder.encode(instruction.name, anchorArgs[0]);
+        console.log("[ANCHOR ENCODED]", encoded);
+      } catch (e) {
+        console.error("[ENCODING ERROR]", e);
+      }
+
+      const signature = await program.methods[methodName](
         ...anchorArgs
       )
         .accounts(accountPubkeys)
