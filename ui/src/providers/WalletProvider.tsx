@@ -19,7 +19,7 @@ const WalletContextProvider = (props: WalletContextProviderProps) => {
   const { children } = props;
 
   const { cluster } = useCluster();
-  const endpoint = useMemo(() => cluster.endpoint, [cluster]);
+  const endpoint = useMemo(() => cluster.endpoint, [cluster.endpoint, cluster.name]);
   const onError = useCallback((error: WalletError) => console.log(error), []);
 
   return (
