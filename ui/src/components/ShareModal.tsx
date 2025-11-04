@@ -30,6 +30,7 @@ const ShareModal = (props: ShareModalProps) => {
 
   // Create a unique key for share modal data
   const shareModalKey = 'testship_share_modal';
+console.log(idl,"idl");
 
   // Load share modal data from localStorage on component mount
   React.useEffect(() => {
