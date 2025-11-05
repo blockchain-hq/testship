@@ -25,7 +25,7 @@ const NoIDLView = () => {
       </EmptyHeader>
       <EmptyContent>
         <CustomIDLModal/>
-        <Button variant="default">Load IDL</Button>
+        {/* <Button variant="default">Load IDL</Button> */}
       </EmptyContent>
       <Button
         variant="link"

@@ -12,19 +12,19 @@ const validateIDL = (data: any): { valid: boolean; error?: string } => {
   } 
 
   if (!Array.isArray(data.instructions)) {
-    return { valid: false, error: "IDL must have instructions" };
+    return { valid: false, error: "IDL must have valid instructions" };
   }
 
   if (data.address !== undefined && typeof data.address !== "string") {
-    return { valid: false, error: "IDL address must be a string" };
+    return { valid: false, error: "IDL must have valid address" };
   }
 
   if (data.metadata !== undefined && typeof data.metadata !== "object") {
-    return { valid: false, error: "IDL metadata must be an object" };
+    return { valid: false, error: "IDL must have valid metadata" };
   }
 
   if (data.accounts !== undefined && !Array.isArray(data.accounts)) {
-    return { valid: false, error: "IDL accounts must be an array" };
+    return { valid: false, error: "IDL must have valid accounts" };
   }
 
   return { valid: true };
