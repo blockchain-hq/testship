@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import useHasVisited from '@/hooks/useHasVisited';
 import { useIDL } from '@/context/IDLContext';
 import { Button } from './ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
-import CustomIDLModal from './CustomIDLModal';
-import { ExternalLink } from 'lucide-react';
+import CustomIDLModal from './CustomIDLModal'; 
  
 const EXAMPLE_PROGRAMS = [
   {
@@ -20,7 +18,6 @@ const EXAMPLE_PROGRAMS = [
 ];
 
 const InitialTestModal = () => {
-  const { handleVisit, hasVisited } = useHasVisited();
   const { idl } = useIDL();
   const [open, setOpen] = useState(false);
  
@@ -33,7 +30,14 @@ const InitialTestModal = () => {
     if (!hasUrlHash()) {
       setOpen(true);
     }
-  }, [hasUrlHash]);
+  }, []);
+
+  // Close modal when IDL is uploaded manually
+  useEffect(() => {
+    if (idl && open) {
+      setOpen(false);
+    }
+  }, [idl, open]);
 
   const handleStartTesting = () => { 
     if (!idl) {
@@ -44,15 +48,15 @@ const InitialTestModal = () => {
       }
     }
     
-    handleVisit();
     setOpen(false);
   };
 
   const handleProgramLinkClick = (url: string) => {
+    setOpen(false);
     window.location.href = url;
   };
  
-  if (hasVisited || hasUrlHash()) {
+  if (hasUrlHash()) {
     return null;
   }
 
@@ -78,8 +82,7 @@ const InitialTestModal = () => {
                   onClick={() => handleProgramLinkClick(program.url)}
                 >
                   <div className="flex items-center justify-between w-full mb-2">
-                    <span className="font-medium whitespace-nowrap">{program.name}</span>
-                    <ExternalLink className="h-4 w-4 shrink-0" />
+                    <span className="font-medium whitespace-nowrap">{program.name}</span> 
                   </div>
                   <span className="text-xs text-muted-foreground text-left whitespace-nowrap overflow-hidden text-ellipsis">
                     {program.description}
