@@ -9,6 +9,7 @@ import "driver.js/dist/driver.css";
 import { useEffect } from "react";
 import { useInstructions } from "./context/InstructionsContext";
 import useTour from "./hooks/useTour";
+import InitialTestModal from "./components/InitialTestModal";
 const App = () => {
   const { isLoading } = useIDL();
   const { isLoading: isLoadingSharedState } = useLoadSharedState();
@@ -52,6 +53,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground dark:text-foreground-dark">
+      <InitialTestModal />
       <Header />
       <div className="flex w-full">
 
