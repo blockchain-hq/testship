@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import BaseUrlInput from "./BaseUrlInput";
 import type { IdlInstruction } from "@/lib/types";
 import type { Idl } from "@coral-xyz/anchor";
+import { toast } from "sonner";
 interface ShareModalProps {
   idl: Idl;
   accountMap: Map<string, string | null>;
@@ -29,8 +30,7 @@ const ShareModal = (props: ShareModalProps) => {
   const { copied, handleCopy } = UseCopy();
 
   // Create a unique key for share modal data
-  const shareModalKey = 'testship_share_modal';
-console.log(idl,"idl");
+  const shareModalKey = 'testship_share_modal'; 
 
   // Load share modal data from localStorage on component mount
   React.useEffect(() => {
@@ -72,6 +72,7 @@ console.log(idl,"idl");
     try {
       localStorage.removeItem(shareModalKey);
       console.log('Cleared share modal data from localStorage');
+      toast.success('Share modal data cleared successfully');
     } catch (error) {
       console.warn("Failed to clear share modal data from localStorage:", error);
     }
