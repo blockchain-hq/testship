@@ -153,9 +153,9 @@ export const RPCConfigDialog = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto bg-background dark:bg-background-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark">
-        <DialogHeader className="bg-background dark:bg-background-dark">
+        <DialogHeader className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
           <DialogTitle className="flex items-center gap-2 text-foreground dark:text-foreground-dark">
-            <Settings className="size-5" />
+            <Settings className="size-5 text-foreground dark:text-foreground-dark" />
             RPC Configuration
           </DialogTitle>
           <DialogDescription className="text-muted-foreground dark:text-muted-foreground-dark">
@@ -176,12 +176,12 @@ export const RPCConfigDialog = () => {
               >
                 {isAdding ? (
                   <>
-                    <X className="w-4 h-4 mr-2" />
+                    <X className="w-4 h-4 mr-2 text-foreground dark:text-foreground-dark`" />
                     Cancel
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 mr-2 text-foreground dark:text-foreground-dark" />
                     Add
                   </>
                 )}
