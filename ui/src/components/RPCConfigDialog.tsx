@@ -152,23 +152,23 @@ export const RPCConfigDialog = () => {
           <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto bg-background dark:bg-background-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark">
+        <DialogHeader className="bg-background dark:bg-background-dark">
+          <DialogTitle className="flex items-center gap-2 text-foreground dark:text-foreground-dark">
             <Settings className="size-5" />
             RPC Configuration
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted-foreground dark:text-muted-foreground-dark">
             Manage your RPC endpoints. Add custom endpoints or configure existing
             ones.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 text-foreground dark:text-foreground-dark">
           {/* Add New RPC Section */}
           <div className="space-y-4 p-4 border border-border/50 rounded-md">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Add Custom RPC</h3>
+              <h3 className="text-sm font-semibold text-foreground dark:text-foreground-dark">Add Custom RPC</h3>
               <Button
                 variant="outline"
                 size="sm"
