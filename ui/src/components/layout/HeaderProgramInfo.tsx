@@ -14,10 +14,10 @@ const HeaderProgramInfo = () => {
   const instructions = idl.instructions || [];
 
   // Get explorer URL for program
-  const getProgramExplorerUrl = () => {
-    const baseUrl = `https://explorer.solana.com/address/${programId}`;
-    return `${baseUrl}${getClusterUrlParam(cluster)}`;
-  };
+  // const getProgramExplorerUrl = () => {
+  //   const baseUrl = `https://explorer.solana.com/address/${programId}`;
+  //   return `${baseUrl}${getClusterUrlParam(cluster)}`;
+  // };
 
   // Get Solana Scan URL based on current network selection
   const getSolanaScanUrl = () => {

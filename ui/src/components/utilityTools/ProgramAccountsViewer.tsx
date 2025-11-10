@@ -80,7 +80,7 @@ export const ProgramAccountsViewer = () => {
               try {
                 const decoded = accountsCoder.decode(
                   accountType.name,
-                  account.data as Uint8Array
+                  account.data as Buffer<ArrayBufferLike>
                 );
                 accountData.decoded = decoded;
                 accountData.accountType = accountType.name;
@@ -320,7 +320,7 @@ export const ProgramAccountsViewer = () => {
                     </p>
                     <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto font-mono">
                       {Array.isArray(account.account.data)
-                        ? formatBytes(account.account.data)
+                        ? formatBytes(account.account.data as Uint8Array<ArrayBufferLike>)
                         : "Unable to display data"}
                     </pre>
                   </div>
