@@ -15,11 +15,13 @@ import {
   CoinsIcon,
   BinaryIcon,
   ClockIcon,
+  DatabaseIcon,
 } from "lucide-react";
 import { TimestampConverter } from "./utilityTools/TimestampConverter";
 import { LamportsConverter } from "./utilityTools/LamportsConverter";
 import { StringEncoder } from "./utilityTools/StringEncoder";
 import { DurationPicker } from "./utilityTools/DurationPicker";
+import { ProgramAccountsViewer } from "./utilityTools/ProgramAccountsViewer";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);
@@ -41,8 +43,15 @@ export const UtilityDialog = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="timestamp" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-4">
+        <Tabs defaultValue="accounts" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-5">
+            <TabsTrigger
+              value="accounts"
+              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
+            >
+              <DatabaseIcon className="size-4 lg:mr-2" />
+              <span className="hidden lg:inline">Accounts</span>
+            </TabsTrigger>
             <TabsTrigger
               value="timestamp"
               className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
@@ -72,6 +81,10 @@ export const UtilityDialog = () => {
               <span className="hidden lg:inline">Duration</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="accounts" className="mt-4">
+            <ProgramAccountsViewer />
+          </TabsContent>
 
           <TabsContent value="timestamp" className="mt-4">
             <TimestampConverter />

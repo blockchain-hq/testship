@@ -4,6 +4,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MoonIcon, SunIcon } from "lucide-react";
 import HeaderProgramInfo from "./HeaderProgramInfo";
 import ClusterSelect from "../ClusterSelect";
+import { RPCConfigDialog } from "../RPCConfigDialog";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -37,6 +38,8 @@ export const Header = () => {
             <WalletMultiButton />
 
             <ClusterSelect />
+
+            <RPCConfigDialog />
           </div>
         </div>
       </div>
