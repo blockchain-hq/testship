@@ -50,20 +50,7 @@ const HeaderProgramInfo = () => {
         <span className="text-xs font-mono text-muted-foreground">
           {formatProgramId(programId)}
         </span>
-        <div className="flex items-center space-x-1 ml-1">
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => window.open(getProgramExplorerUrl(), "_blank")}
-                className="inline-flex items-center justify-center rounded-md hover:bg-accent/50 transition-colors p-1"
-              >
-                <ExternalLink className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>View on Solana Explorer</p>
-            </TooltipContent>
-          </Tooltip>
+        <div className="flex items-center space-x-1 ml-1"> 
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
               <button

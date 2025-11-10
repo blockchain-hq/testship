@@ -90,16 +90,7 @@ const ClusterSelect = () => {
               )}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuSeparator />
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Custom Cluster</span>
-            </DropdownMenuItem>
-          </DialogTrigger>
+          <DropdownMenuSeparator /> 
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -33,12 +33,9 @@ export const Header = () => {
               className="flex cursor-pointer"
             >
               {isDarkMode ? <SunIcon /> : <MoonIcon />}
-            </Button>
-
-            <WalletMultiButton />
-
-            <ClusterSelect />
-
+            </Button> 
+            <WalletMultiButton /> 
+            <ClusterSelect /> 
             <RPCConfigDialog />
           </div>
         </div>
