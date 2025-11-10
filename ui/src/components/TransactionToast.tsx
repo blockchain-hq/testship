@@ -47,11 +47,11 @@ export function TransactionToast({
     : "";
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-md">
+    <div className="flex flex-col gap-2 w-full max-w-md  ">
       {message && <p className="text-sm">{message}</p>}
 
       {suggestion && (
-        <div className="bg-muted/20 p-2 rounded text-xs max-h-32 overflow-y-auto">
+        <div className={`bg-muted/20 p-2 rounded text-xs max-h-32 overflow-y-auto ${ showLogs ? "w-[90%]" : "w-full" }`}>
           <p className="font-semibold mb-1">💡 Suggestion:</p>
           <p className="whitespace-pre-line">{suggestion}</p>
         </div>
@@ -94,7 +94,7 @@ export function TransactionToast({
 
       {logs && logs.length > 0 && (
         <div className="border-t pt-2 mt-1">
-          <div className="flex items-center justify-between">
+          <div className={`flex items-center justify-between ${ showLogs ? "w-[90%]" : "w-full" }`}>
             <Button
               variant="ghost"
               size="sm"
@@ -141,12 +141,16 @@ export function TransactionToast({
                         size="sm"
                         onClick={() => handleCopy(formatLogs(logs))}
                       >
-                        <Copy className="h-3 w-3 mr-2" />
-                        Copy Logs
+                        {copied ? (
+                          <Check className="h-3 w-3 mr-2 text-green-600" />
+                        ) : (
+                          <Copy className="h-3 w-3 mr-2" />
+                        )}
+                        {copied ? "Copied!" : "Copy Logs"}
                       </Button>
                     </div>
                     <div className="bg-card border border-border/50 rounded-lg p-4 overflow-auto max-h-[60vh]">
-                      <pre className="text-xs whitespace-pre-wrap break-words">
+                      <pre className="text-xs whitespace-pre-wrap break-words text-foreground">
                         {formatLogs(logs)}
                       </pre>
                     </div>
@@ -157,8 +161,8 @@ export function TransactionToast({
           </div>
 
           {showLogs && (
-            <div className="mt-2 max-h-40 overflow-y-auto overflow-x-auto">
-              <pre className="text-xs bg-card border border-border/50 p-2 rounded whitespace-pre-wrap break-words">
+            <div className={`mt-2 max-h-40 ${ showLogs ? "w-[90%]" : "w-full" } overflow-y-auto overflow-x-hidden bg-muted/20  `}>
+              <pre className="text-xs bg-muted/20  p-2 rounded whitespace-pre-wrap break-words">
                 {formatLogs(logs)}
               </pre>
             </div>
