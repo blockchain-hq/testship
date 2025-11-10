@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCluster, ClusterNetwork } from "@/context/ClusterContext";
+import type { ClusterNetworkType } from "@/context/ClusterContext";
 import {
   Dialog,
   DialogContent,
@@ -50,7 +51,11 @@ export const RPCConfigDialog = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [isTesting, setIsTesting] = useState<string | null>(null);
 
-  const [newCluster, setNewCluster] = useState({
+  const [newCluster, setNewCluster] = useState<{
+    name: string;
+    endpoint: string;
+    network: ClusterNetworkType;
+  }>({
     name: "",
     endpoint: "",
     network: ClusterNetwork.Custom,
