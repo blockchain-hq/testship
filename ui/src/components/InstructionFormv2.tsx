@@ -22,7 +22,7 @@ interface InstructionFormv2Props {
 }
 
 const InstructionFormv2 = (props: InstructionFormv2Props) => {
-  const { instruction, idl, addTransaction } = props;
+  const { instruction, idl, addTransaction } = props; 
   const { getInstructionState, updateInstructionState } = useInstructions();
   const { publicKey: userWalletPublicKey } = useWallet();
 
@@ -31,7 +31,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   const formDataKey = instruction?.name ? `testship_form_${instruction.name}` : null;
   const accountsDataKey = instruction?.name ? `testship_accounts_${instruction.name}` : null;
 
-  const state = getInstructionState(instruction?.name ?? "");
+  const state = getInstructionState(instruction?.name ?? ""); 
   
   // Load form data from localStorage on mount
   const [formData, setFormData] = useState(() => {
@@ -51,7 +51,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   
   // Load account data from localStorage on mount
   const [accountsAddressMap, setAccountsAddressMap] = useState(() => {
-    if (!accountsDataKey) return state.accountsAddresses;
+    if (!accountsDataKey) return state.accountsAddresses; 
     try {
       const saved = localStorage.getItem(accountsDataKey);
       if (saved) {
@@ -61,7 +61,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           if (value && typeof value === 'string') {
             newMap.set(key, value);
           }
-        });
+        }); 
         return newMap;
       }
     } catch (error) {
@@ -96,7 +96,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     );
     
     if (hasData) {
-      const accountsData = Object.fromEntries(accountsAddressMap);
+      const accountsData = Object.fromEntries(accountsAddressMap); 
       try {
         localStorage.setItem(accountsDataKey, JSON.stringify(accountsData));
       } catch (error) {
@@ -111,6 +111,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     formData,
     accountsAddressMap
   );
+ 
 
   useEffect(() => {
     derivedPDAs.forEach((pda, accountName) => {

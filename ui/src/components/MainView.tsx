@@ -10,9 +10,10 @@ import { UtilityDialog } from "./UtilityDialog";
 
 const MainView = () => {
   const { activeInstruction } = useInstructions();
-  const { idl } = useIDL();
+  const { idl } = useIDL(); 
   const { transactions, clearHistory, removeTransaction, addTransaction } =
     useTransactionHistory();
+ 
 
   const instruction = idl?.instructions.find(
     (instruction) => instruction.name === activeInstruction
@@ -39,8 +40,7 @@ const MainView = () => {
             <NoIDLView />
           )}
         </div>
-
-        {/* right col - tx history */}
+ 
         <div className="h-[calc(100vh-16rem)] sticky top-4">
           <UtilityDialog />
           <TransactionHistory

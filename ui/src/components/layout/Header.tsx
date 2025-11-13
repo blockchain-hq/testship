@@ -4,6 +4,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MoonIcon, SunIcon } from "lucide-react";
 import HeaderProgramInfo from "./HeaderProgramInfo";
 import ClusterSelect from "../ClusterSelect";
+import { RPCConfigDialog } from "../RPCConfigDialog";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -14,7 +15,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background dark:bg-background-dark shadow-sm border-b w-full h-16">
+    <header className="bg-background dark:bg-background-dark shadow-sm border-b-1 border-border dark:border-border-dark w-full h-16">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
@@ -32,11 +33,10 @@ export const Header = () => {
               className="flex cursor-pointer"
             >
               {isDarkMode ? <SunIcon /> : <MoonIcon />}
-            </Button>
-
-            <WalletMultiButton />
-
-            <ClusterSelect />
+            </Button> 
+            <WalletMultiButton /> 
+            <ClusterSelect /> 
+            <RPCConfigDialog />
           </div>
         </div>
       </div>

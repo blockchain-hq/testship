@@ -1,3 +1,4 @@
+import CustomIDLModal from "./CustomIDLModal";
 import { Button } from "./ui/button";
 import {
   Empty,
@@ -23,7 +24,8 @@ const NoIDLView = () => {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="default">Load IDL</Button>
+        <CustomIDLModal/>
+        {/* <Button variant="default">Load IDL</Button> */}
       </EmptyContent>
       <Button
         variant="link"

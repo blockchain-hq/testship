@@ -43,8 +43,7 @@ const useLoadSharedState = () => {
               lastUpdated: new Date(),
             };
           }
-        );
-
+        ); 
         setAllInstructionsState(deserializedInstructions);
 
         if (sharedState.activeInstruction) {

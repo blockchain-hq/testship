@@ -79,7 +79,7 @@ export interface ClusterProviderContext {
   getExplorerUrl: (path: string) => string;
 }
 
-const getClusterUrlParam = (cluster: SolanaCluster): string => {
+export const getClusterUrlParam = (cluster: SolanaCluster): string => {
   let suffix = "";
   switch (cluster.network) {
     case ClusterNetwork.Devnet:
@@ -116,19 +116,21 @@ export const ClusterProvider = ({
   const value: ClusterProviderContext = {
     cluster,
     clusters: clusters.sort((a, b) => (a.name > b.name ? 1 : -1)),
-    addCluster: (cluster: SolanaCluster) => {
+    addCluster: (newCluster: SolanaCluster) => {
       try {
-        new Connection(cluster.endpoint);
-        setClusters([...clusters, cluster]);
+        // Validate endpoint by creating a connection
+        new Connection(newCluster.endpoint);
+        setClusters([...clusters, newCluster]);
       } catch (error) {
         console.error("Error adding cluster", error);
+        throw error;
       }
     },
-    deleteCluster: (cluster: SolanaCluster) => {
-      setClusters(clusters.filter((item) => item.name !== cluster.name));
+    deleteCluster: (clusterToDelete: SolanaCluster) => {
+      setClusters(clusters.filter((item) => item.name !== clusterToDelete.name));
     },
-    setCluster: (cluster: SolanaCluster) => {
-      setCluster(cluster);
+    setCluster: (clusterToSet: SolanaCluster) => {
+      setCluster(clusterToSet);
     },
     getExplorerUrl: (path: string) =>
       `https://explorer.solana.com/${path}${getClusterUrlParam(cluster)}`,

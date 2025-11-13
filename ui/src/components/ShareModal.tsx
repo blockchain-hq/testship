@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import BaseUrlInput from "./BaseUrlInput";
 import type { IdlInstruction } from "@/lib/types";
 import type { Idl } from "@coral-xyz/anchor";
+import { toast } from "sonner";
 interface ShareModalProps {
   idl: Idl;
   accountMap: Map<string, string | null>;
@@ -29,7 +30,7 @@ const ShareModal = (props: ShareModalProps) => {
   const { copied, handleCopy } = UseCopy();
 
   // Create a unique key for share modal data
-  const shareModalKey = 'testship_share_modal';
+  const shareModalKey = 'testship_share_modal'; 
 
   // Load share modal data from localStorage on component mount
   React.useEffect(() => {
@@ -71,6 +72,7 @@ const ShareModal = (props: ShareModalProps) => {
     try {
       localStorage.removeItem(shareModalKey);
       console.log('Cleared share modal data from localStorage');
+      toast.success('Share modal data cleared successfully');
     } catch (error) {
       console.warn("Failed to clear share modal data from localStorage:", error);
     }
@@ -82,12 +84,12 @@ const ShareModal = (props: ShareModalProps) => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild> 
         <Button variant="outline">
           <Share />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto border border-border/50 text-foreground bg-card">
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
           <DialogDescription>

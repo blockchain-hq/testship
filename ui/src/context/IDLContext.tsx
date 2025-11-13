@@ -89,7 +89,7 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
         error,
         isLoading: loading,
         fetchIdl,
-        setIdl,
+        setIdl
       }}
     >
       {children}
