@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseWebSocketProps {
   url: string;
+  enabled?: boolean;
   onMessage?: (message: string) => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -10,6 +11,7 @@ interface UseWebSocketProps {
 
 export const useWebSocket = ({
   url,
+  enabled = true,
   onMessage,
   onOpen,
   onClose,
@@ -22,7 +24,19 @@ export const useWebSocket = ({
   const maxReconnectAttempts = 5;
   const reconnectDelay = 3000;
 
-  const connect = () => {
+  const onMessageRef = useRef(onMessage);
+  const onOpenRef = useRef(onOpen);
+  const onCloseRef = useRef(onClose);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+    onOpenRef.current = onOpen;
+    onCloseRef.current = onClose;
+    onErrorRef.current = onError;
+  }, [onMessage, onOpen, onClose, onError]);
+
+  const connect = useCallback(() => {
     try {
       const ws = new WebSocket(url);
       wsRef.current = ws;
@@ -31,36 +45,41 @@ export const useWebSocket = ({
         console.log("WebSocket connected");
         setIsConnected(true);
         setReconnectAttempts(0);
-        onOpen?.();
+        onOpenRef.current?.();
       };
 
       ws.onmessage = (event) => {
-        onMessage?.(event.data);
+        onMessageRef.current?.(event.data);
       };
 
       ws.onclose = () => {
         setIsConnected(false);
-        onClose?.();
-        
-        if (reconnectAttempts < maxReconnectAttempts) {
-          console.log(`Attempting to reconnect... (${reconnectAttempts + 1}/${maxReconnectAttempts})`);
-          setReconnectAttempts(prev => prev + 1);
-          reconnectTimeoutRef.current = setTimeout(() => {
-            connect();
-          }, reconnectDelay);
-        } else {
-          console.log("Max reconnection attempts reached");
-        }
+        onCloseRef.current?.();
+
+        setReconnectAttempts((prev) => {
+          if (prev < maxReconnectAttempts) {
+            console.log(
+              `Attempting to reconnect... (${prev + 1}/${maxReconnectAttempts})`
+            );
+            reconnectTimeoutRef.current = setTimeout(() => {
+              connect();
+            }, reconnectDelay);
+            return prev + 1;
+          } else {
+            console.log("Max reconnection attempts reached");
+            return prev;
+          }
+        });
       };
 
       ws.onerror = (error) => {
         console.error("WebSocket error:", error);
-        onError?.(error);
+        onErrorRef.current?.(error);
       };
     } catch (error) {
       console.error("Failed to create WebSocket connection:", error);
     }
-  };
+  }, [url]);
 
   const disconnect = () => {
     if (reconnectTimeoutRef.current) {
@@ -74,12 +93,14 @@ export const useWebSocket = ({
   };
 
   useEffect(() => {
-    connect();
+    if (enabled) {
+      connect();
+    }
 
     return () => {
       disconnect();
     };
-  }, [url]);
+  }, [enabled, connect]);
 
   return {
     isConnected,

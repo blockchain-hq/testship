@@ -1,6 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import type { Idl } from "@coral-xyz/anchor";
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
 
 type IDLContextType = {
@@ -19,7 +26,13 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchIdl = async () => {
+  const isLocalDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  const fetchIdl = useCallback(async () => {
+    if (!isLocalDevelopment) return;
+
     setLoading(true);
     setError(null);
     try {
@@ -35,13 +48,13 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isLocalDevelopment]);
 
   const debouncedRefresh = () => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
-    
+
     debounceTimeoutRef.current = setTimeout(() => {
       fetchIdl();
     }, 500);
@@ -49,6 +62,7 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
 
   useWebSocket({
     url: "ws://localhost:3000",
+    enabled: isLocalDevelopment,
     onMessage: (message) => {
       if (message === "IDL_UPDATED") {
         console.log("IDL updated, refreshing...");
@@ -80,7 +94,7 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
         clearTimeout(debounceTimeoutRef.current);
       }
     };
-  }, []);
+  }, [fetchIdl]);
 
   return (
     <IDLContext.Provider
@@ -89,7 +103,7 @@ export const IDLProvider = ({ children }: { children: React.ReactNode }) => {
         error,
         isLoading: loading,
         fetchIdl,
-        setIdl
+        setIdl,
       }}
     >
       {children}
