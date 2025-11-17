@@ -131,14 +131,23 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   }, [derivedPDAs]);
 
   const initializeSignerAccounts = useCallback(
-    (instruction: IdlInstruction) => {
-      if (!userWalletPublicKey || !instruction.accounts) return new Map();
+    (instruction: IdlInstruction, existingAccounts?: Map<string, string | null>) => {
+      if (!userWalletPublicKey || !instruction.accounts) return existingAccounts || new Map();
 
-      const accountsMap = new Map<string, string | null>();
+      const accountsMap = new Map(existingAccounts || []);
+      const walletAddress = userWalletPublicKey.toBase58();
+      
       instruction.accounts.forEach((account: ModIdlAccount) => {
+        // Auto-populate signer accounts
         if (account.signer) {
-          accountsMap.set(account.name, userWalletPublicKey.toBase58());
-        } else if (account.address) {
+          accountsMap.set(account.name, walletAddress);
+        }
+        // Auto-populate payer accounts (case-insensitive check)
+        else if (account.name.toLowerCase() === 'payer' && !accountsMap.get(account.name)) {
+          accountsMap.set(account.name, walletAddress);
+        }
+        // Set address from IDL if available
+        else if (account.address && !accountsMap.get(account.name)) {
           accountsMap.set(account.name, account.address);
         }
       });
@@ -180,32 +189,66 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
               newMap.set(key, value);
             }
           });
-          setAccountsAddressMap(newMap);
+          // Merge signer accounts even when localStorage has saved accounts
+          if (instruction && userWalletPublicKey) {
+            const mergedMap = initializeSignerAccounts(instruction, newMap);
+            setAccountsAddressMap(mergedMap);
+          } else {
+            setAccountsAddressMap(newMap);
+          }
         } else {
           // if signers keypairs are empty, set user wallet as signer
-          if (newState.accountsAddresses.size === 0 && instruction) {
-            setAccountsAddressMap(initializeSignerAccounts(instruction));
+          if (instruction) {
+            setAccountsAddressMap(initializeSignerAccounts(instruction, newState.accountsAddresses));
           } else {
             setAccountsAddressMap(newState.accountsAddresses);
           }
         }
       } catch (error) {
-        if (newState.accountsAddresses.size === 0 && instruction) {
-          setAccountsAddressMap(initializeSignerAccounts(instruction));
+        if (instruction) {
+          setAccountsAddressMap(initializeSignerAccounts(instruction, newState.accountsAddresses));
         } else {
           setAccountsAddressMap(newState.accountsAddresses);
         }
       }
     } else {
       // if signers keypairs are empty, set user wallet as signer
-      if (newState.accountsAddresses.size === 0 && instruction) {
-        setAccountsAddressMap(initializeSignerAccounts(instruction));
+      if (instruction) {
+        setAccountsAddressMap(initializeSignerAccounts(instruction, newState.accountsAddresses));
       } else {
         setAccountsAddressMap(newState.accountsAddresses);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instruction?.name]);
+
+  // Auto-populate signer accounts when wallet connects or changes
+  useEffect(() => {
+    if (!instruction || !userWalletPublicKey) return;
+
+    // Only auto-populate if signer accounts are missing or empty
+    const hasSignerAccounts = Array.from(accountsAddressMap.entries()).some(([name, address]) => {
+      const account = instruction.accounts?.find(acc => acc.name === name) as ModIdlAccount | undefined;
+      return account?.signer && address;
+    });
+
+    // If no signer accounts are set, auto-populate them
+    if (!hasSignerAccounts) {
+      const updatedMap = initializeSignerAccounts(instruction, accountsAddressMap);
+      setAccountsAddressMap(updatedMap);
+    } else {
+      // Even if some signers exist, ensure all signer accounts are populated
+      const updatedMap = initializeSignerAccounts(instruction, accountsAddressMap);
+      // Only update if there are changes
+      const hasChanges = Array.from(updatedMap.entries()).some(([name, address]) => {
+        return accountsAddressMap.get(name) !== address;
+      });
+      if (hasChanges) {
+        setAccountsAddressMap(updatedMap);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userWalletPublicKey, instruction?.name, initializeSignerAccounts]);
 
   // debounced update to global state
   useEffect(() => {
