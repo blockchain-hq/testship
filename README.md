@@ -1,37 +1,40 @@
-# <img src="https://www.testship.xyz/_astro/ts.Hvygf-Mj.png" alt="testship logo" width="200"/>
+<div align="center">
+
+# <img src="https://raw.githubusercontent.com/blockchain-hq/testship/refs/heads/main/public/ts.png" alt="testship logo" width="180"/>
 
 # Testship
 
-> Free, Open source, and Fast Testing for Solana Anchor Programs.
+### Test Anchor Programs without Writing Tests
 
-**Bring testing to your program, not your program to the test suite.**
+**Test Anchor programs in 40 seconds, not 40 minutes. No test files. Just results.**
 
 [![npm version](https://img.shields.io/npm/v/@blockchain-hq/testship.svg)](https://www.npmjs.com/package/@blockchain-hq/testship)
-[![License: Restrictive→MIT](https://img.shields.io/badge/License-Restrictive%20%E2%86%92%20MIT%20Dec%202025-orange)](LICENSE)
+[![npm downloads](https://img.shields.io/npm/dm/@blockchain-hq/testship.svg)](https://www.npmjs.com/package/@blockchain-hq/testship)
+[![GitHub stars](https://img.shields.io/github/stars/blockchain-hq/testship.svg)](https://github.com/blockchain-hq/testship/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[Website](https://testship.xyz) • [Documentation](https://docs.testship.xyz) • [Demo Video](https://youtu.be/upQIqKl43ss) • [Twitter](https://x.com/testshipxyz)
+
+</div>
 
 ---
 
-## 🎥 Demo
+## See It In Action
+
+<div align="center">
 
 [![Testship Demo](https://img.youtube.com/vi/upQIqKl43ss/maxresdefault.jpg)](https://youtu.be/upQIqKl43ss)
 
-**[► Watch on YouTube](https://youtu.be/upQIqKl43ss)** (2 min)
+**[Watch Demo (2 min)](https://youtu.be/upQIqKl43ss)**
 
-See how Testship makes testing Anchor programs interactive and visual. This silent demo shows:
-
-- Loading IDL from local Anchor project
-- Testing instructions with live forms
-- Real-time transaction execution
-- Built-in transaction history
-
-_Voice-over version coming soon!_
+</div>
 
 ---
 
 ## Quick Start
 
 ```bash
-# Run directly (recommended)
+# Run in your Anchor project directory
 npx @blockchain-hq/testship start
 
 # Or install globally
@@ -39,143 +42,335 @@ npm install -g @blockchain-hq/testship
 testship start
 ```
 
-Opens your browser at `http://localhost:3000`
+**That's it.** Opens at `http://localhost:3000` with your program ready to test.
 
 ---
 
 ## What is Testship?
 
-Testship lets you test Solana Anchor programs directly in your browser without
-writing test files or changing your development environment.
+**Think Postman for Solana programs.**
 
-**The Problem:** Traditional testing requires writing tests, manually deriving PDAs, updating tests on every small iteration, and context-switching between code and testing.
+Testship generates an interactive testing UI from your Anchor IDL. Test instructions visually, derive PDAs automatically, and see results instantly—all in your browser.
 
-**The Solution:** Testship generates interactive forms from your IDL, handles
-PDA derivation automatically, and lets you test with your actual wallet.
+### The Problem
 
-### Key Features
+Traditional Anchor testing means:
 
-- **🎯 Zero Configuration** - Just run `testship start` in your Anchor project
-- **📝 Auto-Generated Forms** - Forms created automatically from your IDL
-- **🔗 Smart PDA Derivation** - Handles complex account-based PDAs automatically
-- **💼 Wallet Integration** - Works with Phantom, Solflare, and any Solana wallet
-- **⚡ Instant Execution** - Test transactions in seconds, not minutes
-- **💾 Account History** - Saves and reuses accounts across instructions
-- **🔍 Multi-Program Support** - Detects all programs in your workspace
-- **📝 Transaction History** - Keeps track of recent transactions for debugging
+- Writing test files for every instruction
+- Manually deriving PDAs in code
+- Parsing transaction logs to verify results
+- Re-running `anchor test` for every change
+- 40 minutes to test what should take 40 seconds
+
+### The Solution
+
+```bash
+testship start
+```
+
+- Auto-generated forms from IDL
+- Automatic PDA derivation
+- Visual transaction execution
+- Instant feedback on results
+- Test in 40 seconds
+
+---
+
+## Why Developers Love Testship
+
+<table>
+<tr>
+<td width="50%">
+
+### Before Testship
+
+```bash
+# 1. Write test file
+# test/counter.ts
+it("increments counter", async () => {
+  // 30 lines of boilerplate...
+});
+
+# 2. Run tests
+$ anchor test
+# Wait 2-3 minutes...
+
+# 3. Parse logs manually
+# Error: constraint violation
+# Which constraint?
+
+# 4. Fix, repeat
+# Another 2-3 minutes...
+
+Time: 40 minutes per change
+```
+
+</td>
+<td width="50%">
+
+### With Testship
+
+```bash
+# 1. Start Testship
+$ testship start
+
+# 2. Visual interface opens
+# See all instructions
+
+# 3. Click "Increment"
+# Fill parameters (auto-complete)
+# PDAs derived automatically
+
+# 4. Execute
+# Instant result
+
+# 5. See exactly what changed
+
+Time: 40 seconds per test
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+## Key Features
+
+| Feature                   | Description                                                    |
+| ------------------------- | -------------------------------------------------------------- |
+| **Zero Configuration**    | Run `testship start` in any Anchor project—that's it           |
+| **Auto-Generated UI**     | Forms created from your IDL automatically                      |
+| **Smart PDA Derivation**  | Handles complex account-based PDAs without code                |
+| **Wallet Integration**    | Works with Phantom, Solflare, Backpack, and all Solana wallets |
+| **Instant Execution**     | See transaction results in real-time                           |
+| **Account History**       | Reuse accounts across instructions automatically               |
+| **Multi-Program Support** | Detects and loads all programs in your workspace               |
+| **Transaction History**   | Full execution log for debugging                               |
+| **Type Validation**       | Input validation based on IDL types                            |
+| **Cluster Support**       | Test on localnet, devnet, or mainnet                           |
+
+---
+
+## Perfect For
+
+| Use Case               | Why Testship                                        |
+| ---------------------- | --------------------------------------------------- |
+| **Rapid Development**  | Iterate 10x faster during development               |
+| **Debugging**          | Test specific scenarios without writing tests       |
+| **Learning Anchor**    | Understand how programs work interactively          |
+| **Teaching**           | Demonstrate programs to students visually           |
+| **Pre-Deploy Testing** | Verify program behavior before mainnet              |
+| **Demos**              | Show your program to team, users, or investors      |
+| **CI/CD Integration**  | Quick manual verification alongside automated tests |
 
 ---
 
 ## How It Works
 
-```bash
-# 1. Navigate to your Anchor project
-cd my-anchor-project
-
-# 2. Start Testship
-testship start
-
-# 3. Testship automatically:
-#    ✓ Finds your programs
-#    ✓ Loads the IDL
-#    ✓ Opens browser
-#    ✓ Generates testing interface
-
-# 4. You just:
-#    ✓ Select instruction
-#    ✓ Fill form (with auto-complete!)
-#    ✓ Connect wallet
-#    ✓ Execute transaction
-#    ✓ See results
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. You run: testship start                                 │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. Testship automatically:                                 │
+│     • Finds your Anchor workspace                           │
+│     • Loads program IDLs                                    │
+│     • Generates testing UI                                  │
+│     • Opens browser                                         │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. You interact:                                           │
+│     • Select instruction                                    │
+│     • Fill form (with auto-complete & validation)           │
+│     • Connect wallet                                        │
+│     • Execute transaction                                   │
+│     • See results instantly                                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**No test files. No boilerplate. Just results.**
+**No test files. No boilerplate. No context switching. Just testing.**
 
 ---
 
-## 🎯 Use Cases
+## Example: Testing a Counter Program
 
-Perfect for:
+<details>
+<summary><b>Click to see step-by-step example</b></summary>
 
-- 🔨 **Development** - Rapid iteration while building programs
-- 🐛 **Debugging** - Quickly test specific scenarios
-- 📚 **Learning** - Understand how Anchor programs work interactively
-- 🎓 **Teaching** - Demonstrate program functionality to students
-- ✅ **Validation** - Verify program behavior before deployment
-- 🤝 **Demos** - Show your program to team/investors
+### Your Program (counter.rs)
+
+```rust
+#[program]
+pub mod counter {
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        ctx.accounts.counter.count = 0;
+        Ok(())
+    }
+
+    pub fn increment(ctx: Context<Increment>) -> Result<()> {
+        ctx.accounts.counter.count += 1;
+        Ok(())
+    }
+}
+```
+
+### Traditional Testing (test/counter.ts)
+
+```typescript
+// 30+ lines of setup code...
+describe("counter", () => {
+  it("initializes", async () => {
+    const tx = await program.methods
+      .initialize()
+      .accounts({
+        counter: counterPda,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    const counter = await program.account.counter.fetch(counterPda);
+    assert.equal(counter.count, 0);
+  });
+
+  it("increments", async () => {
+    // Another 15 lines...
+  });
+});
+
+// Run: anchor test (2-3 minutes)
+```
+
+### With Testship
+
+```bash
+$ testship start
+
+# Browser opens with:
+# ┌─────────────────────────────┐
+# │ Counter Program             │
+# ├─────────────────────────────┤
+# │ Instructions:               │
+# │ • Initialize  ← [Click]     │
+# │ • Increment                 │
+# └─────────────────────────────┘
+#
+# Form auto-filled with PDAs
+# Click "Execute"
+# Counter initialized (0)
+#
+# Click "Increment"
+# Counter incremented (1)
+#
+# Total time: 30 seconds
+```
+
+</details>
 
 ---
 
 ## Documentation
 
-**Full documentation available at [testship.xyz](https://testship.xyz)**
+**Full documentation:** [docs.testship.xyz](https://docs.testship.xyz)
 
-## ⚠️ Early Release
+- [Getting Started](https://docs.testship.xyz/getting-started)
+- [Features Guide](https://docs.testship.xyz/features)
+- [PDA Derivation](https://docs.testship.xyz/pda-derivation)
+- [Troubleshooting](https://docs.testship.xyz/troubleshooting)
+- [Examples](https://docs.testship.xyz/examples)
 
-**v0.1.1** - Actively under development!
+---
 
-### Features ✅
+## Development Status
 
-- Load Anchor IDL (auto-detect once run in root of anchor project)
-- Execute transactions with real-time feedback
-- Auto-derive PDAs from IDL
-- Wallet integration (Phantom, Metamask, etc.)
-- Form validation and error handling
+**Current Version:** `v0.1.1` — Early Release, Actively Developed
+
+### Working Features
+
+- Auto-detect Anchor projects
+- Load IDL from multiple programs
+- Generate interactive forms from IDL
+- Auto-derive PDAs with seeds
+- Execute transactions with wallet
+- Real-time transaction feedback
+- Account history and reuse
 - Transaction history tracking
-- Account management and reuse
+- Multi-cluster support (localnet/devnet/mainnet)
+- Form validation and error handling
 
-**Found a bug? [Report it!](https://github.com/blockchain-hq/testship/issues)**  
-**Have feedback? [Share it!](https://github.com/blockchain-hq/testship/discussions)**
+### Coming Soon
 
-We're shipping fixes and features daily. Expect frequent updates!
+- Account state inspector (view account data)
+- Batch transaction execution
+- Export test as TypeScript code
+- Custom RPC endpoint support
+- Shareable test sessions
+- Program state snapshots
+
+### Found a Bug?
+
+[Report it on GitHub Issues](https://github.com/blockchain-hq/testship/issues)
+
+We're shipping updates daily based on your feedback!
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+Testship is **open source and MIT licensed**. We welcome contributions from the community!
+
+**Ways to contribute:**
+
+- Submit pull requests
+- Report bugs
+- Suggest features
+- Fork and modify
+- Create derivatives
+- Share feedback
+- Star the repo
+
+See [LICENSE](LICENSE) for details.
 
 ---
 
-## Links
+## Links & Resources
 
-- **npm:** [@blockchain-hq/testship](https://www.npmjs.com/package/@blockchain-hq/testship)
-- **Website & Docs:** [testship.xyz](https://testship.xyz)
+- **Website:** [testship.xyz](https://testship.xyz)
+- **Documentation:** [docs.testship.xyz](https://docs.testship.xyz)
+- **npm Package:** [@blockchain-hq/testship](https://www.npmjs.com/package/@blockchain-hq/testship)
 - **GitHub:** [blockchain-hq/testship](https://github.com/blockchain-hq/testship)
-- **X:** [@testshipxyz](https://x.com/testshipxyz)
+- **Twitter:** [@testshipxyz](https://x.com/testshipxyz)
+- **Discussions:** [GitHub Discussions](https://github.com/blockchain-hq/testship/discussions)
+- **Issues:** [GitHub Issues](https://github.com/blockchain-hq/testship/issues)
 
 ---
 
-## License Status
+## Built With
 
-**Current Status (Oct-Nov 2025):** Restrictive License  
-**Future Status (Dec 1, 2025+):** MIT License (Open Source)
-
-This project is temporarily under a restrictive license to protect our original
-work during the **Solana Cypherpunk Hackathon**. We believe in open source and
-will transition to MIT License as soon as the competition concludes!
-
-### 🎯 What This Means For You
-
-**Right Now (Until Nov 30, 2025):**
-| You Can | You Cannot |
-|---------|------------|
-| ✅ Use Testship as an end user (free!) | ❌ Fork or redistribute |
-| ✅ Report bugs and issues | ❌ Submit to competitions |
-| ✅ Suggest features | ❌ Create derivatives |
-| ✅ Share your experience | ❌ Use commercially without permission |
-| ✅ Provide testimonials | ❌ Copy code for your projects |
-
-**Starting November 1, 2025:**
-| Everything Above + | Full MIT Freedom |
-|-------------------|------------------|
-| ✅ Fork and modify | ✅ Use in commercial projects |
-| ✅ Contribute via Pull Requests | ✅ Create competing tools |
-| ✅ Use in your own projects | ✅ No restrictions! |
-| ✅ Redistribute | ✅ Full open source rights |
-
-📖 **Read the full license terms:** [LICENSE](LICENSE)
+Testship was built at **[Solana Startup Village](https://www.solanahacker.house/)** with support from **[Superteam India](https://superteam.fun/)**.
 
 ---
 
-**⭐ If Testship helps you, please consider starring the project!**
+## Support the Project
+
+If Testship helps you build faster, please:
+
+- [Star this repo](https://github.com/blockchain-hq/testship)
+- [Follow us on Twitter](https://x.com/testshipxyz)
+- Share Testship with your dev friends
+- [Give feedback](https://github.com/blockchain-hq/testship/discussions)
+
+**Built by developers, for developers.**
+
+---
+
+<div align="center">
+
+**Made with care for the Solana ecosystem**
+
+[Website](https://testship.xyz) • [Docs](https://docs.testship.xyz) • [Twitter](https://x.com/testshipxyz) • [npm](https://www.npmjs.com/package/@blockchain-hq/testship)
+
+</div>
