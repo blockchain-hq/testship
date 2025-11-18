@@ -50,8 +50,8 @@ export default function useTransaction(
       const accountMap = new Map(accounts);
       for (const account of instruction.accounts) {
         const acc = account as ModIdlAccount;
-        if (acc.pda?.seeds && !accountMap.get(acc.name)) {
-          try {
+        if (acc.pda?.seeds) {
+          try { 
             const pda = await derivePDA(
               acc.pda.seeds,
               idl.address,
@@ -61,8 +61,10 @@ export default function useTransaction(
               idl
             );
             accountMap.set(acc.name, pda.toBase58());
-          } catch (error) {
-            console.warn(`Could not auto-derive PDA for ${acc.name}:`, error);
+          } catch (error) { 
+            if (!accountMap.get(acc.name)) {
+              console.warn(`Could not auto-derive PDA for ${acc.name}:`, error);
+            }
           }
         }
       }

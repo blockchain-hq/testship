@@ -53,16 +53,16 @@ export const useAutoDerivePDAs = (
       }
 
       setDerivedPDAs((prev) => {
-        const existingAddress = accountsAddressMap.get(account.name);
+        // const existingAddress = accountsAddressMap.get(account.name);
         const alreadyDerived = prev.get(account.name);
 
-        if (
-          existingAddress &&
-          alreadyDerived?.status === "ready" &&
-          alreadyDerived.address === existingAddress
-        ) {
-          return prev;
-        }
+        // if (
+        //   existingAddress &&
+        //   alreadyDerived?.status === "ready" &&
+        //   alreadyDerived.address === existingAddress
+        // ) {
+        //   return prev;
+        // }
 
         if (alreadyDerived?.status === "deriving") {
           return prev;
