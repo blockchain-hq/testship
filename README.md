@@ -276,17 +276,18 @@ $ testship start
 
 **Full documentation:** [docs.testship.xyz](https://docs.testship.xyz)
 
-- [Getting Started](https://docs.testship.xyz/getting-started)
-- [Features Guide](https://docs.testship.xyz/features)
-- [PDA Derivation](https://docs.testship.xyz/pda-derivation)
-- [Troubleshooting](https://docs.testship.xyz/troubleshooting)
-- [Examples](https://docs.testship.xyz/examples)
+- [Getting Started](https://docs.testship.xyz/guides/quickstart/)
+- [Features Guide](https://docs.testship.xyz/features/interactive-ui/)
+- [PDA Derivation](https://docs.testship.xyz/features/pda-derivation/)
+- [Troubleshooting](https://docs.testship.xyz/reference/troubleshooting/)
+- [Session Sharing](https://docs.testship.xyz/features/session-sharing/)
+- [Hot Reloading](https://docs.testship.xyz/features/hot-reloading/)
 
 ---
 
 ## Development Status
 
-**Current Version:** `v0.1.1` — Early Release, Actively Developed
+**Current Version:** `v0.1.8` — Early Release, Actively Developed
 
 ### Working Features
 
@@ -345,12 +346,6 @@ See [LICENSE](LICENSE) for details.
 - **Twitter:** [@testshipxyz](https://x.com/testshipxyz)
 - **Discussions:** [GitHub Discussions](https://github.com/blockchain-hq/testship/discussions)
 - **Issues:** [GitHub Issues](https://github.com/blockchain-hq/testship/issues)
-
----
-
-## Built With
-
-Testship was built at **[Solana Startup Village](https://www.solanahacker.house/)** with support from **[Superteam India](https://superteam.fun/)**.
 
 ---
 
