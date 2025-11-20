@@ -46,7 +46,7 @@ export const ProgramAccountsViewer = () => {
 
     try {
       const programId = new PublicKey(idl.address);
-      
+
       // Fetch all accounts owned by the program
       const accountsData = await connection.getProgramAccounts(programId, {
         encoding: "base64",
@@ -56,9 +56,7 @@ export const ProgramAccountsViewer = () => {
       const decodedAccounts: ProgramAccount[] = [];
 
       // Try to decode accounts if account types are defined in IDL
-      const accountsCoder = idl.accounts
-        ? new BorshAccountsCoder(idl)
-        : null;
+      const accountsCoder = idl.accounts ? new BorshAccountsCoder(idl) : null;
 
       for (const { pubkey, account } of accountsData) {
         const accountData: ProgramAccount = {
@@ -102,18 +100,24 @@ export const ProgramAccountsViewer = () => {
       setAccounts(decodedAccounts);
     } catch (err) {
       console.error("Error fetching program accounts:", err);
-      
+
       let errorMessage = "Failed to fetch program accounts";
-      
+
       // Check for specific error types
       if (err instanceof Error) {
         const errorStr = err.message.toLowerCase();
         if (errorStr.includes("403") || errorStr.includes("forbidden")) {
-          errorMessage = "RPC endpoint blocked request (403 Forbidden). The default Solana RPC endpoint has CORS restrictions. Please add a custom RPC endpoint (e.g., Helius, QuickNode, or Alchemy) in the cluster settings.";
-        } else if (errorStr.includes("429") || errorStr.includes("rate limit")) {
-          errorMessage = "Rate limit exceeded. Please try again later or use a custom RPC endpoint.";
+          errorMessage =
+            "RPC endpoint blocked request (403 Forbidden). The default Solana RPC endpoint has CORS restrictions. Please add a custom RPC endpoint (e.g., Helius, QuickNode, or Alchemy) in the cluster settings.";
+        } else if (
+          errorStr.includes("429") ||
+          errorStr.includes("rate limit")
+        ) {
+          errorMessage =
+            "Rate limit exceeded. Please try again later or use a custom RPC endpoint.";
         } else if (errorStr.includes("network") || errorStr.includes("fetch")) {
-          errorMessage = "Network error. Please check your connection and RPC endpoint.";
+          errorMessage =
+            "Network error. Please check your connection and RPC endpoint.";
         } else {
           errorMessage = err.message;
         }
@@ -121,12 +125,13 @@ export const ProgramAccountsViewer = () => {
         // Handle JSON-RPC error format
         const rpcError = err as { error?: { code?: number; message?: string } };
         if (rpcError.error?.code === 403) {
-          errorMessage = "RPC endpoint blocked request (403 Forbidden). The default Solana RPC endpoint has CORS restrictions. Please add a custom RPC endpoint (e.g., Helius, QuickNode, or Alchemy) in the cluster settings.";
+          errorMessage =
+            "RPC endpoint blocked request (403 Forbidden). The default Solana RPC endpoint has CORS restrictions. Please add a custom RPC endpoint (e.g., Helius, QuickNode, or Alchemy) in the cluster settings.";
         } else if (rpcError.error?.message) {
           errorMessage = rpcError.error.message;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -162,7 +167,10 @@ export const ProgramAccountsViewer = () => {
     }
     if (Array.isArray(data)) {
       return `[\n${data
-        .map((item) => "  ".repeat(indent + 1) + formatDecodedData(item, indent + 1))
+        .map(
+          (item) =>
+            "  ".repeat(indent + 1) + formatDecodedData(item, indent + 1)
+        )
         .join(",\n")}\n${"  ".repeat(indent)}]`;
     }
     if (typeof data === "object") {
@@ -171,7 +179,8 @@ export const ProgramAccountsViewer = () => {
       return `{\n${entries
         .map(
           ([key, value]) =>
-            "  ".repeat(indent + 1) + `${key}: ${formatDecodedData(value, indent + 1)}`
+            "  ".repeat(indent + 1) +
+            `${key}: ${formatDecodedData(value, indent + 1)}`
         )
         .join(",\n")}\n${"  ".repeat(indent)}}`;
     }
@@ -221,7 +230,9 @@ export const ProgramAccountsViewer = () => {
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>Use the cluster dropdown in the header</li>
                   <li>Add a custom RPC endpoint that supports CORS</li>
-                  <li>Popular options: Helius, QuickNode, Alchemy, or your own RPC</li>
+                  <li>
+                    Popular options: Helius, QuickNode, Alchemy, or your own RPC
+                  </li>
                 </ul>
               </div>
             ) : null}
@@ -245,7 +256,7 @@ export const ProgramAccountsViewer = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4 max-h-[600px] overflow-y-auto">
+        <div className="space-y-4">
           {accounts.map((account) => (
             <Card key={account.pubkey} className="border-border/50">
               <CardHeader className="pb-3">
@@ -274,7 +285,12 @@ export const ProgramAccountsViewer = () => {
                     variant="link"
                     size="sm"
                     className="p-0 h-auto text-accent-primary hover:text-accent-primary/80"
-                    onClick={() => window.open(getAccountExplorerUrl(account.pubkey), "_blank")}
+                    onClick={() =>
+                      window.open(
+                        getAccountExplorerUrl(account.pubkey),
+                        "_blank"
+                      )
+                    }
                   >
                     View on Explorer
                     <ExternalLink className="ml-1 h-3 w-3" />
@@ -320,7 +336,9 @@ export const ProgramAccountsViewer = () => {
                     </p>
                     <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto font-mono">
                       {Array.isArray(account.account.data)
-                        ? formatBytes(account.account.data as Uint8Array<ArrayBufferLike>)
+                        ? formatBytes(
+                            account.account.data as Uint8Array<ArrayBufferLike>
+                          )
                         : "Unable to display data"}
                     </pre>
                   </div>
@@ -339,4 +357,3 @@ export const ProgramAccountsViewer = () => {
     </div>
   );
 };
-

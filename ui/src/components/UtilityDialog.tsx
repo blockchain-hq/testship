@@ -17,6 +17,8 @@ import {
   ClockIcon,
   DatabaseIcon,
   KeyIcon,
+  Blocks,
+  Calculator,
 } from "lucide-react";
 import { TimestampConverter } from "./utilityTools/TimestampConverter";
 import { LamportsConverter } from "./utilityTools/LamportsConverter";
@@ -36,96 +38,137 @@ export const UtilityDialog = () => {
           <WrenchIcon className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] border border-border/50 text-foreground bg-card">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col border border-border/50 text-foreground bg-card">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <WrenchIcon className="size-5 text-foreground" />
+            Utility Tools
           </DialogTitle>
           <DialogDescription>
             Helpful tools for working with Solana programs
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="accounts" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-7">
+        <Tabs
+          defaultValue="blockchain"
+          className="w-full flex-1 overflow-hidden flex flex-col"
+        >
+          <TabsList className="grid w-full grid-cols-2 mb-4 flex-shrink-0">
             <TabsTrigger
-              value="accounts"
+              value="blockchain"
               className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
             >
-              <DatabaseIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">Accounts</span>
+              <Blocks className="size-4 mr-2" />
+              Blockchain Tools
             </TabsTrigger>
             <TabsTrigger
-              value="timestamp"
+              value="converters"
               className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
             >
-              <CalendarIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">Timestamp</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="lamports"
-              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
-            >
-              <CoinsIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">Lamports</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="string"
-              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
-            >
-              <BinaryIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">String</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="duration"
-              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
-            >
-              <ClockIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">Duration</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="spl-token"
-              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
-            >
-              <CoinsIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">SPL Token</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="keypair"
-              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
-            >
-              <KeyIcon className="size-4 lg:mr-2" />
-              <span className="hidden lg:inline">Keypair</span>
+              <Calculator className="size-4 mr-2" />
+              Data Converters
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="accounts" className="mt-4">
-            <ProgramAccountsViewer />
+          <TabsContent
+            value="blockchain"
+            className="mt-0 flex-1 overflow-hidden flex flex-col"
+          >
+            <Tabs
+              defaultValue="accounts"
+              className="w-full flex-1 overflow-hidden flex flex-col"
+            >
+              <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
+                <TabsTrigger value="accounts">
+                  <DatabaseIcon className="size-4 mr-2" />
+                  Accounts
+                </TabsTrigger>
+                <TabsTrigger value="spl-token">
+                  <CoinsIcon className="size-4 mr-2" />
+                  SPL Token
+                </TabsTrigger>
+                <TabsTrigger value="keypair">
+                  <KeyIcon className="size-4 mr-2" />
+                  Keypair
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent
+                value="accounts"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <ProgramAccountsViewer />
+              </TabsContent>
+
+              <TabsContent
+                value="spl-token"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <SPLTokenManager />
+              </TabsContent>
+
+              <TabsContent
+                value="keypair"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <KeypairManager />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="timestamp" className="mt-4">
-            <TimestampConverter />
-          </TabsContent>
+          {/* Converters */}
+          <TabsContent
+            value="converters"
+            className="mt-0 flex-1 overflow-hidden flex flex-col"
+          >
+            <Tabs
+              defaultValue="timestamp"
+              className="w-full flex-1 overflow-hidden flex flex-col"
+            >
+              <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
+                <TabsTrigger value="timestamp">
+                  <CalendarIcon className="size-4 mr-2" />
+                  Timestamp
+                </TabsTrigger>
+                <TabsTrigger value="lamports">
+                  <CoinsIcon className="size-4 mr-2" />
+                  Lamports
+                </TabsTrigger>
+                <TabsTrigger value="string">
+                  <BinaryIcon className="size-4 mr-2" />
+                  String
+                </TabsTrigger>
+                <TabsTrigger value="duration">
+                  <ClockIcon className="size-4 mr-2" />
+                  Duration
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="lamports" className="mt-4">
-            <LamportsConverter />
-          </TabsContent>
+              <TabsContent
+                value="timestamp"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <TimestampConverter />
+              </TabsContent>
 
-          <TabsContent value="string" className="mt-4">
-            <StringEncoder />
-          </TabsContent>
+              <TabsContent
+                value="lamports"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <LamportsConverter />
+              </TabsContent>
 
-          <TabsContent value="duration" className="mt-4">
-            <DurationPicker />
-          </TabsContent>
+              <TabsContent value="string" className="mt-4 flex-1 overflow-auto">
+                <StringEncoder />
+              </TabsContent>
 
-          <TabsContent value="spl-token" className="mt-4">
-            <SPLTokenManager />
-          </TabsContent>
-
-          <TabsContent value="keypair" className="mt-4">
-            <KeypairManager />
+              <TabsContent
+                value="duration"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <DurationPicker />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </DialogContent>
