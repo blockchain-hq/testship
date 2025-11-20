@@ -54,6 +54,7 @@
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
     "@inquirer/prompts": "^7.9.0",
+    "@solana/spl-token": "^0.4.14",
     "@types/ws": "^8.18.1",
     "bn.js": "^5.2.2",
     "buffer": "^6.0.3",

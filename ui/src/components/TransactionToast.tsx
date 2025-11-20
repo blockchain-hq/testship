@@ -51,7 +51,11 @@ export function TransactionToast({
       {message && <p className="text-sm">{message}</p>}
 
       {suggestion && (
-        <div className={`bg-muted/20 p-2 rounded text-xs max-h-32 overflow-y-auto ${ showLogs ? "w-[90%]" : "w-full" }`}>
+        <div
+          className={`bg-muted/20 p-2 rounded text-xs max-h-32 overflow-y-auto ${
+            showLogs ? "w-[90%]" : "w-full"
+          }`}
+        >
           <p className="font-semibold mb-1">💡 Suggestion:</p>
           <p className="whitespace-pre-line">{suggestion}</p>
         </div>
@@ -84,7 +88,7 @@ export function TransactionToast({
             className="p-0 h-auto justify-start text-accent-primary hover:text-accent-primary/80"
             asChild
           >
-            <a href={getExplorerUrl(`tx/${signature}`)} target="_blank">
+            <a href={getExplorerUrl(signature, "tx")} target="_blank">
               View on Explorer
               <ExternalLink className="ml-1 h-3 w-3" />
             </a>
@@ -94,7 +98,11 @@ export function TransactionToast({
 
       {logs && logs.length > 0 && (
         <div className="border-t pt-2 mt-1">
-          <div className={`flex items-center justify-between ${ showLogs ? "w-[90%]" : "w-full" }`}>
+          <div
+            className={`flex items-center justify-between ${
+              showLogs ? "w-[90%]" : "w-full"
+            }`}
+          >
             <Button
               variant="ghost"
               size="sm"
@@ -161,7 +169,11 @@ export function TransactionToast({
           </div>
 
           {showLogs && (
-            <div className={`mt-2 max-h-40 ${ showLogs ? "w-[90%]" : "w-full" } overflow-y-auto overflow-x-hidden bg-muted/20  `}>
+            <div
+              className={`mt-2 max-h-40 ${
+                showLogs ? "w-[90%]" : "w-full"
+              } overflow-y-auto overflow-x-hidden bg-muted/20  `}
+            >
               <pre className="text-xs bg-muted/20  p-2 rounded whitespace-pre-wrap break-words">
                 {formatLogs(logs)}
               </pre>

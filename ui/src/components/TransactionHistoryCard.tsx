@@ -74,7 +74,7 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
               className="h-6 px-2 text-xs"
               onClick={() =>
                 window.open(
-                  getExplorerUrl(`tx/${transaction.signature}`),
+                  getExplorerUrl(transaction.signature, "tx"),
                   "_blank"
                 )
               }

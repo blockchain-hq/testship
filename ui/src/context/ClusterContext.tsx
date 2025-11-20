@@ -76,7 +76,7 @@ export interface ClusterProviderContext {
   deleteCluster: (cluster: SolanaCluster) => void;
   setCluster: (cluster: SolanaCluster) => void;
 
-  getExplorerUrl: (path: string) => string;
+  getExplorerUrl: (address: string, type: "address" | "tx") => string;
 }
 
 export const getClusterUrlParam = (cluster: SolanaCluster): string => {
@@ -127,13 +127,17 @@ export const ClusterProvider = ({
       }
     },
     deleteCluster: (clusterToDelete: SolanaCluster) => {
-      setClusters(clusters.filter((item) => item.name !== clusterToDelete.name));
+      setClusters(
+        clusters.filter((item) => item.name !== clusterToDelete.name)
+      );
     },
     setCluster: (clusterToSet: SolanaCluster) => {
       setCluster(clusterToSet);
     },
-    getExplorerUrl: (path: string) =>
-      `https://explorer.solana.com/${path}${getClusterUrlParam(cluster)}`,
+    getExplorerUrl: (address: string, type: "address" | "tx" = "address") =>
+      `https://explorer.solana.com/${type}/${address}${getClusterUrlParam(
+        cluster
+      )}`,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

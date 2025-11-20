@@ -11,6 +11,10 @@ export type PDASeed = {
 
 export type AccountPDADetails = {
   seeds: PDASeed[];
+  program?: {
+    kind: "const";
+    value: number[];
+  };
 };
 
 export type IdlInstruction = Idl["instructions"][number];
@@ -43,7 +47,7 @@ export type TransactionResultLog = {
   timestamp: Date;
   type: "info" | "success" | "error" | "warning";
   message: string;
-  data?: any;
+  data?: unknown;
 };
 
 export interface SharedArg {

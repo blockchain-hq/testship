@@ -22,17 +22,21 @@ interface InstructionFormv2Props {
 }
 
 const InstructionFormv2 = (props: InstructionFormv2Props) => {
-  const { instruction, idl, addTransaction } = props; 
+  const { instruction, idl, addTransaction } = props;
   const { getInstructionState, updateInstructionState } = useInstructions();
   const { publicKey: userWalletPublicKey } = useWallet();
 
   const { execute, isExecuting } = useTransaction(addTransaction);
 
-  const formDataKey = instruction?.name ? `testship_form_${instruction.name}` : null;
-  const accountsDataKey = instruction?.name ? `testship_accounts_${instruction.name}` : null;
+  const formDataKey = instruction?.name
+    ? `testship_form_${instruction.name}`
+    : null;
+  const accountsDataKey = instruction?.name
+    ? `testship_accounts_${instruction.name}`
+    : null;
 
-  const state = getInstructionState(instruction?.name ?? ""); 
-  
+  const state = getInstructionState(instruction?.name ?? "");
+
   // Load form data from localStorage on mount
   const [formData, setFormData] = useState(() => {
     if (!formDataKey) return state.formData;
@@ -40,6 +44,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       const saved = localStorage.getItem(formDataKey);
       return saved ? JSON.parse(saved) : state.formData;
     } catch (error) {
+      console.error("Error loading form data from localStorage:", error);
       return state.formData;
     }
   });
@@ -48,37 +53,37 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     Record<string, string>
   >({});
   const { addSavedAccount } = useSavedAccounts();
-  
+
   // Load account data from localStorage on mount
   const [accountsAddressMap, setAccountsAddressMap] = useState(() => {
-    if (!accountsDataKey) return state.accountsAddresses; 
+    if (!accountsDataKey) return state.accountsAddresses;
     try {
       const saved = localStorage.getItem(accountsDataKey);
       if (saved) {
         const savedAccounts = JSON.parse(saved);
         const newMap = new Map(state.accountsAddresses);
         Object.entries(savedAccounts).forEach(([key, value]) => {
-          if (value && typeof value === 'string') {
+          if (value && typeof value === "string") {
             newMap.set(key, value);
           }
-        }); 
+        });
         return newMap;
       }
     } catch (error) {
-      console.error('Error loading accounts from localStorage:', error);
+      console.error("Error loading account data from localStorage:", error);
     }
     return state.accountsAddresses;
   });
-  
+
   const [signersKeypairs, setSignersKeypairs] = useState(state.signersKeypairs);
 
   // Save form data to localStorage
   useEffect(() => {
     if (!formDataKey) return;
-    const hasData = Object.values(formData).some(value => 
-      value !== "" && value !== undefined && value !== null
+    const hasData = Object.values(formData).some(
+      (value) => value !== "" && value !== undefined && value !== null
     );
-    
+
     if (hasData) {
       try {
         localStorage.setItem(formDataKey, JSON.stringify(formData));
@@ -91,12 +96,12 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
   // Save accounts data to localStorage
   useEffect(() => {
     if (!accountsDataKey) return;
-    const hasData = Array.from(accountsAddressMap.values()).some(value => 
-      value && value.trim() !== ""
+    const hasData = Array.from(accountsAddressMap.values()).some(
+      (value) => value && value.trim() !== ""
     );
-    
+
     if (hasData) {
-      const accountsData = Object.fromEntries(accountsAddressMap); 
+      const accountsData = Object.fromEntries(accountsAddressMap);
       try {
         localStorage.setItem(accountsDataKey, JSON.stringify(accountsData));
       } catch (error) {
@@ -111,7 +116,6 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
     formData,
     accountsAddressMap
   );
- 
 
   useEffect(() => {
     derivedPDAs.forEach((pda, accountName) => {
@@ -135,11 +139,12 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       if (!userWalletPublicKey || !instruction.accounts) return new Map();
 
       const accountsMap = new Map<string, string | null>();
-      instruction.accounts.forEach((account: ModIdlAccount) => {
-        if (account.signer) {
-          accountsMap.set(account.name, userWalletPublicKey.toBase58());
-        } else if (account.address) {
-          accountsMap.set(account.name, account.address);
+      instruction.accounts.forEach((account) => {
+        const modAccount = account as ModIdlAccount;
+        if (modAccount.signer) {
+          accountsMap.set(modAccount.name, userWalletPublicKey.toBase58());
+        } else if (modAccount.address) {
+          accountsMap.set(modAccount.name, modAccount.address);
         }
       });
       return accountsMap;
@@ -149,7 +154,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
   useEffect(() => {
     const newState = getInstructionState(instruction?.name ?? "");
-    
+
     // Load from localStorage when instruction name changes (hot-reload)
     if (formDataKey) {
       try {
@@ -160,12 +165,13 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           setFormData(newState.formData);
         }
       } catch (error) {
+        console.error("Error loading form data from localStorage:", error);
         setFormData(newState.formData);
       }
     } else {
       setFormData(newState.formData);
     }
-    
+
     setSignersKeypairs(newState.signersKeypairs);
 
     // Load accounts from localStorage when instruction name changes (hot-reload)
@@ -176,7 +182,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           const parsedAccounts = JSON.parse(savedAccounts);
           const newMap = new Map(newState.accountsAddresses);
           Object.entries(parsedAccounts).forEach(([key, value]) => {
-            if (value && typeof value === 'string') {
+            if (value && typeof value === "string") {
               newMap.set(key, value);
             }
           });
@@ -190,6 +196,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
           }
         }
       } catch (error) {
+        console.error("Error loading account data from localStorage:", error);
         if (newState.accountsAddresses.size === 0 && instruction) {
           setAccountsAddressMap(initializeSignerAccounts(instruction));
         } else {
@@ -300,7 +307,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
             validationErrors={validationErrors}
           />
           <AccountsFormv2
-            accounts={instruction.accounts ?? null}
+            accounts={(instruction.accounts as ModIdlAccount[]) ?? null}
             accountsAddressMap={accountsAddressMap}
             onAccountChange={setAccountsAddressMap}
             signersKeypairs={signersKeypairs}
@@ -313,7 +320,12 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
       </ScrollArea>
 
       <div className="flex flex-row justify-end items-center gap-2">
-        <ShareModal idl={idl} accountMap={accountsAddressMap} instructions={[instruction]} formData={formData} />
+        <ShareModal
+          idl={idl}
+          accountMap={accountsAddressMap}
+          instructions={[instruction]}
+          formData={formData}
+        />
 
         <Button
           disabled={isExecuting}

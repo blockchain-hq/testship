@@ -27,7 +27,9 @@ export const useAutoDerivePDAs = (
   const derivePDAsForInstruction = useCallback(async () => {
     if (!instruction || !idl) return;
 
-    const pdaAccounts = instruction.accounts.filter(isAccountPda);
+    const pdaAccounts = instruction.accounts.filter((account) =>
+      isAccountPda(account as ModIdlAccount)
+    );
 
     for (const account of pdaAccounts as ModIdlAccount[]) {
       const canDerive = checkDependencies(
@@ -82,7 +84,8 @@ export const useAutoDerivePDAs = (
               accountsAddressMap,
               formData,
               connection,
-              idl
+              idl,
+              account.pda?.program
             );
 
             setDerivedPDAs((current) => {
