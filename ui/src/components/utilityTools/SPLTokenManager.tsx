@@ -19,6 +19,8 @@ import {
   CopyIcon,
   Wallet,
 } from "lucide-react";
+import { toast } from "sonner";
+import { TransactionToast } from "../TransactionToast";
 
 interface TokenInfo {
   mint: string;
@@ -32,15 +34,8 @@ export const SPLTokenManager = () => {
   const { copied, handleCopy } = UseCopy();
   const { publicKey } = useWallet();
 
-  const {
-    createToken,
-    mintTokens,
-    transferTokens,
-    getTokenInfo,
-    clearError,
-    loading,
-    error,
-  } = useSPLToken();
+  const { createToken, mintTokens, transferTokens, getTokenInfo, loading } =
+    useSPLToken();
 
   const [decimals, setDecimals] = useState("9");
   const [createdMint, setCreatedMint] = useState<string | null>(null);
@@ -65,8 +60,11 @@ export const SPLTokenManager = () => {
       setMintAddress(mint);
       setTransferMint(mint);
       setInfoMint(mint);
+
+      toast.success("Token mint created successfully!");
     } catch (error) {
       console.error("Failed to create token:", error);
+      toast.error("Failed to create token. Please try again.");
     }
   };
 
@@ -78,10 +76,19 @@ export const SPLTokenManager = () => {
         parseFloat(mintAmount)
       );
 
-      alert(`Minted ${mintAmount} tokens! Tx: ${signature.slice(0, 20)}...`);
+      toast.success(
+        <TransactionToast
+          signature={signature}
+          status="success"
+          message={`Successfully minted ${mintAmount} tokens!`}
+        />
+      );
       setMintAmount("");
     } catch (err) {
       console.error("Mint tokens error:", err);
+      toast.error(
+        "Failed to mint tokens. Please check the console for details."
+      );
     }
   };
 
@@ -93,12 +100,19 @@ export const SPLTokenManager = () => {
         parseFloat(transferAmount)
       );
 
-      alert(
-        `Transferred ${transferAmount} tokens! Tx: ${signature.slice(0, 20)}...`
+      toast.success(
+        <TransactionToast
+          signature={signature}
+          status="success"
+          message={`Successfully transferred ${transferAmount} tokens!`}
+        />
       );
       setTransferAmount("");
     } catch (err) {
       console.error("Transfer tokens error:", err);
+      toast.error(
+        "Failed to transfer tokens. Please check the console for details."
+      );
     }
   };
 
@@ -106,8 +120,12 @@ export const SPLTokenManager = () => {
     try {
       const info = await getTokenInfo(infoMint);
       setTokenInfo(info);
+      toast.success("Token information retrieved successfully!");
     } catch (err) {
       console.error("Get token info error:", err);
+      toast.error(
+        "Failed to get token information. Please check the mint address."
+      );
     }
   };
 
@@ -122,22 +140,6 @@ export const SPLTokenManager = () => {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-sm text-destructive">{error}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearError}
-              className="mt-2"
-            >
-              Dismiss
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       <Tabs defaultValue="create" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="create">
