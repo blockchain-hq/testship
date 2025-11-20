@@ -16,6 +16,7 @@ import {
   BinaryIcon,
   ClockIcon,
   DatabaseIcon,
+  KeyIcon,
 } from "lucide-react";
 import { TimestampConverter } from "./utilityTools/TimestampConverter";
 import { LamportsConverter } from "./utilityTools/LamportsConverter";
@@ -23,6 +24,7 @@ import { StringEncoder } from "./utilityTools/StringEncoder";
 import { DurationPicker } from "./utilityTools/DurationPicker";
 import { ProgramAccountsViewer } from "./utilityTools/ProgramAccountsViewer";
 import { SPLTokenManager } from "./utilityTools/SPLTokenManager";
+import { KeypairManager } from "./utilityTools/KaypairManager";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);
@@ -45,7 +47,7 @@ export const UtilityDialog = () => {
         </DialogHeader>
 
         <Tabs defaultValue="accounts" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-7">
             <TabsTrigger
               value="accounts"
               className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
@@ -88,6 +90,14 @@ export const UtilityDialog = () => {
               <CoinsIcon className="size-4 lg:mr-2" />
               <span className="hidden lg:inline">SPL Token</span>
             </TabsTrigger>
+
+            <TabsTrigger
+              value="keypair"
+              className="data-[state=active]:bg-[#00bf63]/10 data-[state=active]:text-[#00bf63]"
+            >
+              <KeyIcon className="size-4 lg:mr-2" />
+              <span className="hidden lg:inline">Keypair</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="accounts" className="mt-4">
@@ -112,6 +122,10 @@ export const UtilityDialog = () => {
 
           <TabsContent value="spl-token" className="mt-4">
             <SPLTokenManager />
+          </TabsContent>
+
+          <TabsContent value="keypair" className="mt-4">
+            <KeypairManager />
           </TabsContent>
         </Tabs>
       </DialogContent>
