@@ -5,6 +5,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import HeaderProgramInfo from "./HeaderProgramInfo";
 import ClusterSelect from "../ClusterSelect";
 import { RPCConfigDialog } from "../RPCConfigDialog";
+import ClearFormsModal from "../ClearFormsModal";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,6 +27,7 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <ClearFormsModal />
             <Button
               variant="outline"
               size="sm"
@@ -33,9 +35,9 @@ export const Header = () => {
               className="flex cursor-pointer"
             >
               {isDarkMode ? <SunIcon /> : <MoonIcon />}
-            </Button> 
-            <WalletMultiButton /> 
-            <ClusterSelect /> 
+            </Button>
+            <WalletMultiButton />
+            <ClusterSelect />
             <RPCConfigDialog />
           </div>
         </div>
