@@ -13,23 +13,18 @@ import {
   Plus,
   CopyIcon,
   CheckIcon,
-  Trash2,
-  Eye,
-  EyeOff,
-  MailWarningIcon,
+  FileWarningIcon,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { useCluster } from "@/context/ClusterContext";
-
-interface SavedKeypair {
-  label: string;
-  publicKey: string;
-  secretKey: string;
-  timestamp: number;
-}
+import { type SavedKeypair } from "@/lib/types";
+import SavedKeypairCard from "./KeypairManagerComponents/SavedKeypairCard";
 
 export const KeypairManager = () => {
-  const { copied, handleCopy } = UseCopy();
+  const { handleCopy } = UseCopy();
+  const [copiedItem, setCopiedItem] = useState<
+    "publicKey" | "secretKeyBase64" | "secretKeyJson" | null
+  >(null);
   const { getExplorerUrl } = useCluster();
 
   const [newKeypair, setNewKeypair] = useState<Keypair | null>(null);
@@ -48,6 +43,15 @@ export const KeypairManager = () => {
   });
 
   const [showSecrets, setShowSecrets] = useState<Set<string>>(new Set());
+
+  const handleCopyWithReset = (
+    text: string,
+    itemType: "publicKey" | "secretKeyBase64" | "secretKeyJson"
+  ) => {
+    handleCopy(text);
+    setCopiedItem(itemType);
+    setTimeout(() => setCopiedItem(null), 2000);
+  };
 
   const handleGenerateKeypair = () => {
     const kp = Keypair.generate();
@@ -163,10 +167,13 @@ export const KeypairManager = () => {
                           size="icon"
                           variant="outline"
                           onClick={() =>
-                            handleCopy(newKeypair.publicKey.toBase58())
+                            handleCopyWithReset(
+                              newKeypair.publicKey.toBase58(),
+                              "publicKey"
+                            )
                           }
                         >
-                          {copied ? (
+                          {copiedItem === "publicKey" ? (
                             <CheckIcon className="size-4 text-[#00bf63]" />
                           ) : (
                             <CopyIcon className="size-4" />
@@ -208,14 +215,15 @@ export const KeypairManager = () => {
                           size="icon"
                           variant="outline"
                           onClick={() =>
-                            handleCopy(
+                            handleCopyWithReset(
                               Buffer.from(newKeypair.secretKey).toString(
                                 "base64"
-                              )
+                              ),
+                              "secretKeyBase64"
                             )
                           }
                         >
-                          {copied ? (
+                          {copiedItem === "secretKeyBase64" ? (
                             <CheckIcon className="size-4 text-[#00bf63]" />
                           ) : (
                             <CopyIcon className="size-4" />
@@ -241,12 +249,13 @@ export const KeypairManager = () => {
                           size="icon"
                           variant="outline"
                           onClick={() =>
-                            handleCopy(
-                              JSON.stringify(Array.from(newKeypair.secretKey))
+                            handleCopyWithReset(
+                              JSON.stringify(Array.from(newKeypair.secretKey)),
+                              "secretKeyJson"
                             )
                           }
                         >
-                          {copied ? (
+                          {copiedItem === "secretKeyJson" ? (
                             <CheckIcon className="size-4 text-[#00bf63]" />
                           ) : (
                             <CopyIcon className="size-4" />
@@ -271,7 +280,7 @@ export const KeypairManager = () => {
                     >
                       <p className="font-bold mb-2">Warning</p>
                       <div className="flex flex-row items-center">
-                        <MailWarningIcon className="size-4 mr-2" />
+                        <FileWarningIcon className="size-4 mr-2" />
                         <span>
                           Private keys stored in browser. Only use for testing
                           purposes!
@@ -344,10 +353,13 @@ export const KeypairManager = () => {
                           size="icon"
                           variant="outline"
                           onClick={() =>
-                            handleCopy(importedKeypair.publicKey.toBase58())
+                            handleCopyWithReset(
+                              importedKeypair.publicKey.toBase58(),
+                              "publicKey"
+                            )
                           }
                         >
-                          {copied ? (
+                          {copiedItem === "publicKey" ? (
                             <CheckIcon className="size-4 text-[#00bf63]" />
                           ) : (
                             <CopyIcon className="size-4" />
@@ -396,116 +408,14 @@ export const KeypairManager = () => {
             </Card>
           ) : (
             savedKeypairs.map((kp) => (
-              <Card key={kp.publicKey} className="relative">
-                <CardContent className="pt-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline">{kp.label}</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(kp.timestamp).toLocaleDateString()}
-                        </span>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-xs text-muted-foreground">
-                          Public Key:
-                        </Label>
-                        <div className="flex gap-2">
-                          <Input
-                            value={kp.publicKey}
-                            readOnly
-                            className="font-mono text-xs"
-                          />
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() => handleCopy(kp.publicKey)}
-                          >
-                            {copied ? (
-                              <CheckIcon className="size-4 text-[#00bf63]" />
-                            ) : (
-                              <CopyIcon className="size-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 mt-3">
-                        <Label className="text-xs text-muted-foreground">
-                          Secret Key:
-                        </Label>
-                        <div className="flex gap-2">
-                          <Input
-                            value={kp.secretKey}
-                            readOnly
-                            className="font-mono text-xs"
-                            type={
-                              showSecrets.has(kp.publicKey)
-                                ? "text"
-                                : "password"
-                            }
-                          />
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() => toggleShowSecret(kp.publicKey)}
-                          >
-                            {showSecrets.has(kp.publicKey) ? (
-                              <EyeOff className="size-4" />
-                            ) : (
-                              <Eye className="size-4" />
-                            )}
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() => handleCopy(kp.secretKey)}
-                          >
-                            {copied ? (
-                              <CheckIcon className="size-4 text-[#00bf63]" />
-                            ) : (
-                              <CopyIcon className="size-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2 mt-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleCopy(exportAsJSON(kp.secretKey))}
-                        >
-                          <CopyIcon className="w-3 h-3 mr-1" />
-                          Copy as JSON
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="link"
-                          onClick={() =>
-                            window.open(
-                              getExplorerUrl(kp.publicKey, "address"),
-                              "_blank"
-                            )
-                          }
-                        >
-                          View on Explorer →
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteKeypair(kp.publicKey)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SavedKeypairCard
+                key={kp.publicKey}
+                savedKeypair={kp}
+                onDelete={handleDeleteKeypair}
+                showSecrets={showSecrets}
+                onToggleSecret={toggleShowSecret}
+                exportAsJSON={exportAsJSON}
+              />
             ))
           )}
         </TabsContent>
