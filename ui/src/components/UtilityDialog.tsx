@@ -26,7 +26,7 @@ import { StringEncoder } from "./utilityTools/StringEncoder";
 import { DurationPicker } from "./utilityTools/DurationPicker";
 import { ProgramAccountsViewer } from "./utilityTools/ProgramAccountsViewer";
 import { SPLTokenManager } from "./utilityTools/SPLTokenManager";
-import { KeypairManager } from "./utilityTools/KaypairManager";
+import { KeypairManager } from "./utilityTools/KeypairManager";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);

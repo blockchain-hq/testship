@@ -16,6 +16,7 @@ import {
   Trash2,
   Eye,
   EyeOff,
+  MailWarningIcon,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { useCluster } from "@/context/ClusterContext";
@@ -262,6 +263,20 @@ export const KeypairManager = () => {
                         onChange={(e) => setKeypairLabel(e.target.value)}
                         placeholder="e.g., AMM ID, Test Account"
                       />
+                    </div>
+
+                    <div
+                      className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
+                      role="alert"
+                    >
+                      <p className="font-bold mb-2">Warning</p>
+                      <div className="flex flex-row items-center">
+                        <MailWarningIcon className="size-4 mr-2" />
+                        <span>
+                          Private keys stored in browser. Only use for testing
+                          purposes!
+                        </span>
+                      </div>
                     </div>
 
                     <Button
