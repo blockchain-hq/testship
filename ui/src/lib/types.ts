@@ -73,7 +73,7 @@ export interface SharedState {
 }
 
 export type InstructionState = {
-  formData: Record<string, string | number>;
+  formData: Record<string, unknown>; // Supports strings, numbers, arrays, objects, null for Option types
   accountsAddresses: Map<string, string | null>;
   signersKeypairs: Map<string, Keypair>;
   lastUpdated: Date;

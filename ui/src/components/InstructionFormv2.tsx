@@ -237,7 +237,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
     instruction?.accounts.forEach((account) => {
       const value = accountsAddressMap.get(account.name);
-      const error = validateField(account.name, value);
+      const error = validateField(account.name, value, undefined, idl);
       if (error) {
         errors[account.name] = error;
         isValid = false;
@@ -246,7 +246,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
     instruction?.args.forEach((arg) => {
       const value = formData[arg.name];
-      const error = validateField(arg.name, value, arg.type);
+      const error = validateField(arg.name, value, arg.type, idl);
       if (error) {
         errors[arg.name] = error;
         isValid = false;

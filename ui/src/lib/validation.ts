@@ -1,22 +1,78 @@
 import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 import { PublicKey } from "@solana/web3.js";
+import {
+  isVecType,
+  isOptionType, 
+  isArrayType,
+  getVecInnerType,
+  getOptionInnerType,
+  getArrayInfo,
+} from "./typeParser";
+import type { Idl } from "@coral-xyz/anchor";
 
-export const validateField = (name: string, value: unknown, type?: IdlType) => {
-  if (value === null || value === undefined) {
-    return `${name} is required`;
-  }
-
-  if (typeof value === "string" && value.trim() === "") {
-    return `${name} is required`;
-  }
-
+export const validateField = (
+  name: string,
+  value: unknown,
+  type?: IdlType,
+  idl?: Idl
+): string | null => {
   if (!type) {
+    if (value === null || value === undefined) {
+      return `${name} is required`;
+    }
     try {
       new PublicKey(value);
       return null;
     } catch {
       return `${name} must be a valid address`;
     }
+  }
+
+  // Handle Option types - null/undefined is valid
+  if (isOptionType(type)) {
+    if (value === null || value === undefined) {
+      return null; // Option can be None
+    }
+    const innerType = getOptionInnerType(type);
+    return validateField(`${name} (Some)`, value, innerType, idl);
+  }
+
+  // Handle Vec types
+  if (isVecType(type)) {
+    if (!Array.isArray(value)) {
+      return `${name} must be an array`;
+    }
+    const innerType = getVecInnerType(type);
+    for (let i = 0; i < value.length; i++) {
+      const error = validateField(`${name}[${i}]`, value[i], innerType, idl);
+      if (error) return error;
+    }
+    return null;
+  }
+
+  // Handle Array types (fixed size)
+  if (isArrayType(type)) {
+    const { inner, size } = getArrayInfo(type);
+    if (!Array.isArray(value)) {
+      return `${name} must be an array`;
+    }
+    if (value.length !== size) {
+      return `${name} must have exactly ${size} elements`;
+    }
+    for (let i = 0; i < value.length; i++) {
+      const error = validateField(`${name}[${i}]`, value[i], inner, idl);
+      if (error) return error;
+    }
+    return null;
+  }
+
+  // Required field check for non-option types
+  if (value === null || value === undefined) {
+    return `${name} is required`;
+  }
+
+  if (typeof value === "string" && value.trim() === "") {
+    return `${name} is required`;
   }
 
   if (typeof type === "string") {
