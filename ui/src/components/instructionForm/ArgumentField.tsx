@@ -152,8 +152,21 @@ const ArgumentField = ({
                 type
               )
             ) {
-              const num = Number(val);
-              onChange(isNaN(num) ? val : num);
+              // Allow empty string for intermediate typing
+              if (val === "" || val === "-") {
+                onChange(val);
+                return;
+              }
+              // Validate it's a valid number
+              const trimmed = val.trim();
+              const num = Number(trimmed);
+              // Only convert if it's a valid integer number
+              if (!isNaN(num) && isFinite(num) && Number.isInteger(num)) {
+                onChange(num);
+              } else {
+                // Keep the string for now (user might be typing), but it will be validated on submit
+                onChange(val);
+              }
               return;
             }
           }

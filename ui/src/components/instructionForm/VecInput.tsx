@@ -3,8 +3,9 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import type { IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
-import { getTypeDisplayName } from "@/lib/typeParser";
+import { getTypeDisplayName, isDefinedType, isStructType, isEnumType, isNestedType } from "@/lib/typeParser";
 import type { Idl } from "@coral-xyz/anchor";
+import ArgumentField from "./ArgumentField";
 
 interface VecInputProps {
   name: string;
@@ -24,7 +25,20 @@ const VecInput = ({
   validationError,
 }: VecInputProps) => {
   const handleAddItem = () => {
-    onChange([...value, ""]);
+    // Initialize with appropriate default value based on inner type
+    let defaultValue: unknown = "";
+    
+    if (isDefinedType(innerType)) {
+      if (isStructType(idl, innerType)) {
+        // For structs, initialize with empty object
+        defaultValue = {};
+      } else if (isEnumType(idl, innerType)) {
+        // For enums, initialize with null (user will select variant)
+        defaultValue = null;
+      }
+    }
+    
+    onChange([...value, defaultValue]);
   };
 
   const handleRemoveItem = (index: number) => {
@@ -73,13 +87,25 @@ const VecInput = ({
               className="flex items-start gap-2 p-2 bg-background rounded border border-border/30"
             >
               <div className="flex-1">
-                <SimpleFieldInput
-                  name={`${name}[${index}]`}
-                  value={item}
-                  type={innerType}
-                  idl={idl}
-                  onChange={(val: unknown) => handleItemChange(index, val)}
-                />
+                {isNestedType(idl, innerType) ? (
+                  // Use ArgumentField for complex types (structs, enums, nested Vec/Option)
+                  <ArgumentField
+                    name={`${name}[${index}]`}
+                    value={item}
+                    type={innerType}
+                    idl={idl}
+                    onChange={(val: unknown) => handleItemChange(index, val)}
+                  />
+                ) : (
+                  // Use SimpleFieldInput for primitive types
+                  <SimpleFieldInput
+                    name={`${name}[${index}]`}
+                    value={item}
+                    type={innerType}
+                    idl={idl}
+                    onChange={(val: unknown) => handleItemChange(index, val)}
+                  />
+                )}
               </div>
               <Button
                 type="button"
@@ -150,8 +176,21 @@ const SimpleFieldInput = ({
                 type
               )
             ) {
-              const num = Number(val);
-              onChange(isNaN(num) ? val : num);
+              // Allow empty string for intermediate typing
+              if (val === "" || val === "-") {
+                onChange(val);
+                return;
+              }
+              // Validate it's a valid number
+              const trimmed = val.trim();
+              const num = Number(trimmed);
+              // Only convert if it's a valid integer number
+              if (!isNaN(num) && isFinite(num) && Number.isInteger(num)) {
+                onChange(num);
+              } else {
+                // Keep the string for now (user might be typing), but it will be validated on submit
+                onChange(val);
+              }
               return;
             }
           }

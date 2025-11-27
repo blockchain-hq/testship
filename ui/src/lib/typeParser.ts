@@ -2,8 +2,10 @@ import type { Idl, IdlType } from "@coral-xyz/anchor/dist/cjs/idl";
 
 // Type definitions for complex IDL types
 export type VecType = { vec: IdlType };
-export type OptionType = { option: IdlType }; 
-export type DefinedType = { defined: string | { name: string; generics?: unknown[] } };
+export type OptionType = { option: IdlType };
+export type DefinedType = {
+  defined: string | { name: string; generics?: unknown[] };
+};
 export type ArrayType = { array: [IdlType, number] };
 
 export type ComplexIdlType =
@@ -28,7 +30,7 @@ export const isDefinedType = (type: IdlType): boolean => {
   return typeof type === "object" && type !== null && "defined" in type;
 };
 
-// Check if a type is an Array 
+// Check if a type is an Array
 export const isArrayType = (type: IdlType): type is ArrayType => {
   return typeof type === "object" && type !== null && "array" in type;
 };
@@ -52,11 +54,17 @@ export const isStructType = (idl: Idl, type: IdlType): boolean => {
 };
 
 // Helper to extract type name from defined type
-const getDefinedTypeName = (type: { defined: unknown }): string | null => {
+export const getDefinedTypeName = (type: {
+  defined: unknown;
+}): string | null => {
   if (typeof type.defined === "string") {
     return type.defined;
   }
-  if (typeof type.defined === "object" && type.defined !== null && "name" in type.defined) {
+  if (
+    typeof type.defined === "object" &&
+    type.defined !== null &&
+    "name" in type.defined
+  ) {
     return typeof type.defined.name === "string" ? type.defined.name : null;
   }
   return null;
@@ -66,7 +74,7 @@ const getDefinedTypeName = (type: { defined: unknown }): string | null => {
 export const resolveDefinedType = (
   idl: Idl,
   type: { defined: unknown }
-): (NonNullable<Idl["types"]>[number]) | null => {
+): NonNullable<Idl["types"]>[number] | null => {
   if (!idl.types) return null;
   const typeName = getDefinedTypeName(type);
   if (!typeName) return null;
@@ -84,7 +92,9 @@ export const getOptionInnerType = (type: OptionType): IdlType => {
 };
 
 // Get the inner type and size of an Array
-export const getArrayInfo = (type: ArrayType): { inner: IdlType; size: number } => {
+export const getArrayInfo = (
+  type: ArrayType
+): { inner: IdlType; size: number } => {
   return { inner: type.array[0], size: type.array[1] };
 };
 
@@ -92,14 +102,24 @@ export const getArrayInfo = (type: ArrayType): { inner: IdlType; size: number } 
 export const getEnumVariants = (
   idl: Idl,
   type: IdlType
-): Array<{ name: string; fields?: unknown }> | null => {
+): Array<{
+  name: string;
+  fields?: Array<{ name?: string; type: IdlType }> | IdlType[];
+}> | null => {
   if (!isDefinedType(type)) return null;
   const definedType = resolveDefinedType(idl, type as { defined: unknown });
   if (!definedType || definedType.type?.kind !== "enum") return null;
-  return (definedType.type as { variants?: Array<{ name: string; fields?: unknown }> }).variants || null;
+
+  const enumType = definedType.type as {
+    variants?: Array<{
+      name: string;
+      fields?: Array<{ name?: string; type: IdlType }> | IdlType[];
+    }>;
+  };
+
+  return enumType.variants || null;
 };
 
- 
 // Get struct fields if the type is a struct
 export const getStructFields = (
   idl: Idl,
@@ -108,12 +128,12 @@ export const getStructFields = (
   if (!isDefinedType(type)) return null;
   const definedType = resolveDefinedType(idl, type as { defined: unknown });
   if (!definedType || definedType.type?.kind !== "struct") return null;
-  
+
   // @ts-expect-error - Anchor's struct fields structure
   return definedType.type.fields || null;
 };
 
-//Get a human-readable type name for display
+// Get a human-readable type name for display
 export const getTypeDisplayName = (idl: Idl, type: IdlType): string => {
   if (typeof type === "string") {
     return type;
@@ -150,7 +170,7 @@ export const getTypeDisplayName = (idl: Idl, type: IdlType): string => {
   return "unknown";
 };
 
-//  Check if a type is nested (contains structs, enums, or other complex types) 
+// Check if a type is nested (contains structs, enums, or other complex types)
 export const isNestedType = (idl: Idl, type: IdlType): boolean => {
   if (isDefinedType(type)) {
     return isStructType(idl, type) || isEnumType(idl, type);
@@ -170,4 +190,3 @@ export const isNestedType = (idl: Idl, type: IdlType): boolean => {
 
   return false;
 };
-
