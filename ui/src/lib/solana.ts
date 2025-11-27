@@ -3,7 +3,6 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import type { PDASeed } from "./types";
 import { BorshAccountsCoder } from "@coral-xyz/anchor";
-import { toCamelCase } from "./utils";
 import {
   isVecType,
   isOptionType,
@@ -19,6 +18,48 @@ import {
   getDefinedTypeName,
 } from "./typeParser";
 
+ 
+export function toCamelCase(str: string): string {
+  if (!str) return str;
+
+  // Handle snake_case: convert to camelCase
+  if (str.includes("_")) {
+    const parts = str.split("_");
+    return (
+      parts[0].toLowerCase() +
+      parts
+        .slice(1)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join("")
+    );
+  }
+
+  // For pure uppercase like "USA", convert entirely to lowercase
+  if (str === str.toUpperCase() && str.length > 1) {
+    return str.toLowerCase();
+  }
+
+  // For PascalCase, find leading uppercase sequence
+  let i = 0;
+  while (
+    i < str.length &&
+    str[i] === str[i].toUpperCase() &&
+    str[i] !== str[i].toLowerCase()
+  ) {
+    i++;
+  }
+
+  if (i === 0) {
+    return str;
+  } else if (i === 1) { 
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  } else if (i === str.length) { 
+    return str.toLowerCase();
+  } else { 
+    return str.slice(0, i - 1).toLowerCase() + str.slice(i - 1);
+  }
+}
+
 const getByteSize = (type: IdlType): number => {
   if (type === "u8" || type === "i8") return 1;
   if (type === "u16" || type === "i16") return 2;
@@ -33,11 +74,9 @@ export const toBuffer = (value: unknown, type: IdlType) => {
   }
 
   if (
-    ["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"].includes(
-      type as string
-    )
+    ["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"].includes(type as string)
   ) {
-    // @ts-expect-error: type is set to unknown due to dynamic logic generation
+    // @ts-expect-error: dynamic type
     const num = new BN(value);
     const size = getByteSize(type);
     return new Uint8Array(num.toArray("le", size));
@@ -54,52 +93,17 @@ export const toBuffer = (value: unknown, type: IdlType) => {
   throw new Error(`Unsupported type: ${type}`);
 };
 
-/**
- * Check if a field type is optional (Option<T>)
- */
+ 
 function isOptionalType(type: IdlType): boolean {
   return typeof type === "object" && type !== null && "option" in type;
 }
 
-/**
- * Convert a string to camelCase (matching Anchor's internal behavior)
- * - "Admin" → "admin"
- * - "MyVariant" → "myVariant"  
- * - "USA" → "usa"
- * - "snake_case" → "snakeCase"
- */
-function toEnumVariantCase(str: string): string {
-  // Handle snake_case first
-  if (str.includes("_")) {
-    return str
-      .toLowerCase()
-      .replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-  }
-  // For PascalCase or ALL_CAPS, convert to camelCase
-  // First letter lowercase, then follow the original casing for the rest
-  // But for ALL_CAPS like "USA", convert entirely to lowercase
-  if (str === str.toUpperCase() && str.length > 1) {
-    // All uppercase like "USA", "UK" → "usa", "uk"
-    return str.toLowerCase();
-  }
-  // PascalCase like "Admin" → "admin", "MyVariant" → "myVariant"
-  return str.charAt(0).toLowerCase() + str.slice(1);
-}
-
-/**
- * Converts a value to the appropriate Anchor type for transaction submission.
- * Handles all IDL types including Vec, Option, Array, Enum, and Struct.
- *
- * For Anchor 0.30+:
- * - Enum variants must be camelCase (Anchor converts internally using camelCase)
- * - Struct fields use snake_case (exact casing from IDL/Rust)
- */
+ 
 export const toAnchorType = (
   value: unknown,
   type: IdlType,
   idl?: Idl
-): unknown => {
-  // Handle null/undefined early for Option types
+): unknown => { 
   if (value === null || value === undefined) {
     if (isOptionType(type)) {
       return null;
@@ -163,9 +167,7 @@ export const toAnchorType = (
           if (Array.isArray(parsed)) {
             const { inner, size } = getArrayInfo(type);
             if (parsed.length !== size) {
-              throw new Error(
-                `Expected array of size ${size}, got ${parsed.length}`
-              );
+              throw new Error(`Expected array of size ${size}, got ${parsed.length}`);
             }
             return parsed.map((item) => toAnchorType(item, inner, idl));
           }
@@ -188,12 +190,10 @@ export const toAnchorType = (
   if (isDefinedType(type)) {
     const typeName = getDefinedTypeName(type as { defined: unknown });
 
-    // Handle Enum types
     if (idl && isEnumType(idl, type)) {
       return convertEnumValue(value, type, idl);
     }
 
-    // Handle Struct types
     if (idl && isStructType(idl, type)) {
       return convertStructValue(value, type, idl, typeName || "unknown");
     }
@@ -224,26 +224,19 @@ export const toAnchorType = (
         if (typeof value === "string") {
           const trimmed = value.trim();
           if (trimmed === "" || trimmed === "-" || trimmed === "+") {
-            throw new Error(
-              `Invalid ${type}: empty or incomplete number "${value}"`
-            );
+            throw new Error(`Invalid ${type}: empty or incomplete number "${value}"`);
           }
-
-          // Reject incomplete scientific notation
           if (/[eE][+-]?$/.test(trimmed)) {
             throw new Error(
               `Invalid ${type}: "${value}" appears to be incomplete scientific notation`
             );
           }
-
           const num = Number(trimmed);
           if (isNaN(num) || !isFinite(num)) {
             throw new Error(`Invalid ${type}: "${value}" is not a valid number`);
           }
           if (!Number.isInteger(num)) {
-            throw new Error(
-              `Invalid ${type}: expected integer, got "${value}"`
-            );
+            throw new Error(`Invalid ${type}: expected integer, got "${value}"`);
           }
           if (type === "u8" && (num < 0 || num > 255)) {
             throw new Error(`Invalid u8: value ${num} is out of range (0-255)`);
@@ -290,17 +283,7 @@ export const toAnchorType = (
   return value;
 };
 
-/**
- * Converts a value to an Anchor enum format for Anchor 0.30+
- *
- * CRITICAL: Anchor's BorshInstructionCoder uses camelCase for enum variant names!
- * - "Admin" in IDL → expects { admin: {} } in code
- * - "USA" in IDL → expects { usa: {} } in code
- * - "MyVariant" in IDL → expects { myVariant: {} } in code
- *
- * Format: { variantName: {} } for unit variants
- *         { variantName: { field1: value1 } } for struct variants
- */
+ 
 function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
   const variants = getEnumVariants(idl, type);
   const typeName = getDefinedTypeName(type as { defined: unknown });
@@ -310,22 +293,20 @@ function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
     const inputKey = Object.keys(value)[0];
 
     if (inputKey) {
-      // Find the matching variant in IDL (case-insensitive search for matching)
       const matchedVariant = variants?.find(
         (v) =>
           v.name === inputKey ||
           v.name.toLowerCase() === inputKey.toLowerCase() ||
-          toEnumVariantCase(v.name) === inputKey ||
-          toEnumVariantCase(v.name).toLowerCase() === inputKey.toLowerCase()
+          toCamelCase(v.name) === inputKey ||
+          toCamelCase(v.name).toLowerCase() === inputKey.toLowerCase()
       );
 
       if (matchedVariant) {
         const fieldsValue = (value as Record<string, unknown>)[inputKey];
 
-        // CRITICAL: Convert to camelCase for Anchor's Borsh encoder
-        const variantName = toEnumVariantCase(matchedVariant.name);
+        // CRITICAL: Use camelCase for the variant name
+        const variantName = toCamelCase(matchedVariant.name);
 
-        // No fields or empty fields
         if (fieldsValue === undefined || fieldsValue === null) {
           return { [variantName]: {} };
         }
@@ -337,17 +318,11 @@ function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
           return { [variantName]: {} };
         }
 
-        // Handle array fields (tuple variant)
         if (Array.isArray(fieldsValue)) {
-          const processedFields = processEnumTupleFields(
-            fieldsValue,
-            matchedVariant,
-            idl
-          );
+          const processedFields = processEnumTupleFields(fieldsValue, matchedVariant, idl);
           return { [variantName]: processedFields };
         }
 
-        // Handle object fields (struct variant)
         if (typeof fieldsValue === "object" && !Array.isArray(fieldsValue)) {
           const processedFields = processEnumStructFields(
             fieldsValue as Record<string, unknown>,
@@ -357,7 +332,6 @@ function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
           return { [variantName]: processedFields };
         }
 
-        // Single primitive field
         if (
           matchedVariant.fields &&
           Array.isArray(matchedVariant.fields) &&
@@ -396,8 +370,7 @@ function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
       );
     }
 
-    // CRITICAL: Convert to camelCase for Anchor's Borsh encoder
-    return { [toEnumVariantCase(matchedVariant.name)]: {} };
+    return { [toCamelCase(matchedVariant.name)]: {} };
   }
 
   throw new Error(
@@ -405,9 +378,6 @@ function convertEnumValue(value: unknown, type: IdlType, idl: Idl): unknown {
   );
 }
 
-/**
- * Process tuple fields for an enum variant
- */
 function processEnumTupleFields(
   fields: unknown[],
   variant: { name: string; fields?: unknown },
@@ -428,9 +398,6 @@ function processEnumTupleFields(
   });
 }
 
-/**
- * Process struct fields for an enum variant
- */
 function processEnumStructFields(
   fields: Record<string, unknown>,
   variant: { name: string; fields?: unknown },
@@ -446,18 +413,15 @@ function processEnumStructFields(
   for (const fieldDef of fieldDefs) {
     if (!fieldDef.name) continue;
 
-    const fieldValue =
-      fields[fieldDef.name] ?? fields[toCamelCase(fieldDef.name)];
-    result[fieldDef.name] = toAnchorType(fieldValue, fieldDef.type, idl);
+    const fieldValue = fields[fieldDef.name] ?? fields[toCamelCase(fieldDef.name)];
+    // CRITICAL: Use camelCase for field names in enum struct variants
+    result[toCamelCase(fieldDef.name)] = toAnchorType(fieldValue, fieldDef.type, idl);
   }
 
   return result;
 }
 
-/**
- * Converts a value to an Anchor struct format for Anchor 0.30+
- * Validates that required fields are present.
- */
+ 
 function convertStructValue(
   value: unknown,
   type: IdlType,
@@ -466,37 +430,29 @@ function convertStructValue(
 ): unknown {
   const fields = getStructFields(idl, type);
 
-  // CRITICAL: Check if value is the correct type
   if (typeof value === "string") {
     try {
       const parsed = JSON.parse(value);
-      if (
-        typeof parsed === "object" &&
-        parsed !== null &&
-        !Array.isArray(parsed)
-      ) {
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
         value = parsed;
       } else {
         throw new Error(
-          `Invalid value for struct "${structName}": expected object with fields {${fields?.map((f) => f.name).join(", ")}}, got string`
+          `Invalid value for struct "${structName}": expected object, got string`
         );
       }
     } catch (e) {
-      if (
-        e instanceof Error &&
-        e.message.includes("Invalid value for struct")
-      ) {
+      if (e instanceof Error && e.message.includes("Invalid value for struct")) {
         throw e;
       }
       throw new Error(
-        `Invalid value for struct "${structName}": expected object with fields {${fields?.map((f) => f.name).join(", ")}}, got non-JSON string`
+        `Invalid value for struct "${structName}": expected object, got non-JSON string`
       );
     }
   }
 
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(
-      `Invalid value for struct "${structName}": expected object with fields {${fields?.map((f) => f.name).join(", ")}}, got ${Array.isArray(value) ? "array" : typeof value}`
+      `Invalid value for struct "${structName}": expected object, got ${Array.isArray(value) ? "array" : typeof value}`
     );
   }
 
@@ -510,12 +466,10 @@ function convertStructValue(
   const missingRequiredFields: string[] = [];
 
   for (const field of fields) {
-    // Try both original and camelCase field names from input
-    let fieldValue =
-      structValue[field.name] ?? structValue[toCamelCase(field.name)];
+    // Try to get value using various name formats (snake_case, camelCase)
+    let fieldValue = structValue[field.name] ?? structValue[toCamelCase(field.name)];
     const isOptional = isOptionalType(field.type);
 
-    // Check for missing required fields
     if (
       (fieldValue === undefined || fieldValue === null || fieldValue === "") &&
       !isOptional
@@ -523,14 +477,14 @@ function convertStructValue(
       missingRequiredFields.push(field.name);
     }
 
-    // For optional fields, convert undefined/empty string to null
     if (isOptional && (fieldValue === undefined || fieldValue === "")) {
       fieldValue = null;
-    }
+    } 
+  
+    const camelFieldName = toCamelCase(field.name);
 
-    // Use the EXACT field name from IDL for struct fields
     try {
-      result[field.name] = toAnchorType(fieldValue, field.type, idl);
+      result[camelFieldName] = toAnchorType(fieldValue, field.type, idl);
     } catch (e) {
       throw new Error(
         `Error converting field "${field.name}" in struct "${structName}": ${e instanceof Error ? e.message : e}`
@@ -538,7 +492,6 @@ function convertStructValue(
     }
   }
 
-  // Throw error if required fields are missing
   if (missingRequiredFields.length > 0) {
     throw new Error(
       `Missing required fields in struct "${structName}": ${missingRequiredFields.join(", ")}. ` +
@@ -588,13 +541,7 @@ export const derivePDA = async (
     }
 
     if (seed.kind === "account" && seed.account) {
-      const buffer = await extractAccountSeed(
-        seed,
-        accounts,
-        args,
-        connection,
-        idl
-      );
+      const buffer = await extractAccountSeed(seed, accounts, args, connection, idl);
       buffers.push(buffer);
       continue;
     }
@@ -613,10 +560,7 @@ export const derivePDA = async (
     ? new PublicKey(new Uint8Array(pdaProgram.value))
     : new PublicKey(programId);
 
-  const [pda] = PublicKey.findProgramAddressSync(
-    normalizedBuffers,
-    derivationProgramId
-  );
+  const [pda] = PublicKey.findProgramAddressSync(normalizedBuffers, derivationProgramId);
   return pda;
 };
 
@@ -646,9 +590,9 @@ const extractAccountSeed = async (
   if (value === undefined) throw new Error(`Field not found: ${fieldName}`);
 
   const accountType = idl.types?.find((t) => t.name === seed.account);
-  // @ts-expect-error: inferred types are not comprehensive
+  // @ts-expect-error: inferred types
   const field = (accountType as unknown)?.type.fields.find(
-    // @ts-expect-error: inferred types are not comprehensive
+    // @ts-expect-error: inferred types
     (f: unknown) => f.name === fieldName || toCamelCase(f.name) === camelField
   );
   if (!field) throw new Error(`Field type not found: ${fieldName}`);
