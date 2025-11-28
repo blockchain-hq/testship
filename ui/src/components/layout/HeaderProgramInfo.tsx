@@ -73,12 +73,19 @@ const HeaderProgramInfo = () => {
         <h3 className="font-medium text-md text-foreground dark:text-foreground-dark">
           {idl.metadata.name}
         </h3>
-        <Badge
-          variant="secondary"
-          className="text-xs font-medium px-2 py-0.5 h-8"
-        >
-          v{idl.metadata.version}
-        </Badge>
+        <Tooltip delayDuration={100}>
+          <TooltipTrigger asChild>
+            <Badge
+              variant="secondary"
+              className="text-xs font-medium px-2 py-0.5 h-8"
+            >
+              v{idl.metadata.version}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Program Version</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <ProgramIdWithExplorerLink programId={programId} />
