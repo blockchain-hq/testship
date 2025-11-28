@@ -57,7 +57,7 @@ export default function useTransaction(
       });
       const program = new Program(idl, provider);
 
-      // auto-derive
+      // Auto-derive PDAs
       const accountMap = new Map(accounts);
       for (const account of instruction.accounts) {
         const acc = account as ModIdlAccount;
@@ -85,24 +85,31 @@ export default function useTransaction(
         accountPubkeys[toCamelCase(name)] = new PublicKey(address);
       }
 
+      // Convert arguments to Anchor types with IDL for complex type resolution
       const anchorArgs = instruction.args.map((arg) => {
         const value = args[arg.name];
         if (value === undefined || value === null) {
+          // Allow null for Option types
+          const isOptionArg =
+            typeof arg.type === "object" &&
+            arg.type !== null &&
+            "option" in arg.type;
+          if (isOptionArg) {
+            return null;
+          }
           throw new Error(`Missing argument: ${arg.name}`);
         }
-        return toAnchorType(value, arg.type);
+        try {
+          return toAnchorType(value, arg.type, idl);
+        } catch (e) {
+          throw new Error(
+            `Failed to convert argument "${arg.name}": ${e instanceof Error ? e.message : e}`
+          );
+        }
       });
 
-      for (const [name, pubkey] of Object.entries(accountPubkeys)) {
-        const balance = await connection.getBalance(pubkey as PublicKey);
-        console.log(
-          `${name}:`,
-          pubkey.toBase58(),
-          "Balance:",
-          balance / 1e9,
-          "SOL"
-        );
-      }
+      // Log for debugging (can be removed in production)
+      console.log(`Executing ${instruction.name} with args:`, anchorArgs);
 
       // Capture before snapshots for writable accounts
       const writableAccounts: Array<{ name: string; pubkey: PublicKey }> = [];
@@ -202,6 +209,17 @@ export default function useTransaction(
       return { signature, accounts: accountMap };
     } catch (error: unknown) {
       console.error("Transaction error:", error);
+
+      if (error instanceof Error) {
+        // Check for the specific Borsh enum error
+        if (error.message.includes("unable to infer src variant")) {
+          console.error(
+            "\n❌ ENUM SERIALIZATION ERROR:",
+            "\nThis error occurs when an enum variant name doesn't match the IDL exactly.",
+            "\nMake sure enum variants use EXACT casing from the IDL (e.g., 'USA' not 'usa').\n"
+          );
+        }
+      }
 
       txToast.dismiss(toastId);
 
