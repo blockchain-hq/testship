@@ -9,12 +9,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
-      buffer: "buffer/",
+      buffer: "buffer",
     },
   },
   define: {
     global: "globalThis",
-    "global.Buffer": "Buffer",
   },
   optimizeDeps: {
     esbuildOptions: {

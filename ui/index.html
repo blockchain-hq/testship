@@ -8,6 +8,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      import { Buffer } from "buffer";
+      import * as buffer from "buffer";
+      window.Buffer = Buffer;
+      window.buffer = buffer;
+      globalThis.Buffer = Buffer;
+      globalThis.buffer = buffer;
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
