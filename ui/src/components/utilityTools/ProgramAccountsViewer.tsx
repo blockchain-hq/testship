@@ -4,10 +4,12 @@ import { useIDL } from "@/context/IDLContext";
 import { useCluster, getClusterUrlParam } from "@/context/ClusterContext";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
-import { Loader2, RefreshCw, Database } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Loader2, RefreshCw, Database, List, Table } from "lucide-react";
 import { useProgramAccounts } from "@/hooks/useProgramAccounts";
 import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 import { AccountTreeNode } from "./AccountTreeView";
+import { AccountTableView } from "./AccountTableView";
 
 export const ProgramAccountsViewer = () => {
   const { idl } = useIDL();
@@ -125,27 +127,45 @@ export const ProgramAccountsViewer = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
-          <Card>
-            <CardContent className="p-0">
-              {accounts.map((account) => (
-                <AccountTreeNode
-                  key={account.pubkey}
-                  account={account}
-                  depth={0}
-                  getAccountExplorerUrl={getAccountExplorerUrl}
-                  recentChanges={recentChanges}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        <Tabs defaultValue="tree" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="tree" className="gap-2">
+              <List className="w-4 h-4" />
+              Tree View
+            </TabsTrigger>
+            <TabsTrigger value="table" className="gap-2">
+              <Table className="w-4 h-4" />
+              Table View
+            </TabsTrigger>
+          </TabsList>
 
-      {accounts.length > 0 && (
-        <div className="text-center text-xs text-muted-foreground pt-2">
-          Found {accounts.length} account{accounts.length !== 1 ? "s" : ""}
-        </div>
+          <TabsContent value="tree" className="space-y-2">
+            <Card>
+              <CardContent className="p-0">
+                {accounts.map((account) => (
+                  <AccountTreeNode
+                    key={account.pubkey}
+                    account={account}
+                    depth={0}
+                    getAccountExplorerUrl={getAccountExplorerUrl}
+                    recentChanges={recentChanges}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+            <div className="text-center text-xs text-muted-foreground pt-2">
+              Found {accounts.length} account{accounts.length !== 1 ? "s" : ""}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="table">
+            <AccountTableView
+              accounts={accounts}
+              getAccountExplorerUrl={getAccountExplorerUrl}
+              recentChanges={recentChanges}
+            />
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );

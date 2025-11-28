@@ -19,6 +19,7 @@ import {
   KeyIcon,
   Blocks,
   Calculator,
+  Network,
 } from "lucide-react";
 import { TimestampConverter } from "./utilityTools/TimestampConverter";
 import { LamportsConverter } from "./utilityTools/LamportsConverter";
@@ -27,6 +28,7 @@ import { DurationPicker } from "./utilityTools/DurationPicker";
 import { ProgramAccountsViewer } from "./utilityTools/ProgramAccountsViewer";
 import { SPLTokenManager } from "./utilityTools/SPLTokenManager";
 import { KeypairManager } from "./utilityTools/KeypairManager";
+import { AccountRelationshipGraph } from "./utilityTools/AccountRelationshipGraph";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);
@@ -78,10 +80,14 @@ export const UtilityDialog = () => {
               defaultValue="accounts"
               className="w-full flex-1 overflow-hidden flex flex-col"
             >
-              <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
+              <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
                 <TabsTrigger value="accounts">
                   <DatabaseIcon className="size-4 mr-2" />
                   Accounts
+                </TabsTrigger>
+                <TabsTrigger value="graph">
+                  <Network className="size-4 mr-2" />
+                  Graph
                 </TabsTrigger>
                 <TabsTrigger value="spl-token">
                   <CoinsIcon className="size-4 mr-2" />
@@ -98,6 +104,13 @@ export const UtilityDialog = () => {
                 className="mt-4 flex-1 overflow-auto"
               >
                 <ProgramAccountsViewer />
+              </TabsContent>
+
+              <TabsContent
+                value="graph"
+                className="mt-4 flex-1 overflow-auto"
+              >
+                <AccountRelationshipGraph />
               </TabsContent>
 
               <TabsContent
