@@ -11,6 +11,8 @@ import { useTransactionToast } from "./useTransactionToast";
 import { parseSolanaError, type ErrorWithLogs } from "@/lib/errorParser";
 import { type TransactionRecord } from "./useTransactionHistory";
 import { useIDL } from "@/context/IDLContext";
+import { useInvalidateAccountQueries } from "./useProgramAccounts";
+import { useCluster } from "@/context/ClusterContext";
 
 export default function useTransaction(
   addTransaction: (tx: TransactionRecord) => void
@@ -18,8 +20,13 @@ export default function useTransaction(
   const { idl } = useIDL();
   const [isExecuting, setIsExecuting] = useState(false);
   const { connection } = useConnection();
+  const { cluster } = useCluster();
   const wallet = useAnchorWallet();
   const txToast = useTransactionToast();
+  const invalidateAccountQueries = useInvalidateAccountQueries(idl, {
+    name: cluster.name,
+    endpoint: cluster.endpoint,
+  });
 
   const execute = async (
     instruction: IdlInstruction,
@@ -145,6 +152,7 @@ export default function useTransaction(
       return null;
     } finally {
       setIsExecuting(false);
+      invalidateAccountQueries();
     }
   };
 
