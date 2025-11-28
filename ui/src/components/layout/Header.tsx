@@ -6,6 +6,7 @@ import HeaderProgramInfo from "./HeaderProgramInfo";
 import ClusterSelect from "../ClusterSelect";
 import { RPCConfigDialog } from "../RPCConfigDialog";
 import ClearFormsModal from "../ClearFormsModal";
+import { UtilityDialog } from "../UtilityDialog";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -27,6 +28,7 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <UtilityDialog />
             <ClearFormsModal />
             <Button
               variant="outline"

@@ -14,14 +14,15 @@ export default defineConfig({
   },
   define: {
     global: "globalThis",
+    "global.Buffer": "Buffer",
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
         global: "globalThis",
-        Buffer: "buffer",
       },
     },
+    include: ["buffer"],
   },
   base: "./", // need relative path for loading assets
 });
