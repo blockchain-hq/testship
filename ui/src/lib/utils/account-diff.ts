@@ -300,9 +300,52 @@ export interface AccountStateDiff {
 }
 
 export const compareAccountStates = (
-  before: unknown,
-  after: unknown
+  before: unknown | null,
+  after: unknown | null
 ): AccountStateDiff => {
+  // Handle account creation or closure
+  if (!before && after) {
+    // Account created - all fields are "added"
+    if (typeof after === "object" && after !== null) {
+      const afterObj = after as Record<string, unknown>;
+      const fieldDiffs: Record<string, FieldDiff> = {};
+      for (const key of Object.keys(afterObj)) {
+        fieldDiffs[key] = {
+          fieldKey: key,
+          oldValue: null,
+          newValue: afterObj[key],
+          changeType: "added",
+        };
+      }
+      return {
+        changedFields: Object.keys(afterObj),
+        fieldDiffs,
+        hasChanges: true,
+      };
+    }
+  }
+
+  if (before && !after) {
+    // Account closed - all fields are "removed"
+    if (typeof before === "object" && before !== null) {
+      const beforeObj = before as Record<string, unknown>;
+      const fieldDiffs: Record<string, FieldDiff> = {};
+      for (const key of Object.keys(beforeObj)) {
+        fieldDiffs[key] = {
+          fieldKey: key,
+          oldValue: beforeObj[key],
+          newValue: null,
+          changeType: "removed",
+        };
+      }
+      return {
+        changedFields: Object.keys(beforeObj),
+        fieldDiffs,
+        hasChanges: true,
+      };
+    }
+  }
+
   const changedFields = getChangedFields(before, after);
   const fieldDiffs: Record<string, FieldDiff> = {};
 

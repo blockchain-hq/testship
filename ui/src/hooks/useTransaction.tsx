@@ -119,12 +119,24 @@ export default function useTransaction(
         }
       }
 
-      const beforeSnapshots: Record<string, unknown> = {};
+      // Also capture payer wallet (always pays fees, even if not marked writable)
+      if (wallet.publicKey) {
+        const payerInWritable = writableAccounts.some((acc) =>
+          acc.pubkey.equals(wallet.publicKey!)
+        );
+        if (!payerInWritable) {
+          writableAccounts.push({
+            name: "payer (wallet)",
+            pubkey: wallet.publicKey,
+          });
+        }
+      }
+
+      const beforeSnapshots: Record<string, unknown | null> = {};
       for (const { name, pubkey } of writableAccounts) {
         const snapshot = await captureAccountSnapshot(connection, pubkey, idl);
-        if (snapshot) {
-          beforeSnapshots[name] = snapshot;
-        }
+        // Store even if null (account doesn't exist yet - will be created)
+        beforeSnapshots[name] = snapshot;
       }
 
       const signature = await program.methods[toCamelCase(instruction.name)](
@@ -135,12 +147,11 @@ export default function useTransaction(
         .rpc();
 
       // Capture after snapshots for the same accounts
-      const afterSnapshots: Record<string, unknown> = {};
+      const afterSnapshots: Record<string, unknown | null> = {};
       for (const { name, pubkey } of writableAccounts) {
         const snapshot = await captureAccountSnapshot(connection, pubkey, idl);
-        if (snapshot) {
-          afterSnapshots[name] = snapshot;
-        }
+        // Store even if null (account was closed)
+        afterSnapshots[name] = snapshot;
       }
 
       // Build account snapshots for storage
@@ -149,17 +160,21 @@ export default function useTransaction(
         const before = beforeSnapshots[name];
         const after = afterSnapshots[name];
 
-        if (before && after) {
+        // Handle all cases: creation, modification, closure
+        if (before || after) {
           const beforeData = before as {
             decoded: unknown;
             accountType?: string;
-          };
-          const afterData = after as { decoded: unknown; accountType?: string };
+          } | null;
+          const afterData = after as {
+            decoded: unknown;
+            accountType?: string;
+          } | null;
 
           accountSnapshots[name] = {
-            before: beforeData.decoded,
-            after: afterData.decoded,
-            accountType: beforeData.accountType || afterData.accountType,
+            before: beforeData?.decoded || null,
+            after: afterData?.decoded || null,
+            accountType: beforeData?.accountType || afterData?.accountType,
           };
         }
       }

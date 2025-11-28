@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 export interface AccountSnapshot {
-  before: unknown;
-  after: unknown;
+  before: unknown | null;
+  after: unknown | null;
   accountType?: string;
 }
 

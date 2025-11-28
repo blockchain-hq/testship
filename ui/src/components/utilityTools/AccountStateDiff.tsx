@@ -8,8 +8,8 @@ import { compareAccountStates } from "@/lib/utils/account-diff";
 
 interface AccountStateDiffProps {
   accountName: string;
-  beforeState: unknown;
-  afterState: unknown;
+  beforeState: unknown | null;
+  afterState: unknown | null;
   accountType?: string;
 }
 
@@ -22,8 +22,92 @@ export const AccountStateDiff = ({
   const [showOnlyChanged, setShowOnlyChanged] = useState(false);
   const [showRawData, setShowRawData] = useState(false);
 
+  // Detect account creation or closure
+  const isCreated = !beforeState && afterState;
+  const isClosed = beforeState && !afterState;
+
   // Calculate diff
   const stateDiff = compareAccountStates(beforeState, afterState);
+
+  // Show creation message
+  if (isCreated) {
+    return (
+      <div className="space-y-2 border border-green-500/50 rounded-md p-3 bg-green-50 dark:bg-green-950/20">
+        <div className="flex items-center justify-between pb-2 border-b border-green-500/30">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold font-mono">{accountName}</p>
+            {accountType && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] px-1.5 py-0 h-4"
+              >
+                {accountType}
+              </Badge>
+            )}
+            <Badge className="text-[10px] px-1.5 py-0 h-4 bg-green-600 dark:bg-green-700">
+              ACCOUNT CREATED
+            </Badge>
+          </div>
+        </div>
+        {showRawData ? (
+          <div className="bg-muted/30 rounded-md overflow-hidden border border-border/50">
+            <pre className="text-[10px] p-3 overflow-x-auto font-mono leading-relaxed">
+              {JSON.stringify(afterState, null, 2)}
+            </pre>
+          </div>
+        ) : (
+          <div className="rounded-md border border-border/50 overflow-hidden bg-background/50 divide-y divide-border/30">
+            {Object.entries((afterState as Record<string, unknown>) || {}).map(
+              ([fieldKey, value]) => (
+                <div
+                  key={fieldKey}
+                  className="grid grid-cols-[35%_1fr] gap-3 px-3 py-2 hover:bg-muted/20 transition-colors"
+                >
+                  <div className="text-[11px] font-mono text-muted-foreground font-medium truncate">
+                    {fieldKey}
+                  </div>
+                  <div className="text-[11px] min-w-0">
+                    <SmartFieldValue fieldKey={fieldKey} value={value} />
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-2 text-[10px] gap-1"
+          onClick={() => setShowRawData(!showRawData)}
+        >
+          <Code2 className="w-3 h-3" />
+          {showRawData ? "Smart" : "Raw"}
+        </Button>
+      </div>
+    );
+  }
+
+  // Show closure message
+  if (isClosed) {
+    return (
+      <div className="space-y-2 border border-red-500/50 rounded-md p-3 bg-red-50 dark:bg-red-950/20">
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold font-mono">{accountName}</p>
+          {accountType && (
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+              {accountType}
+            </Badge>
+          )}
+          <Badge className="text-[10px] px-1.5 py-0 h-4 bg-red-600 dark:bg-red-700">
+            ACCOUNT CLOSED
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          This account was closed during the transaction
+        </p>
+      </div>
+    );
+  }
 
   if (!stateDiff.hasChanges) {
     return (
