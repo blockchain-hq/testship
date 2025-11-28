@@ -1,7 +1,19 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui";
-import { ChevronRight, ChevronDown, ExternalLink, Loader2 } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronDown,
+  ExternalLink,
+  Loader2,
+  Clock,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { useLazyLoadChildren } from "@/hooks/useProgramAccounts";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useIDL } from "@/context/IDLContext";
@@ -14,10 +26,19 @@ interface AccountTreeNodeProps {
   account: DecodedAccount;
   depth: number;
   getAccountExplorerUrl: (address: string) => string;
+  recentChanges?: Map<
+    string,
+    { timestamp: number; txSignature: string; instructionName: string }
+  >;
 }
 
 export const AccountTreeNode = (props: AccountTreeNodeProps) => {
-  const { account: initialAccount, depth, getAccountExplorerUrl } = props;
+  const {
+    account: initialAccount,
+    depth,
+    getAccountExplorerUrl,
+    recentChanges,
+  } = props;
   const { connection } = useConnection();
   const { idl } = useIDL();
   const { cluster } = useCluster();
@@ -93,6 +114,25 @@ export const AccountTreeNode = (props: AccountTreeNodeProps) => {
   const shouldShowExpandButton =
     hasChildren || (hasDecodedData && potentialRefCount > 0);
 
+  // Check if this account was recently changed
+  const recentChange = useMemo(() => {
+    return recentChanges?.get(account.pubkey);
+  }, [recentChanges, account.pubkey]);
+
+  const formatTimeAgo = (timestamp: number) => {
+    const now = Date.now();
+    const diffMs = now - timestamp;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return `${diffDays}d ago`;
+  };
+
   return (
     <div className="border-l border-border/20">
       {/* Account Header */}
@@ -129,6 +169,35 @@ export const AccountTreeNode = (props: AccountTreeNodeProps) => {
             >
               {account.accountType}
             </Badge>
+          )}
+
+          {/* Recent change indicator */}
+          {recentChange && (
+            <TooltipProvider>
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <Clock className="w-3 h-3 text-green-600 dark:text-green-400" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <div className="space-y-0.5">
+                    <p className="font-semibold">Recently Changed</p>
+                    <p className="text-muted-foreground">
+                      by {recentChange.instructionName}
+                    </p>
+                    <p className="text-muted-foreground text-[10px]">
+                      {formatTimeAgo(recentChange.timestamp)}
+                    </p>
+                    <p className="text-muted-foreground text-[10px] font-mono">
+                      {recentChange.txSignature.slice(0, 8)}...
+                      {recentChange.txSignature.slice(-8)}
+                    </p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
 
           {/* Account address */}
@@ -176,6 +245,7 @@ export const AccountTreeNode = (props: AccountTreeNodeProps) => {
               account={child}
               depth={depth + 1}
               getAccountExplorerUrl={getAccountExplorerUrl}
+              recentChanges={recentChanges}
             />
           ))}
         </div>

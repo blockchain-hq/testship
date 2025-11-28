@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useIDL } from "@/context/IDLContext";
 import { useCluster, getClusterUrlParam } from "@/context/ClusterContext";
@@ -5,18 +6,50 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Loader2, RefreshCw, Database } from "lucide-react";
 import { useProgramAccounts } from "@/hooks/useProgramAccounts";
+import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 import { AccountTreeNode } from "./AccountTreeView";
 
 export const ProgramAccountsViewer = () => {
   const { idl } = useIDL();
   const { connection } = useConnection();
   const { cluster } = useCluster();
+  const { transactions } = useTransactionHistory();
 
   const { accounts, isLoading, error, refetch } = useProgramAccounts(
     connection,
     idl,
     cluster
   );
+
+  // Build map of recently changed accounts from transaction history
+  const recentChanges = useMemo(() => {
+    const changesMap = new Map<
+      string,
+      { timestamp: number; txSignature: string; instructionName: string }
+    >();
+
+    // Process transactions (newest first) to find account changes
+    for (const tx of transactions) {
+      if (tx.status === "success" && tx.accountSnapshots) {
+        for (const accountName of Object.keys(tx.accountSnapshots)) {
+          // Get the actual address from the accounts field
+          const address = tx.accounts?.[accountName];
+          if (address) {
+            // Only add if not already present (keeping the most recent)
+            if (!changesMap.has(address)) {
+              changesMap.set(address, {
+                timestamp: tx.timestamp,
+                txSignature: tx.signature,
+                instructionName: tx.instructionName,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return changesMap;
+  }, [transactions]);
 
   const getAccountExplorerUrl = (address: string) => {
     const baseUrl = `https://explorer.solana.com/address/${address}`;
@@ -101,6 +134,7 @@ export const ProgramAccountsViewer = () => {
                   account={account}
                   depth={0}
                   getAccountExplorerUrl={getAccountExplorerUrl}
+                  recentChanges={recentChanges}
                 />
               ))}
             </CardContent>

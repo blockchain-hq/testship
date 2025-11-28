@@ -9,10 +9,14 @@ import { toCamelCase } from "@/lib/utils";
 import type { IdlInstruction, ModIdlAccount } from "@/lib/types";
 import { useTransactionToast } from "./useTransactionToast";
 import { parseSolanaError, type ErrorWithLogs } from "@/lib/errorParser";
-import { type TransactionRecord } from "./useTransactionHistory";
+import {
+  type TransactionRecord,
+  type AccountSnapshot,
+} from "./useTransactionHistory";
 import { useIDL } from "@/context/IDLContext";
 import { useInvalidateAccountQueries } from "./useProgramAccounts";
 import { useCluster } from "@/context/ClusterContext";
+import { captureAccountSnapshot } from "@/lib/utils/account-diff";
 
 export default function useTransaction(
   addTransaction: (tx: TransactionRecord) => void
@@ -100,12 +104,65 @@ export default function useTransaction(
         );
       }
 
+      // Capture before snapshots for writable accounts
+      const writableAccounts: Array<{ name: string; pubkey: PublicKey }> = [];
+      for (const account of instruction.accounts) {
+        const acc = account as ModIdlAccount;
+        const accountName = acc.name;
+        const address = accountMap.get(accountName);
+
+        if (address && acc.writable) {
+          writableAccounts.push({
+            name: accountName,
+            pubkey: new PublicKey(address),
+          });
+        }
+      }
+
+      const beforeSnapshots: Record<string, unknown> = {};
+      for (const { name, pubkey } of writableAccounts) {
+        const snapshot = await captureAccountSnapshot(connection, pubkey, idl);
+        if (snapshot) {
+          beforeSnapshots[name] = snapshot;
+        }
+      }
+
       const signature = await program.methods[toCamelCase(instruction.name)](
         ...anchorArgs
       )
         .accounts(accountPubkeys)
         .signers(Array.from(signers.values()))
         .rpc();
+
+      // Capture after snapshots for the same accounts
+      const afterSnapshots: Record<string, unknown> = {};
+      for (const { name, pubkey } of writableAccounts) {
+        const snapshot = await captureAccountSnapshot(connection, pubkey, idl);
+        if (snapshot) {
+          afterSnapshots[name] = snapshot;
+        }
+      }
+
+      // Build account snapshots for storage
+      const accountSnapshots: Record<string, AccountSnapshot> = {};
+      for (const { name } of writableAccounts) {
+        const before = beforeSnapshots[name];
+        const after = afterSnapshots[name];
+
+        if (before && after) {
+          const beforeData = before as {
+            decoded: unknown;
+            accountType?: string;
+          };
+          const afterData = after as { decoded: unknown; accountType?: string };
+
+          accountSnapshots[name] = {
+            before: beforeData.decoded,
+            after: afterData.decoded,
+            accountType: beforeData.accountType || afterData.accountType,
+          };
+        }
+      }
 
       txToast.dismiss(toastId);
 
@@ -121,6 +178,10 @@ export default function useTransaction(
         status: "success",
         timestamp: Date.now(),
         accounts: Object.fromEntries(accountMap),
+        accountSnapshots:
+          Object.keys(accountSnapshots).length > 0
+            ? accountSnapshots
+            : undefined,
       });
 
       return { signature, accounts: accountMap };

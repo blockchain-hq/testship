@@ -1,9 +1,11 @@
+import { useState } from "react";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Check, Copy, ExternalLink, X } from "lucide-react";
+import { Check, Copy, ExternalLink, X, ChevronDown, ChevronRight, GitCompare } from "lucide-react";
 import UseCopy from "@/hooks/useCopy";
 import { useCluster } from "@/context/ClusterContext";
+import { AccountStateDiff } from "./utilityTools/AccountStateDiff";
 
 interface TransactionHistoryCardProps {
   transaction: TransactionRecord;
@@ -16,6 +18,12 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
 
   const { copied, handleCopy } = UseCopy();
   const { getExplorerUrl } = useCluster();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const hasSnapshots = transaction.accountSnapshots && 
+    Object.keys(transaction.accountSnapshots).length > 0;
+  const snapshotCount = hasSnapshots ? Object.keys(transaction.accountSnapshots!).length : 0;
+
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -101,6 +109,55 @@ const TransactionHistoryCard = (props: TransactionHistoryCardProps) => {
             <p className="text-xs text-red-600 dark:text-red-400 mt-1 line-clamp-2">
               {transaction.error}
             </p>
+          )}
+
+          {/* State diff toggle button */}
+          {hasSnapshots && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 mt-2 text-xs gap-1.5"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <ChevronDown className="w-3 h-3" />
+              ) : (
+                <ChevronRight className="w-3 h-3" />
+              )}
+              <GitCompare className="w-3 h-3" />
+              <span>
+                View State Changes
+                {snapshotCount > 0 && (
+                  <Badge variant="secondary" className="ml-1.5 text-[9px] px-1 py-0 h-3.5">
+                    {snapshotCount}
+                  </Badge>
+                )}
+              </span>
+            </Button>
+          )}
+
+          {/* Expanded diff view */}
+          {isExpanded && hasSnapshots && (
+            <div className="mt-3 space-y-2">
+              {Object.entries(transaction.accountSnapshots!).map(
+                ([accountName, snapshot]) => (
+                  <AccountStateDiff
+                    key={accountName}
+                    accountName={accountName}
+                    beforeState={snapshot.before}
+                    afterState={snapshot.after}
+                    accountType={snapshot.accountType}
+                  />
+                )
+              )}
+            </div>
+          )}
+
+          {/* No snapshots available message */}
+          {isExpanded && !hasSnapshots && (
+            <div className="mt-3 text-xs text-muted-foreground italic p-2 bg-muted/20 rounded-md">
+              No state diff data available for this transaction.
+            </div>
           )}
         </div>
 
