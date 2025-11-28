@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   WrenchIcon,
   CalendarIcon,
@@ -85,9 +86,15 @@ export const UtilityDialog = () => {
                   <DatabaseIcon className="size-4 mr-2" />
                   Accounts
                 </TabsTrigger>
-                <TabsTrigger value="graph">
+                <TabsTrigger value="graph" className="relative">
                   <Network className="size-4 mr-2" />
                   Graph
+                  <Badge
+                    variant="secondary"
+                    className="absolute -top-1 -right-1 px-1.5 py-0 text-[10px] h-4 bg-[#00bf63] text-white border-none"
+                  >
+                    BETA
+                  </Badge>
                 </TabsTrigger>
                 <TabsTrigger value="spl-token">
                   <CoinsIcon className="size-4 mr-2" />
@@ -106,10 +113,7 @@ export const UtilityDialog = () => {
                 <ProgramAccountsViewer />
               </TabsContent>
 
-              <TabsContent
-                value="graph"
-                className="mt-4 flex-1 overflow-auto"
-              >
+              <TabsContent value="graph" className="mt-4 flex-1 overflow-auto">
                 <AccountRelationshipGraph />
               </TabsContent>
 
