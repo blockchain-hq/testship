@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-
+import { Check, ChevronsUpDown, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useHotkeys } from "react-hotkeys-hook";
+import { Kbd } from "../ui/kbd";
 
 interface SearchProps {
   instructionNames: string[];
@@ -33,6 +33,10 @@ const Search = (props: SearchProps) => {
     setSelectedInstructionName,
   } = props;
   const [open, setOpen] = React.useState(false);
+
+  const isActiveInstruction = (instructionName: string) => {
+    return instructionName === selectedInstructionName;
+  };
 
   useHotkeys(
     "ctrl+k",
@@ -51,21 +55,27 @@ const Search = (props: SearchProps) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="flex-1 justify-between cursor-pointer"
+          className="flex-1 w-full justify-between cursor-pointer border-0 border-b rounded-none"
         >
-          {selectedInstructionName
-            ? instructionNames.find(
-                (instructionName) => instructionName === selectedInstructionName
-              )
-            : "Select instruction..."}
+          <span className="flex items-center gap-2 group">
+            <SearchIcon className="size-4" />
+            {selectedInstructionName
+              ? instructionNames.find(
+                  (instructionName) =>
+                    instructionName === selectedInstructionName
+                )
+              : "Select instruction..."}
+            <Kbd className="text-xs  group-hover:bg-transparent">CTRL + K</Kbd>
+          </span>
+
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border border-border/50 shadow-lg">
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border border-border">
         <Command>
           <CommandInput
             placeholder="Search or select an instruction..."
-            className="h-9"
+            className="h-9 border-b-0"
           />
           <CommandList>
             <CommandEmpty>No instruction found.</CommandEmpty>
@@ -78,7 +88,10 @@ const Search = (props: SearchProps) => {
                     setSelectedInstructionName(currentValue);
                     setOpen(false);
                   }}
-                  className="cursor-pointer"
+                  className={cn(
+                    "cursor-pointer font-normal",
+                    isActiveInstruction(instructionName) ? "font-semibold" : ""
+                  )}
                 >
                   {instructionName}
                   <Check

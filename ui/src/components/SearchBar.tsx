@@ -1,6 +1,4 @@
-import { SearchIcon } from "lucide-react";
 import Search from "./instructionForm/Search";
-import { Kbd } from "./ui/kbd";
 import { useInstructions } from "@/context/InstructionsContext";
 import { useIDL } from "@/context/IDLContext";
 
@@ -12,7 +10,6 @@ const SearchBar = () => {
 
   return (
     <div className="flex items-center space-x-2 gap-2" id="search-bar">
-      <SearchIcon className="size-4" />
       <Search
         instructionNames={idl.instructions.map(
           (instruction) => instruction.name
@@ -22,7 +19,6 @@ const SearchBar = () => {
           setActiveInstruction(instructionName);
         }}
       />
-      <Kbd>CTRL + K</Kbd>
     </div>
   );
 };
