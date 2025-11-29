@@ -30,22 +30,48 @@ import { ProgramAccountsViewer } from "./utilityTools/ProgramAccountsViewer";
 import { SPLTokenManager } from "./utilityTools/SPLTokenManager";
 import { KeypairManager } from "./utilityTools/KeypairManager";
 import { AccountRelationshipGraph } from "./utilityTools/AccountRelationshipGraph";
+import { useHotkeys } from "react-hotkeys-hook";
+import { Kbd } from "./ui/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const UtilityDialog = () => {
   const [open, setOpen] = useState(false);
 
+  useHotkeys(
+    "ctrl+t",
+    () => {
+      setOpen(true);
+    },
+    {
+      enableOnFormTags: ["INPUT", "TEXTAREA", "SELECT"],
+    }
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          id="utility-dialog-trigger"
-          className="h-10 border-border"
-        >
-          <WrenchIcon className="size-4" />
-          Tools
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              id="utility-dialog-trigger"
+              className="h-10 border-border"
+            >
+              <WrenchIcon className="size-4" />
+              Tools
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="flex items-center gap-2">
+            <Kbd className="text-xs bg-secondary/10 border border-secondary/30 text-secondary">
+              CTRL + T
+            </Kbd>
+            <p>Open Utility Tools</p>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+
       <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col border border-border/50 text-foreground bg-card">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">

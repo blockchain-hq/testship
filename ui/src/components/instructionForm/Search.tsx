@@ -57,7 +57,7 @@ const Search = (props: SearchProps) => {
           aria-expanded={open}
           className="flex-1 w-full justify-between cursor-pointer border-0 border-b-2 border-border h-10 rounded-none shadow-none"
         >
-          <span className="flex items-center gap-2 group">
+          <div className="flex items-center gap-2 group">
             <SearchIcon className="size-4" />
             {selectedInstructionName
               ? instructionNames.find(
@@ -65,10 +65,12 @@ const Search = (props: SearchProps) => {
                     instructionName === selectedInstructionName
                 )
               : "Select instruction..."}
-            <Kbd className="text-xs  group-hover:bg-transparent">CTRL + K</Kbd>
-          </span>
+          </div>
 
-          <ChevronsUpDown className="opacity-50" />
+          <div className="flex items-center gap-2">
+            <Kbd className="text-xs bg-primary/10">CTRL + K</Kbd>
+            <ChevronsUpDown className="opacity-50" />
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border border-border">

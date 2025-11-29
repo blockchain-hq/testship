@@ -311,10 +311,7 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
           <div
             key={account.name}
             className={cn(
-              "grid w-full items-center space-y-1 rounded-lg transition-all",
-              isAccountPda(account) &&
-                derivedPDAs.get(account.name)?.status === "ready" &&
-                "bg-green-500/5 space-y-2"
+              "grid w-full items-center space-y-1 rounded-lg transition-all"
             )}
           >
             <div className="flex flex-row items-center gap-2 w-full space-y-1">
@@ -355,10 +352,7 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
                 onChange={(e) =>
                   handleAccountChange(account.name, e.target.value)
                 }
-                className={cn(
-                  getInputClassName(account),
-                  "border-border rounded-xs shadow-none"
-                )}
+                className={cn(getInputClassName(account))}
                 readOnly={
                   isAccountPda(account) &&
                   derivedPDAs.get(account.name)?.status === "deriving"
@@ -385,7 +379,13 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
                         variant="outline"
                         size="icon"
                         onClick={() => handleClearPDA(account.name)}
-                        className="flex-shrink-0"
+                        className={cn(
+                          "flex-shrink-0",
+                          isAccountPda(account) &&
+                            derivedPDAs.get(account.name)?.status === "ready"
+                            ? "!border-green-300 !bg-green-500/10 !text-green-600"
+                            : "border-border rounded-xs shadow-none"
+                        )}
                       >
                         <RefreshCw className="h-4 w-4" />
                       </Button>

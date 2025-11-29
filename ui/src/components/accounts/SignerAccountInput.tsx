@@ -196,7 +196,10 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0 border border-border rounded-xs">
             <Command className="bg-card ">
-              <CommandInput placeholder="Search mode..." className="h-9" />
+              <CommandInput
+                placeholder="Search mode..."
+                className="h-9 !bg-transparent"
+              />
               <CommandList>
                 <CommandEmpty>No mode found.</CommandEmpty>
                 <CommandGroup>
