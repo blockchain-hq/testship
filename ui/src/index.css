@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --brand: #00bf63;
   --background: oklch(0.99 0 0);
   --foreground: oklch(0 0 0);
   --card: oklch(1 0 0);
@@ -114,6 +115,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -197,7 +199,7 @@ button:hover {
 .wallet-adapter-modal-button-close svg {
   fill: #fff !important;
 }
- 
+
 .toaster [data-sonner-toast] {
   --initial-height: auto !important;
 }

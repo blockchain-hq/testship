@@ -18,9 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Circle, CircleCheck, NetworkIcon, Trash2 } from "lucide-react";
 import { ClusterNetwork } from "@/context/ClusterContext";
 import type { SolanaCluster } from "@/context/ClusterContext";
+import { RPCConfigDialog } from "./RPCConfigDialog";
 
 const ClusterSelect = () => {
   const { clusters, setCluster, cluster, addCluster, deleteCluster } =
@@ -58,29 +59,46 @@ const ClusterSelect = () => {
     return item.network === ClusterNetwork.Custom && item.name !== "local";
   };
 
+  const isActiveCluster = (item: SolanaCluster) => {
+    return item.name === cluster.name;
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="capitalize">
-            {cluster.name}
+          <Button
+            variant="outline"
+            className="capitalize h-10 bg-gray-200 dark:bg-gray-800 border-none"
+          >
+            <NetworkIcon className="h-3.5" />
+            {cluster.name || "Select Cluster"}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="border border-border/50 rounded-md"
-        >
+        <DropdownMenuContent align="end" className="border border-border">
           {clusters.map((item) => (
             <DropdownMenuItem
               key={item.name}
               onClick={() => setCluster(item)}
-              className="capitalize flex justify-between items-center"
+              className="capitalize flex justify-start items-center gap-2"
             >
-              <span>{item.name}</span>
+              {isActiveCluster(item) ? (
+                <CircleCheck className="h-3.5 text-brand" />
+              ) : (
+                <Circle className="h-3.5" />
+              )}
+              <span
+                className={`text-sm  ${
+                  isActiveCluster(item) ? "font-semibold" : "font-normal"
+                }`}
+              >
+                {item.name}
+              </span>
+
               {isCustomCluster(item) && (
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon-sm"
                   className="h-6 w-6 p-0 ml-2"
                   onClick={(e) => handleDeleteCluster(item, e)}
                 >
@@ -89,7 +107,10 @@ const ClusterSelect = () => {
               )}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuSeparator /> 
+
+          <DropdownMenuSeparator />
+
+          <RPCConfigDialog />
         </DropdownMenuContent>
       </DropdownMenu>
 

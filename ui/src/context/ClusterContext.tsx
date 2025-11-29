@@ -20,6 +20,7 @@ export interface SolanaCluster {
   endpoint: string;
   network?: ClusterNetworkType;
   active?: boolean;
+  connected?: boolean;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

@@ -28,14 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui";
-import {
-  Settings,
-  Plus,
-  Trash2,
-  Check,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Settings, Plus, Trash2, Check, X, Loader2 } from "lucide-react";
 import { Connection } from "@solana/web3.js";
 import { toast } from "sonner";
 
@@ -138,7 +131,9 @@ export const RPCConfigDialog = () => {
       toast.success(`RPC test successful! Current slot: ${slot}`);
     } catch (error) {
       toast.error(
-        `RPC test failed: ${error instanceof Error ? error.message : "Unknown error"}`
+        `RPC test failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
       );
     } finally {
       setIsTesting(null);
@@ -148,8 +143,12 @@ export const RPCConfigDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Settings className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          className="h-10 w-fit flex flex-row font-semibold text-muted-foreground items-center gap-2"
+        >
+          <Settings className="size-4" />
+          Manage RPCs
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto bg-background dark:bg-background-dark bg-card dark:bg-card-dark border border-border dark:border-border-dark">
@@ -159,8 +158,8 @@ export const RPCConfigDialog = () => {
             RPC Configuration
           </DialogTitle>
           <DialogDescription className="text-muted-foreground dark:text-muted-foreground-dark">
-            Manage your RPC endpoints. Add custom endpoints or configure existing
-            ones.
+            Manage your RPC endpoints. Add custom endpoints or configure
+            existing ones.
           </DialogDescription>
         </DialogHeader>
 
@@ -168,7 +167,9 @@ export const RPCConfigDialog = () => {
           {/* Add New RPC Section */}
           <div className="space-y-4 p-4 border border-border/50 rounded-md">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground dark:text-foreground-dark">Add Custom RPC</h3>
+              <h3 className="text-sm font-semibold text-foreground dark:text-foreground-dark">
+                Add Custom RPC
+              </h3>
               <Button
                 variant="outline"
                 size="sm"
@@ -361,7 +362,8 @@ export const RPCConfigDialog = () => {
                 onClick={() => {
                   setNewCluster({
                     name: "Helius Mainnet",
-                    endpoint: "https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY",
+                    endpoint:
+                      "https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY",
                     network: ClusterNetwork.Mainnet,
                   });
                   setIsAdding(true);
@@ -376,7 +378,8 @@ export const RPCConfigDialog = () => {
                 onClick={() => {
                   setNewCluster({
                     name: "QuickNode Mainnet",
-                    endpoint: "https://YOUR_ENDPOINT.solana-mainnet.quiknode.pro/YOUR_TOKEN/",
+                    endpoint:
+                      "https://YOUR_ENDPOINT.solana-mainnet.quiknode.pro/YOUR_TOKEN/",
                     network: ClusterNetwork.Mainnet,
                   });
                   setIsAdding(true);
@@ -391,7 +394,8 @@ export const RPCConfigDialog = () => {
                 onClick={() => {
                   setNewCluster({
                     name: "Alchemy Mainnet",
-                    endpoint: "https://solana-mainnet.g.alchemy.com/v2/YOUR_API_KEY",
+                    endpoint:
+                      "https://solana-mainnet.g.alchemy.com/v2/YOUR_API_KEY",
                     network: ClusterNetwork.Mainnet,
                   });
                   setIsAdding(true);
@@ -407,4 +411,3 @@ export const RPCConfigDialog = () => {
     </Dialog>
   );
 };
-

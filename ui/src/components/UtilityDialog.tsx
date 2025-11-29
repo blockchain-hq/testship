@@ -37,8 +37,13 @@ export const UtilityDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" id="utility-dialog-trigger">
+        <Button
+          variant="outline"
+          id="utility-dialog-trigger"
+          className="h-10 border-border"
+        >
           <WrenchIcon className="size-4" />
+          Tools
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col border border-border/50 text-foreground bg-card">
