@@ -8,13 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { CardContent, CardHeader } from "./ui/card";
 import {
   Select,
   SelectContent,
@@ -105,18 +99,17 @@ export function TransactionHistory({
   };
 
   return (
-    <Card
-      className="h-full flex flex-col bg-card border border-border/50 rounded-md"
-      id="transaction-history"
-    >
-      <CardHeader className="pb-3">
+    <div className="h-full flex flex-col bg-card" id="transaction-history">
+      <CardHeader className="px-4 py-1 h-10 border-b-2 border-border">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg">Transaction Results</CardTitle>
-            <CardDescription>
-              {transactions.length} transaction
-              {transactions.length !== 1 ? "s" : ""}
-            </CardDescription>
+            <h2 className="text-lg font-semibold">
+              Transaction Results{" "}
+              <span className="text-xs text-muted-foreground">
+                ({transactions.length} transaction
+                {transactions.length !== 1 ? "s" : ""})
+              </span>
+            </h2>
           </div>
 
           <div className="flex gap-2">
@@ -227,6 +220,6 @@ export function TransactionHistory({
           </ScrollArea>
         )}
       </CardContent>
-    </Card>
+    </div>
   );
 }

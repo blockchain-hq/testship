@@ -39,7 +39,7 @@ const MainView = () => {
           )}
         </div>
 
-        <div className="h-[calc(100vh-16rem)] sticky top-4">
+        <div className="h-[calc(100vh-16rem)]">
           <TransactionHistory
             transactions={transactions}
             onClear={clearHistory}

@@ -55,7 +55,7 @@ const Search = (props: SearchProps) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="flex-1 w-full justify-between cursor-pointer border-0 border-b rounded-none"
+          className="flex-1 w-full justify-between cursor-pointer border-0 border-b-2 border-border h-10 rounded-none shadow-none"
         >
           <span className="flex items-center gap-2 group">
             <SearchIcon className="size-4" />
@@ -75,7 +75,7 @@ const Search = (props: SearchProps) => {
         <Command>
           <CommandInput
             placeholder="Search or select an instruction..."
-            className="h-9 border-b-0"
+            className="!bg-transparent"
           />
           <CommandList>
             <CommandEmpty>No instruction found.</CommandEmpty>
