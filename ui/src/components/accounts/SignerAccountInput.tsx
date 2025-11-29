@@ -117,7 +117,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
   }, [selectedMode, publicKey]);
 
   return (
-    <div className="grid w-full items-center gap-3">
+    <div className="grid w-full items-center space-y-1">
       <div className="flex flex-row items-center gap-2 w-full">
         <Label
           htmlFor="signerAccount"
@@ -146,7 +146,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
         </Badge>
       </div>
 
-      <div className="flex flex-row items-center gap-2 bg-transparent border border-input rounded-md px-3 h-9 focus-within:outline-none focus-within:ring-1 focus-within:ring-ring transition-colors">
+      <div className="flex flex-row bg-primary/5 items-center gap-2  border border-input rounded-xs px-3 h-9 focus-within:outline-none focus-within:ring-1 focus-within:ring-ring transition-colors">
         {selectedMode === "Manual Input" ? (
           <Tooltip delayDuration={100}>
             <TooltipTrigger>
@@ -160,16 +160,22 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
             </TooltipContent>
           </Tooltip>
         ) : selectedMode === "Connected Wallet" && signerAccountAddress ? (
-          <CheckCircle2 color="green" className="w-4 h-4 flex-shrink-0" />
+          <CheckCircle2
+            color="green"
+            className="w-4 h-4 flex-shrink-0 bg-transparent hover:bg-transparent"
+          />
         ) : selectedMode === "Generate New" && signerAccountKeypair ? (
-          <CheckCircle2 color="green" className="w-4 h-4 flex-shrink-0" />
+          <CheckCircle2
+            color="green"
+            className="w-4 h-4 flex-shrink-0 hover:bg-transparent bg-transparent"
+          />
         ) : null}
 
         <Input
           id="signerAccount"
           type="text"
           placeholder="Enter value for signer account"
-          className="border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0 h-auto"
+          className="border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0 h-auto border-border rounded-xs !bg-transparent"
           value={signerAccountAddress ?? ""}
           onChange={(e) => onChange(e.target.value, null)}
         />
@@ -180,7 +186,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
               variant="ghost"
               role="combobox"
               aria-expanded={open}
-              className="w-[200px] justify-between border-none bg-transparent hover:bg-transparent"
+              className="w-[200px] justify-between border-none bg-transparent hover:text-brand hover:bg-transparent"
             >
               {selectedMode
                 ? options.find((mode) => mode === selectedMode)
@@ -188,7 +194,7 @@ const SignerAccountInput = (props: SignerAccountInputProps) => {
               <ChevronDown className="opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0 border border-border/50 rounded-md">
+          <PopoverContent className="w-[200px] p-0 border border-border rounded-xs">
             <Command className="bg-card ">
               <CommandInput placeholder="Search mode..." className="h-9" />
               <CommandList>

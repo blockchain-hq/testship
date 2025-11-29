@@ -14,6 +14,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import type { TransactionRecord } from "@/hooks/useTransactionHistory";
 import { useSavedAccounts } from "@/context/SavedAccountsContext";
 import ShareModal from "./ShareModal";
+import { Separator } from "./ui/separator";
 
 interface InstructionFormv2Props {
   instruction: IdlInstruction | null;
@@ -294,11 +295,11 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
 
   return (
     <form
-      className="w-full max-w-[800px] bg-card border border-border/50 rounded-md p-4 space-y-8"
+      className="w-full bg-card space-y-8 h-[calc(100vh-16rem)]"
       id="instruction-form"
       onSubmit={handleSubmit}
     >
-      <ScrollArea className="h-[60vh] rounded-md overflow-hidden">
+      <ScrollArea className="h-full rounded-md overflow-hidden">
         <div className="space-y-4">
           <ArgumentForm
             args={instruction.args ?? null}
@@ -306,6 +307,9 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
             onChange={setFormData}
             validationErrors={validationErrors}
           />
+
+          <Separator />
+
           <AccountsFormv2
             accounts={(instruction.accounts as ModIdlAccount[]) ?? null}
             accountsAddressMap={accountsAddressMap}
@@ -319,7 +323,7 @@ const InstructionFormv2 = (props: InstructionFormv2Props) => {
         </div>
       </ScrollArea>
 
-      <div className="flex flex-row justify-end items-center gap-2">
+      <div className="flex flex-row justify-end items-center gap-2 border-t border-border px-4 py-2">
         <ShareModal
           idl={idl}
           accountMap={accountsAddressMap}

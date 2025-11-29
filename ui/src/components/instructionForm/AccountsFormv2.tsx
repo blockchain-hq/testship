@@ -52,7 +52,6 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     formData,
     derivedPDAs,
   } = props;
- 
 
   const { savedAccounts } = useSavedAccounts();
 
@@ -85,7 +84,6 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
     },
     [handleAccountChange]
   );
-
 
   const getPDABadge = (account: ModIdlAccount) => {
     if (!isAccountPda(account)) return null;
@@ -274,7 +272,7 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
   };
 
   return (
-    <div className="flex flex-col bg-card border border-border/50 rounded-md p-4 space-y-4">
+    <div className="flex flex-col bg-card space-y-4 px-4">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
           {accounts.length > 0
@@ -313,13 +311,13 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
           <div
             key={account.name}
             className={cn(
-              "grid w-full items-center gap-3 p-3 rounded-lg transition-all",
+              "grid w-full items-center space-y-1 rounded-lg transition-all",
               isAccountPda(account) &&
                 derivedPDAs.get(account.name)?.status === "ready" &&
-                "bg-green-500/5"
+                "bg-green-500/5 space-y-2"
             )}
           >
-            <div className="flex flex-row items-center gap-2 w-full">
+            <div className="flex flex-row items-center gap-2 w-full space-y-1">
               <Label
                 htmlFor={account.name}
                 className="text-sm font-medium text-foreground text-left"
@@ -344,7 +342,7 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 space-y-1">
               <Input
                 id={account.name}
                 type="text"
@@ -357,7 +355,10 @@ const AccountsFormv2 = (props: AccountsFormv2Props) => {
                 onChange={(e) =>
                   handleAccountChange(account.name, e.target.value)
                 }
-                className={getInputClassName(account)}
+                className={cn(
+                  getInputClassName(account),
+                  "border-border rounded-xs shadow-none"
+                )}
                 readOnly={
                   isAccountPda(account) &&
                   derivedPDAs.get(account.name)?.status === "deriving"

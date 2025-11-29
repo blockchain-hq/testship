@@ -203,3 +203,7 @@ button:hover {
 .toaster [data-sonner-toast] {
   --initial-height: auto !important;
 }
+
+input {
+  @apply border-border rounded-xs shadow-none bg-primary/5;
+}

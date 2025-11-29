@@ -16,7 +16,7 @@ import EnumInput from "./EnumInput";
 import StructInput from "./StructInput";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/lib/utils";
 
 interface ArgumentFieldProps {
   name: string;
@@ -145,7 +145,7 @@ const ArgumentField = ({
         placeholder={`Enter value for ${name}`}
         value={String(value ?? "")}
         onChange={(e) => {
-          const val = e.target.value; 
+          const val = e.target.value;
           if (typeof type === "string") {
             if (
               ["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"].includes(
@@ -172,11 +172,10 @@ const ArgumentField = ({
           }
           onChange(val);
         }}
-        className={cn(validationError && "border-red-500")}
+        className={(cn(validationError && "border-red-500"), "")}
       />
     </div>
   );
 };
 
 export default ArgumentField;
-

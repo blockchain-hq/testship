@@ -18,7 +18,7 @@ const MainView = () => {
   );
 
   return (
-    <div>
+    <div className="h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 ">
         {/* left col - instructions */}
         <div className="space-y-4">

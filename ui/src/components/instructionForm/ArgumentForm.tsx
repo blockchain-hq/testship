@@ -18,24 +18,26 @@ const ArgumentForm = (props: ArgumentFormProps) => {
   };
 
   if (!args || !idl) return null;
-  
+
   return (
-    <div className="bg-card border border-border/50 rounded-md p-4 space-y-4">
+    <div className="bg-card space-y-4 px-4">
       <h4 className="text-sm font-semibold text-foreground/90 uppercase tracking-wider">
         {args.length > 0 ? `Arguments (${args.length})` : "No Arguments"}
       </h4>
 
-      {args.map((arg) => (
-        <ArgumentField
-          key={arg.name}
-          name={arg.name}
-          value={formData[arg.name]}
-          type={arg.type}
-          idl={idl}
-          onChange={(value) => handleChange(arg.name, value)}
-          validationError={validationErrors[arg.name]}
-        />
-      ))}
+      <div className="space-y-4">
+        {args.map((arg) => (
+          <ArgumentField
+            key={arg.name}
+            name={arg.name}
+            value={formData[arg.name]}
+            type={arg.type}
+            idl={idl}
+            onChange={(value) => handleChange(arg.name, value)}
+            validationError={validationErrors[arg.name]}
+          />
+        ))}
+      </div>
     </div>
   );
 };
