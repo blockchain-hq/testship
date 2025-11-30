@@ -1,6 +1,6 @@
 {
   "name": "@blockchain-hq/testship",
-  "version": "0.2.2",
+  "version": "0.2.3-alpha.0",
   "description": "Interactive testing for Solana Anchor programs in the browser. Zero config, auto-generated forms, smart PDA derivation. Will be MIT licensed Dec 1, 2025.",
   "main": "index.js",
   "bin": {
