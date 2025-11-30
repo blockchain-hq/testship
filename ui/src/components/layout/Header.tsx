@@ -6,7 +6,7 @@ import HeaderProgramInfo from "./HeaderProgramInfo";
 import ClusterSelect from "../ClusterSelect";
 import { UtilityDialog } from "../UtilityDialog";
 import { SettingsDropdown } from "./SettingsDropdown";
-import { UtilityDialogV2 } from "../UtilityDialogV2";
+// import { UtilityDialogV2 } from "../UtilityDialogV2";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,8 +31,8 @@ export const Header = () => {
           {/* utilities, network and wallet */}
           <div className="flex items-center space-x-8">
             {/* utilities */}
-            {/* <UtilityDialog /> */}
-            <UtilityDialogV2 />
+            <UtilityDialog />
+            {/* <UtilityDialogV2 /> */}
 
             {/* network and wallet */}
             <div className="flex items-center space-x-1">
