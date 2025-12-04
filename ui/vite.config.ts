@@ -22,7 +22,6 @@ export default defineConfig({
         global: "globalThis",
       },
     },
-    include: ["buffer"],
   },
   base: "./", // need relative path for loading assets
 });

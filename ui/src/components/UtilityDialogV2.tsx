@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  ScrollArea,
 } from "./ui";
 import {
   CalendarIcon,
