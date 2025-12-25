@@ -4,11 +4,12 @@ import chalk from "chalk";
 import { StartCommandOptions } from "../types";
 import { ProjectConfig } from "../../shared/types";
 import { findAnchorProject } from "../utils/find-anchor-project";
+import { startServer } from "../../server";
 
 export const handleStartCommand = async (options: StartCommandOptions) => {
   const spinner = ora("Starting testship server").start();
 
-  let projectConfig: ProjectConfig | undefined;
+  let projectConfig: ProjectConfig;
 
   if (options.idl) {
     console.log(chalk.blue("\nUsing provided IDL file"));
@@ -26,4 +27,6 @@ export const handleStartCommand = async (options: StartCommandOptions) => {
     spinner.succeed(`Found Anchor project: `);
     console.log(chalk.green(projectConfig.programName));
   }
+
+  await startServer(projectConfig, options.port);
 };
