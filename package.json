@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "tsx cli/index.ts",
-    "build": "tsc && cd ui && npm run build && cd .. && chmod +x dist/cli/index.js",
+    "build": "tsc && chmod +x dist/cli/index.js",
     "relink": "npm run build && sudo npm link",
     "test": "vitest",
     "prepublishOnly": "npm run build"

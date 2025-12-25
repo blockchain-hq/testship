@@ -1,0 +1,29 @@
+import ora from "ora";
+import path from "path";
+import chalk from "chalk";
+import { StartCommandOptions } from "../types";
+import { ProjectConfig } from "../../shared/types";
+import { findAnchorProject } from "../utils/find-anchor-project";
+
+export const handleStartCommand = async (options: StartCommandOptions) => {
+  const spinner = ora("Starting testship server").start();
+
+  let projectConfig: ProjectConfig | undefined;
+
+  if (options.idl) {
+    console.log(chalk.blue("\nUsing provided IDL file"));
+    projectConfig = {
+      rootPath: process.cwd(),
+      programName: "program",
+      idlPath: path.resolve(options.idl),
+    };
+
+    spinner.succeed(`Loaded IDL from ${projectConfig.idlPath}`);
+  } else {
+    console.log(chalk.blue("\nScanning for Anchor program..."));
+    projectConfig = await findAnchorProject(process.cwd());
+
+    spinner.succeed(`Found Anchor project: `);
+    console.log(chalk.green(projectConfig.programName));
+  }
+};
