@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type {
   InstructionNode,
   ProgramNode,
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { TypeInput } from "./type-input";
+import { SignerAccountInput } from "./signer-account-input";
 import {
   CircleNotchIcon,
   CheckCircleIcon,
@@ -50,9 +51,22 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
     () => buildAccountDefaults(instruction.accounts)
   );
   const [argValues, setArgValues] = useState<Record<string, any>>({});
+  const [signerKeypairs, setSignerKeypairs] = useState<
+    Record<string, CryptoKeyPair | null>
+  >({});
   const [executing, setExecuting] = useState(false);
   const { active: cluster, getExplorerUrl } = useCluster();
   const { addTransaction } = useTxHistory();
+
+  // Filter out discriminator arguments (auto-handled, not user-facing)
+  const discriminatorNames = new Set(
+    (instruction.discriminators ?? [])
+      .filter((d) => d.kind === "fieldDiscriminatorNode")
+      .map((d) => d.name)
+  );
+  const visibleArgs = instruction.arguments.filter(
+    (arg) => !discriminatorNames.has(arg.name)
+  );
 
   const derivedPDAs = useAutoDerivePDAs(
     instruction.accounts,
@@ -77,6 +91,14 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
 
   const setAccount = (name: string, value: string) =>
     setAccountValues((prev) => ({ ...prev, [name]: value }));
+
+  const setSignerAccount = useCallback(
+    (name: string, addr: string, keypair: CryptoKeyPair | null) => {
+      setAccountValues((prev) => ({ ...prev, [name]: addr }));
+      setSignerKeypairs((prev) => ({ ...prev, [name]: keypair }));
+    },
+    []
+  );
 
   const setArg = (name: string, value: any) =>
     setArgValues((prev) => ({ ...prev, [name]: value }));
@@ -152,13 +174,13 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
     >
       <ScrollArea className="flex-1">
         <div className="space-y-6 px-4 py-4">
-          {instruction.arguments.length > 0 && (
+          {visibleArgs.length > 0 && (
             <section className="space-y-3">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Arguments ({instruction.arguments.length})
+                Arguments ({visibleArgs.length})
               </h4>
               <div className="space-y-3">
-                {instruction.arguments.map((arg) => (
+                {visibleArgs.map((arg) => (
                   <ArgField
                     key={arg.name}
                     arg={arg}
@@ -171,7 +193,7 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
             </section>
           )}
 
-          {instruction.arguments.length > 0 && instruction.accounts.length > 0 && (
+          {visibleArgs.length > 0 && instruction.accounts.length > 0 && (
             <Separator />
           )}
 
@@ -195,17 +217,28 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
                 </div>
               </div>
               <div className="space-y-3">
-                {instruction.accounts.map((acc) => (
-                  <AccountField
-                    key={acc.name}
-                    account={acc}
-                    value={accountValues[acc.name] ?? ""}
-                    onChange={(v) => setAccount(acc.name, v)}
-                    derivedPDA={derivedPDAs.get(acc.name)}
-                    argValues={argValues}
-                    accountValues={accountValues}
-                  />
-                ))}
+                {instruction.accounts.map((acc) =>
+                  acc.isSigner === true && !isPdaAccount(acc) ? (
+                    <SignerAccountInput
+                      key={acc.name}
+                      account={acc}
+                      value={accountValues[acc.name] ?? ""}
+                      onChange={(addr, kp) =>
+                        setSignerAccount(acc.name, addr, kp)
+                      }
+                    />
+                  ) : (
+                    <AccountField
+                      key={acc.name}
+                      account={acc}
+                      value={accountValues[acc.name] ?? ""}
+                      onChange={(v) => setAccount(acc.name, v)}
+                      derivedPDA={derivedPDAs.get(acc.name)}
+                      argValues={argValues}
+                      accountValues={accountValues}
+                    />
+                  )
+                )}
               </div>
             </section>
           )}
