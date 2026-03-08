@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { MoonIcon, SunIcon } from "lucide-react";
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { Button } from "../ui/button";
-// import HeaderProgramInfo from "./HeaderProgramInfo";
-// import ClusterSelect from "../ClusterSelect";
-// import { UtilityDialog } from "../UtilityDialog";
-// import { SettingsDropdown } from "./SettingsDropdown";
-// import { UtilityDialogV2 } from "../UtilityDialogV2";
 import { WalletButton } from "./wallet-button";
+import { HeaderProgramInfo } from "./header-program-info";
+import { ClusterSelect } from "../cluster-select";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -17,42 +14,30 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background dark:bg-background-dark shadow-sm border-b-1 border-border dark:border-border-dark w-full h-16">
+    <header className="bg-background shadow-sm border-b w-full h-14 shrink-0">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* logo and program info */}
+        <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <img src="/ts.png" alt="Testship Logo" width={50} height={50} />
+              <img src="/ts.png" alt="Testship Logo" width={40} height={40} />
             </div>
-            {/* <HeaderProgramInfo /> */}
+            <HeaderProgramInfo />
           </div>
 
-          {/* utilities, network and wallet */}
-          <div className="flex items-center space-x-8">
-            {/* utilities */}
-            {/* <UtilityDialog /> */}
-            {/* <UtilityDialogV2 /> */}
-
-            {/* network and wallet */}
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              {/* <ClusterSelect /> */}
+              <ClusterSelect />
               <WalletButton className="!h-8" />
             </div>
 
-            {/* settings */}
-            <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={toggleTheme}
-                className="flex cursor-pointer h-10 w-10"
-              >
-                {isDarkMode ? <SunIcon size={24} /> : <MoonIcon size={24} />}
-              </Button>
-
-              {/* <SettingsDropdown /> */}
-            </div>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={toggleTheme}
+              className="cursor-pointer"
+            >
+              {isDarkMode ? <SunIcon size={20} /> : <MoonIcon size={20} />}
+            </Button>
           </div>
         </div>
       </div>
