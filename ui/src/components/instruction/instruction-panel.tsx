@@ -21,7 +21,7 @@ export const InstructionPanel = () => {
   if (!instruction) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
-        Select an instruction from the sidebar
+        Select an instruction above
       </div>
     );
   }
