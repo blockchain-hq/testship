@@ -8,7 +8,9 @@ import type {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TypeInput } from "./type-input";
-import { Play } from "lucide-react";
+import { Play, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { buildInstruction, executeTransaction, type TxResult } from "@/lib/transaction";
+import { address } from "@solana/kit";
 
 type Props = {
   instruction: InstructionNode;
@@ -20,6 +22,8 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
     () => buildAccountDefaults(instruction.accounts)
   );
   const [argValues, setArgValues] = useState<Record<string, any>>({});
+  const [executing, setExecuting] = useState(false);
+  const [result, setResult] = useState<TxResult | null>(null);
 
   const setAccount = (name: string, value: string) =>
     setAccountValues((prev) => ({ ...prev, [name]: value }));
@@ -27,13 +31,42 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
   const setArg = (name: string, value: any) =>
     setArgValues((prev) => ({ ...prev, [name]: value }));
 
-  const handleExecute = () => {
-    console.log("Execute:", {
-      program: programNode.publicKey,
-      instruction: instruction.name,
-      accounts: accountValues,
-      args: argValues,
-    });
+  const handleExecute = async () => {
+    if (!programNode.publicKey) return;
+
+    setExecuting(true);
+    setResult(null);
+
+    try {
+      const ix = buildInstruction(
+        instruction,
+        accountValues,
+        argValues,
+        programNode.publicKey,
+        programNode
+      );
+
+      // TODO: wire wallet signer and RPC URL from connector
+      const rpcUrl = "http://127.0.0.1:8899";
+      const feePayer = address(accountValues[instruction.accounts[0]?.name] ?? "");
+
+      const txResult = await executeTransaction(
+        ix,
+        feePayer,
+        rpcUrl,
+        async (tx) => tx // placeholder: needs real wallet signing
+      );
+
+      setResult(txResult);
+    } catch (err: any) {
+      setResult({
+        signature: "",
+        success: false,
+        error: err.message ?? String(err),
+      });
+    } finally {
+      setExecuting(false);
+    }
   };
 
   return (
@@ -86,13 +119,55 @@ export const InstructionForm = ({ instruction, programNode }: Props) => {
         </section>
       )}
 
-      <Button onClick={handleExecute} className="gap-2">
-        <Play className="h-3.5 w-3.5" />
-        Execute
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button onClick={handleExecute} disabled={executing} className="gap-2">
+          {executing ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Play className="h-3.5 w-3.5" />
+          )}
+          {executing ? "Executing..." : "Execute"}
+        </Button>
+      </div>
+
+      {result && <TxResultDisplay result={result} />}
     </div>
   );
 };
+
+const TxResultDisplay = ({ result }: { result: TxResult }) => (
+  <div
+    className={`rounded-md border p-4 text-sm font-mono space-y-2 ${
+      result.success
+        ? "border-green-500/30 bg-green-500/5"
+        : "border-destructive/30 bg-destructive/5"
+    }`}
+  >
+    <div className="flex items-center gap-2">
+      {result.success ? (
+        <CheckCircle className="h-4 w-4 text-green-500" />
+      ) : (
+        <XCircle className="h-4 w-4 text-destructive" />
+      )}
+      <span>{result.success ? "Success" : "Failed"}</span>
+    </div>
+    {result.signature && (
+      <div className="text-xs text-muted-foreground break-all">
+        {result.signature}
+      </div>
+    )}
+    {result.error && (
+      <div className="text-xs text-destructive break-all">{result.error}</div>
+    )}
+    {result.logs && result.logs.length > 0 && (
+      <div className="text-[11px] text-muted-foreground space-y-0.5 max-h-40 overflow-y-auto">
+        {result.logs.map((log, i) => (
+          <div key={i}>{log}</div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 
 const AccountField = ({
   account,
