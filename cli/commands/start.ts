@@ -12,20 +12,21 @@ export const handleStartCommand = async (options: StartCommandOptions) => {
   let projectConfig: ProjectConfig;
 
   if (options.idl) {
-    console.log(chalk.blue("\nUsing provided IDL file"));
+    const idlPath = path.resolve(options.idl);
+    const name = path.basename(idlPath, ".json");
+
     projectConfig = {
       rootPath: process.cwd(),
-      programName: "program",
-      idlPath: path.resolve(options.idl),
+      programs: [{ name, idlPath, source: "anchor" }],
     };
 
-    spinner.succeed(`Loaded IDL from ${projectConfig.idlPath}`);
+    spinner.succeed(`Loaded IDL from ${idlPath}`);
   } else {
-    console.log(chalk.blue("\nScanning for Anchor program..."));
+    console.log(chalk.blue("\nScanning for programs..."));
     projectConfig = await findAnchorProject(process.cwd());
 
-    spinner.succeed(`Found Anchor project: `);
-    console.log(chalk.green(projectConfig.programName));
+    const names = projectConfig.programs.map((p) => p.name).join(", ");
+    spinner.succeed(`Found programs: ${chalk.green(names)}`);
   }
 
   await startServer(projectConfig, options.port);

@@ -1,14 +1,13 @@
 import path from "path";
 import fs from "fs";
 import chalk from "chalk";
-import { ProjectConfig } from "../../shared/types";
-import { select } from "@inquirer/prompts";
-import { IDL_DIR } from "../../shared/constants";
+import { ProjectConfig, ProgramEntry } from "../../shared/types";
+import { checkbox } from "@inquirer/prompts";
+import { IDL_DIR, DEPLOY_DIR } from "../../shared/constants";
 
 export const findAnchorProject = async (
   cwd: string
 ): Promise<ProjectConfig> => {
-  // check if Anchor.toml exists
   const anchorToml = path.join(cwd, "Anchor.toml");
   if (!fs.existsSync(anchorToml)) {
     throw new Error(
@@ -16,7 +15,6 @@ export const findAnchorProject = async (
     );
   }
 
-  // check idl file for program name
   const idlDirPath = path.join(cwd, IDL_DIR);
   if (!fs.existsSync(idlDirPath)) {
     throw new Error(
@@ -24,7 +22,6 @@ export const findAnchorProject = async (
     );
   }
 
-  // find all idl files
   const idlFiles = fs
     .readdirSync(idlDirPath)
     .filter((f) => f.endsWith(".json"))
@@ -36,30 +33,38 @@ export const findAnchorProject = async (
     );
   }
 
-  let programIndex = 0;
+  let selectedFiles = idlFiles;
+
   if (idlFiles.length > 1) {
-    programIndex = await select({
-      message: "Found multiple Anchor programs. Select one:",
-      choices: idlFiles.map((file, i) => ({
+    selectedFiles = await checkbox({
+      message: "Found multiple programs. Select which to load:",
+      choices: idlFiles.map((file) => ({
         name: file.replace(".json", ""),
-        value: i,
+        value: file,
+        checked: true,
       })),
     });
+
+    if (selectedFiles.length === 0) {
+      throw new Error("No programs selected.");
+    }
   }
 
-  const programName = idlFiles[programIndex].replace(".json", "");
-  const idlPath = path.join(cwd, IDL_DIR, programName + ".json");
+  const programs: ProgramEntry[] = selectedFiles.map((file) => {
+    const name = file.replace(".json", "");
+    const idlPath = path.join(cwd, IDL_DIR, file);
+    const soPath = path.join(cwd, DEPLOY_DIR, name + ".so");
 
-  if (!fs.existsSync(idlPath)) {
-    throw new Error(
-      "Selected program IDL not found. \n\n" +
-        chalk.yellow("Please run: anchor build")
-    );
-  }
+    return {
+      name,
+      idlPath,
+      deployPath: fs.existsSync(soPath) ? soPath : undefined,
+      source: "anchor" as const,
+    };
+  });
 
   return {
     rootPath: cwd,
-    programName,
-    idlPath,
+    programs,
   };
 };
