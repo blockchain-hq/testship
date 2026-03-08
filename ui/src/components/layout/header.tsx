@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { Button } from "../ui/button";
 // import HeaderProgramInfo from "./HeaderProgramInfo";
